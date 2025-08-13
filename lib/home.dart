@@ -97,7 +97,7 @@ class VedaHomePage extends StatelessWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 800,
       child: Stack(
@@ -187,22 +187,19 @@ class VedaHomePage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {},
                       style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>((
-                              Set<MaterialState> states,
-                            ) {
-                              if (states.contains(MaterialState.hovered)) {
-                                return Colors.transparent;
-                              }
-                              return const Color(0xFF0035FF);
-                            }),
-                        foregroundColor: MaterialStateProperty.all(
-                          Colors.white,
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (Set<WidgetState> states) {
+                            if (states.contains(WidgetState.hovered)) {
+                              return Colors.transparent;
+                            }
+                            return const Color(0xFF0035FF);
+                          },
                         ),
-                        side: MaterialStateProperty.resolveWith<BorderSide>((
-                          Set<MaterialState> states,
+                        foregroundColor: WidgetStateProperty.all(Colors.white),
+                        side: WidgetStateProperty.resolveWith<BorderSide>((
+                          Set<WidgetState> states,
                         ) {
-                          if (states.contains(MaterialState.hovered)) {
+                          if (states.contains(WidgetState.hovered)) {
                             return const BorderSide(
                               color: Colors.white,
                               width: 2,
@@ -210,19 +207,19 @@ class VedaHomePage extends StatelessWidget {
                           }
                           return BorderSide.none;
                         }),
-                        padding: MaterialStateProperty.all(
+                        padding: WidgetStateProperty.all(
                           const EdgeInsets.symmetric(
                             horizontal: 25,
                             vertical: 15,
                           ),
                         ),
-                        shape: MaterialStateProperty.all(
+                        shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        elevation: MaterialStateProperty.all(0),
-                        minimumSize: MaterialStateProperty.all(
+                        elevation: WidgetStateProperty.all(0),
+                        minimumSize: WidgetStateProperty.all(
                           const Size(205, 54),
                         ),
                       ),
@@ -246,37 +243,35 @@ class VedaHomePage extends StatelessWidget {
                       onPressed: () {},
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.resolveWith<Color?>((
-                              Set<MaterialState> states,
+                            WidgetStateProperty.resolveWith<Color?>((
+                              Set<WidgetState> states,
                             ) {
-                              if (states.contains(MaterialState.hovered)) {
+                              if (states.contains(WidgetState.hovered)) {
                                 return const Color(0xFF0035FF);
                               }
                               return Colors.transparent;
                             }),
-                        foregroundColor: MaterialStateProperty.all(
-                          Colors.white,
-                        ),
-                        side: MaterialStateProperty.resolveWith<BorderSide>((
-                          Set<MaterialState> states,
+                        foregroundColor: WidgetStateProperty.all(Colors.white),
+                        side: WidgetStateProperty.resolveWith<BorderSide>((
+                          Set<WidgetState> states,
                         ) {
-                          if (states.contains(MaterialState.hovered)) {
+                          if (states.contains(WidgetState.hovered)) {
                             return BorderSide.none;
                           }
                           return const BorderSide(color: Colors.white);
                         }),
-                        padding: MaterialStateProperty.all(
+                        padding: WidgetStateProperty.all(
                           const EdgeInsets.symmetric(
                             horizontal: 25,
                             vertical: 15,
                           ),
                         ),
-                        shape: MaterialStateProperty.all(
+                        shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        minimumSize: MaterialStateProperty.all(
+                        minimumSize: WidgetStateProperty.all(
                           const Size(205, 54),
                         ),
                       ),
@@ -671,11 +666,12 @@ class VedaHomePage extends StatelessWidget {
     );
   }
 
+  // Your existing _buildWhyVedaSection widget with dotted lines
   Widget _buildWhyVedaSection() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center, // Center titles
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           RichText(
             text: TextSpan(
@@ -717,22 +713,41 @@ class VedaHomePage extends StatelessWidget {
           ),
           const SizedBox(height: 40),
 
-          // ✅ Three items in a row, centered
+          // Row with dotted lines between items
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildReasonItem(
                 '100%\nCustom Solutions',
                 'Tailored software, not templates. Built to match your business model.',
                 Icons.construction,
               ),
-              const SizedBox(width: 40),
+
+              // Dotted line between first and second item
+              Padding(
+                padding: const EdgeInsets.only(top: 25),
+                child: CustomPaint(
+                  size: const Size(100, 1), // Adjust width as needed
+                  painter: _DottedLinePainter(),
+                ),
+              ),
+
               _buildReasonItem(
                 'Local Support,\nGlobal Standards',
-                'Serving Bahrain-based enterprises with ISO-grade quality.',
+                'Serving Bohrdin-based enterprises with ISO-grade quality.',
                 Icons.public,
               ),
-              const SizedBox(width: 40),
+
+              // Dotted line between second and third item
+              Padding(
+                padding: const EdgeInsets.only(top: 25),
+                child: CustomPaint(
+                  size: const Size(100, 1), // Adjust width as needed
+                  painter: _DottedLinePainter(),
+                ),
+              ),
+
               _buildReasonItem(
                 'Fast\nTurnaround',
                 'Rapid development cycles with clear timelines and zero guesswork.',
@@ -745,9 +760,10 @@ class VedaHomePage extends StatelessWidget {
     );
   }
 
+  // Your existing _buildReasonItem widget
   Widget _buildReasonItem(String title, String description, IconData icon) {
     return SizedBox(
-      width: 280, // Fixed width so all items align nicely
+      width: 280,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -759,7 +775,7 @@ class VedaHomePage extends StatelessWidget {
             ),
             child: Icon(icon, color: Colors.white, size: 28),
           ),
-          const SizedBox(height: 16), // Space between icon and text
+          const SizedBox(height: 16),
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
@@ -788,92 +804,268 @@ class VedaHomePage extends StatelessWidget {
   }
 
   Widget _buildLetsTalkSection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+      width: double.infinity,
+      height: 700, // <-- give the section a height
+      child: Stack(
         children: [
-          const Text(
-            "Let's Talk",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.blue,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            "Tell us what you're Working on",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            "We'll help you build the right solution",
-            style: TextStyle(fontSize: 18, color: Colors.black87),
-          ),
-          const SizedBox(height: 30),
-          const ContactInfoItem(
-            icon: Icons.email,
-            text: 'info@vedabahrain.com',
-          ),
-          const SizedBox(height: 15),
-          const ContactInfoItem(
-            icon: Icons.location_on,
-            text: 'Manama, Kingdom of Bahrain',
-          ),
-          const SizedBox(height: 15),
-          const ContactInfoItem(icon: Icons.phone, text: '+973 17 374742'),
-          const SizedBox(height: 30),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Phone',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Message',
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 40,
-                horizontal: 15,
-              ),
-              alignLabelWithHint: true,
-            ),
-            maxLines: 5,
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
+          // Background image
+          Container(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade800,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            height: double.infinity, // <-- expand to fill parent
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('last.png'),
+                fit: BoxFit.cover,
               ),
-              child: const Text('Submit', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+
+          // Gradient overlay
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromRGBO(3, 9, 35, 0.9),
+                  Color.fromRGBO(3, 9, 35, 0.85),
+                  Color.fromRGBO(3, 9, 35, 0.8),
+                  Color.fromRGBO(3, 9, 35, 0.7),
+                  Color.fromRGBO(3, 9, 35, 0.6),
+                ],
+                stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+              ),
+            ),
+          ),
+          // Content on top
+          Padding(
+            padding: const EdgeInsets.fromLTRB(130, 100, 130, 70),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '// ',
+                        style: TextStyle(
+                          color: const Color(0xFF0035FF),
+                          fontSize: 25,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "Let's Talk",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Tell us what you're\n",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 46,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "Working on",
+                        style: TextStyle(
+                          color: const Color(0xFF0035FF),
+                          fontSize: 46,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Two-column layout
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left column - Contact Info
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "We'll help you\nbuild the right solution",
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          ContactInfoItem(
+                            icon: Icons.email_outlined,
+                            text: 'info@vedabahrain.com',
+                            textColor: Colors.white,
+                          ),
+                          SizedBox(height: 20),
+                          ContactInfoItem(
+                            icon: Icons.location_on_outlined,
+                            text: 'Manama, Kingdom of Bahrain',
+                            textColor: Colors.white,
+                          ),
+                          SizedBox(height: 20),
+                          ContactInfoItem(
+                            icon: Icons.local_phone_outlined,
+                            text: '+973 17 374742',
+                            textColor: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Right column - Form Fields
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildCustomTextField(label: 'Name'),
+                            const SizedBox(height: 12),
+                            _buildCustomTextField(label: 'Email'),
+                            const SizedBox(height: 12),
+                            _buildCustomTextField(label: 'Phone'),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: 564,
+                              height: 102, // desired height
+                              child: TextField(
+                                style: const TextStyle(color: Colors.white),
+                                maxLines: 5,
+                                decoration: InputDecoration(
+                                  labelText: 'Message',
+                                  labelStyle: const TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withOpacity(0.16),
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    12,
+                                    16,
+                                    12,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  alignLabelWithHint: true,
+                                ),
+                                textAlignVertical: TextAlignVertical.top,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: 157,
+                              height: 54,
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color.fromRGBO(
+                                    0,
+                                    53,
+                                    255,
+                                    1,
+                                  ),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.fromLTRB(
+                                    30,
+                                    15,
+                                    30,
+                                    15,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Text(
+                                      'Submit',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    Icon(Icons.arrow_forward_rounded),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCustomTextField({required String label}) {
+    return SizedBox(
+      width: 564, // fixed width
+      height: 48, // fixed height
+      child: TextField(
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white70),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.16), // translucent background
+          contentPadding: const EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            12,
+          ), // padding inside
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12), // rounded corners
+            borderSide: BorderSide.none, // remove default border
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
       ),
     );
   }
@@ -929,16 +1121,29 @@ class VedaHomePage extends StatelessWidget {
 class ContactInfoItem extends StatelessWidget {
   final IconData icon;
   final String text;
+  final Color textColor;
 
-  const ContactInfoItem({super.key, required this.icon, required this.text});
+  const ContactInfoItem({
+    required this.icon,
+    required this.text,
+    this.textColor = Colors.black,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: Colors.blue.shade800),
-        const SizedBox(width: 15),
-        Text(text, style: const TextStyle(fontSize: 16)),
+        SizedBox(width: 5),
+        Icon(icon, color: Colors.white),
+        SizedBox(width: 10),
+        Text(
+          text,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -964,4 +1169,25 @@ class FooterLink extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey.shade800
+      ..strokeWidth = 2;
+
+    const dashWidth = 4;
+    const dashSpace = 4;
+    double startX = 0;
+
+    while (startX < size.width) {
+      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
