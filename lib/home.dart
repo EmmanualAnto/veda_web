@@ -1,44 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/footer.dart';
 
 class VedaHomePage extends StatelessWidget {
   const VedaHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final isDesktop = screenWidth >= 1150;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
             _buildtopbarSection(),
-            // Header + Services stacked together
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _buildHeaderSection(context),
-                Positioned(
-                  bottom: -110, // Push it down from header
-                  left: 0,
-                  right: 0,
-                  child: _buildServicesGridSection(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 100), // Space after overlapping section
-            // About Us Section
+
+            if (isDesktop)
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  _buildHeaderSection(context),
+                  Positioned(
+                    bottom: -75,
+                    left: 0,
+                    right: 0,
+                    child: _buildServicesGridSection(context),
+                  ),
+                ],
+              )
+            else ...[
+              _buildHeaderSection(context),
+              const SizedBox(height: 40),
+              _buildServicesGridSection(context),
+            ],
+
+            SizedBox(height: isDesktop ? 100 : 40),
+
             _buildAboutUsSection(),
-
-            // Our Services Section
             _buildOurServicesSection(),
-
-            // Why Veda Section
             _buildWhyVedaSection(),
-
-            // Let's Talk Section
             _buildLetsTalkSection(),
-
-            // Footer
-            _buildFooterSection(),
+            Footer(),
           ],
         ),
       ),
@@ -53,7 +58,7 @@ class VedaHomePage extends StatelessWidget {
         children: [
           // Left-side logo
           Image.asset(
-            'logo.png', // Your Veda logo
+            'logonew.png', // Your Veda logo
             height: 50,
             width: 150,
           ),
@@ -63,30 +68,30 @@ class VedaHomePage extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'Home',
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
               TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'About',
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
               TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'Services',
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
               TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'Contact',
-                  style: TextStyle(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
             ],
@@ -97,260 +102,314 @@ class VedaHomePage extends StatelessWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 800,
-      child: Stack(
-        children: [
-          // Image at the bottom of the stack
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('1.png'), // Your image path
-                fit: BoxFit.cover,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isMobile = constraints.maxWidth < 800;
+
+        return SizedBox(
+          width: double.infinity,
+          height: 800,
+          child: Stack(
+            children: [
+              // Background image
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('1.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-          ),
-          // Gradient overlay covering the entire image
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromRGBO(3, 9, 35, 0.879),
-                  Color.fromRGBO(3, 9, 35, 0.867),
-                  Color.fromRGBO(3, 9, 35, 0.85),
-                  Color.fromRGBO(3, 9, 35, 0.67),
-                  Color.fromRGBO(3, 9, 35, 0.6),
-                ],
-                stops: [0.0, 0.25, 0.5, 0.75, 1.0], // <-- smooth stops
+
+              // Gradient overlay
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromRGBO(3, 9, 35, 0.879),
+                      Color.fromRGBO(3, 9, 35, 0.867),
+                      Color.fromRGBO(3, 9, 35, 0.85),
+                      Color.fromRGBO(3, 9, 35, 0.67),
+                      Color.fromRGBO(3, 9, 35, 0.6),
+                    ],
+                    stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+                  ),
+                ),
               ),
-            ),
-          ),
-          // Content on top of the gradient
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 120, vertical: 170),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
+
+              // Content
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 5 : 120,
+                  vertical: isMobile
+                      ? 0
+                      : 170, // remove vertical padding on mobile
+                ),
+                child: Align(
+                  alignment: isMobile ? Alignment.center : Alignment.topLeft,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // makes it shrink-wrap
+                    crossAxisAlignment: isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
                     children: [
-                      TextSpan(
-                        text: '// ',
-                        style: TextStyle(
-                          color: const Color(0xFF0035FF),
-                          fontSize: 30,
-                          fontWeight: FontWeight.w900,
+                      // Title
+                      RichText(
+                        textAlign: isMobile
+                            ? TextAlign.center
+                            : TextAlign.start,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '// ',
+                              style: TextStyle(
+                                color: const Color(0xFF0035FF),
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Powering Innovation Through Technology',
+                              style: GoogleFonts.instrumentSans(
+                                color: Colors.white,
+                                fontSize: isMobile ? 16 : 22,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      TextSpan(
-                        text: 'Powering Innovation Through Technology',
-                        style: TextStyle(
+
+                      SizedBox(height: isMobile ? 20 : 15),
+
+                      // Heading
+                      Text(
+                        'Future-Ready Software & Tech\nSolutions for Modern Businesses',
+                        textAlign: isMobile
+                            ? TextAlign.center
+                            : TextAlign.start,
+                        style: GoogleFonts.instrumentSans(
                           color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
+                          fontSize: isMobile ? 26 : 46,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
                         ),
                       ),
+
+                      SizedBox(height: isMobile ? 40 : 25),
+
+                      // Subtitle
+                      Text(
+                        'Tailored software, powerful platforms, and reliable IT infrastructure everything your\nbusiness needs to scale, seamlessly.',
+                        textAlign: isMobile
+                            ? TextAlign.center
+                            : TextAlign.start,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: isMobile ? 14 : 20,
+                          height: 1.5,
+                        ),
+                      ),
+
+                      SizedBox(height: isMobile ? 45 : 35),
+
+                      // Buttons
+                      isMobile
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildPrimaryButton(),
+                                const SizedBox(height: 15),
+                                _buildSecondaryButton(),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                _buildPrimaryButton(),
+                                const SizedBox(width: 15),
+                                _buildSecondaryButton(),
+                              ],
+                            ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 15),
-                const Text(
-                  'Future-Ready Software & Tech\nSolutions for Modern Businesses',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 46,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  'Tailored software, powerful platforms, and reliable IT infrastructure everything your\nbusiness needs to scale, seamlessly.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                          (Set<WidgetState> states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return Colors.transparent;
-                            }
-                            return const Color(0xFF0035FF);
-                          },
-                        ),
-                        foregroundColor: WidgetStateProperty.all(Colors.white),
-                        side: WidgetStateProperty.resolveWith<BorderSide>((
-                          Set<WidgetState> states,
-                        ) {
-                          if (states.contains(WidgetState.hovered)) {
-                            return const BorderSide(
-                              color: Colors.white,
-                              width: 2,
-                            );
-                          }
-                          return BorderSide.none;
-                        }),
-                        padding: WidgetStateProperty.all(
-                          const EdgeInsets.symmetric(
-                            horizontal: 25,
-                            vertical: 15,
-                          ),
-                        ),
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        elevation: WidgetStateProperty.all(0),
-                        minimumSize: WidgetStateProperty.all(
-                          const Size(205, 54),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Contact Now',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, size: 24),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStateProperty.resolveWith<Color?>((
-                              Set<WidgetState> states,
-                            ) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return const Color(0xFF0035FF);
-                              }
-                              return Colors.transparent;
-                            }),
-                        foregroundColor: WidgetStateProperty.all(Colors.white),
-                        side: WidgetStateProperty.resolveWith<BorderSide>((
-                          Set<WidgetState> states,
-                        ) {
-                          if (states.contains(WidgetState.hovered)) {
-                            return BorderSide.none;
-                          }
-                          return const BorderSide(color: Colors.white);
-                        }),
-                        padding: WidgetStateProperty.all(
-                          const EdgeInsets.symmetric(
-                            horizontal: 25,
-                            vertical: 15,
-                          ),
-                        ),
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        minimumSize: WidgetStateProperty.all(
-                          const Size(205, 54),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Explore more',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, size: 24),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServicesGridSection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      child: Center(
-        // Center the entire row
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment:
-                MainAxisAlignment.center, // Center the items in the row
-            children: [
-              _buildServiceItem(
-                'Web Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.web,
-              ),
-              const SizedBox(width: 20),
-              _buildServiceItem(
-                'Software Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.apps,
-              ),
-              const SizedBox(width: 20),
-              _buildServiceItem(
-                'Hardware & Networking',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.settings_input_hdmi,
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildServiceItem(String title, String description, IconData icon) {
+  // Keeping your same button styles
+  Widget _buildPrimaryButton() => ElevatedButton(
+    onPressed: () {},
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+        (states) => states.contains(WidgetState.hovered)
+            ? Colors.transparent
+            : const Color(0xFF0035FF),
+      ),
+      foregroundColor: WidgetStateProperty.all(Colors.white),
+      side: WidgetStateProperty.resolveWith<BorderSide>(
+        (states) => states.contains(WidgetState.hovered)
+            ? const BorderSide(color: Colors.white, width: 2)
+            : BorderSide.none,
+      ),
+      padding: WidgetStateProperty.all(
+        const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      elevation: WidgetStateProperty.all(0),
+      minimumSize: WidgetStateProperty.all(const Size(205, 54)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Contact Now',
+          style: GoogleFonts.instrumentSans(
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(width: 8),
+        const Icon(Icons.arrow_forward, size: 24),
+      ],
+    ),
+  );
+
+  Widget _buildSecondaryButton() => OutlinedButton(
+    onPressed: () {},
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+        (states) => states.contains(WidgetState.hovered)
+            ? const Color(0xFF0035FF)
+            : Colors.transparent,
+      ),
+      foregroundColor: WidgetStateProperty.all(Colors.white),
+      side: WidgetStateProperty.resolveWith<BorderSide>(
+        (states) => states.contains(WidgetState.hovered)
+            ? BorderSide.none
+            : const BorderSide(color: Colors.white),
+      ),
+      padding: WidgetStateProperty.all(
+        const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      minimumSize: WidgetStateProperty.all(const Size(205, 54)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Explore more',
+          style: GoogleFonts.instrumentSans(
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(width: 8),
+        const Icon(Icons.arrow_forward, size: 24),
+      ],
+    ),
+  );
+
+  Widget _buildServicesGridSection(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 700) {
+      // Mobile: single column
+      return Column(
+        children: [
+          _buildServiceItem(
+            'Web Applications',
+            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+            Icons.web,
+          ),
+          const SizedBox(height: 20),
+          _buildServiceItem(
+            'Software Applications',
+            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+            Icons.apps,
+          ),
+          const SizedBox(height: 20),
+          _buildServiceItem(
+            'Hardware & Networking',
+            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+            Icons.settings_input_hdmi,
+          ),
+        ],
+      );
+    } else {
+      // Medium & Desktop: use Wrap for responsive layout
+      double cardWidth = 370;
+      if (screenWidth >= 600 && screenWidth < 1200) {
+        // Medium screens: max 2 cards per row
+        cardWidth = (screenWidth / 2) - 30;
+        if (cardWidth > 370) cardWidth = 370; // max width
+      }
+
+      return Center(
+        child: Wrap(
+          spacing: 20,
+          runSpacing: 20,
+          alignment: WrapAlignment.center,
+          children: [
+            _buildServiceItem(
+              'Web Applications',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.web,
+              width: cardWidth,
+            ),
+            _buildServiceItem(
+              'Software Applications',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.apps,
+              width: cardWidth,
+            ),
+            _buildServiceItem(
+              'Hardware & Networking',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.settings_input_hdmi,
+              width: cardWidth,
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  // Update _buildServiceItem to accept width
+  Widget _buildServiceItem(
+    String title,
+    String description,
+    IconData icon, {
+    double width = 370,
+  }) {
     return Container(
-      width: 370, // Figma exact width
-      height: 130, // Figma exact height
-      padding: const EdgeInsets.all(16), // from figma
-      margin: const EdgeInsets.only(bottom: 12), // keeps spacing between items
+      width: width,
+      height: 130,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white, // same background as before
-        borderRadius: BorderRadius.circular(14), // figma radius
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
         border: Border(
           top: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
           right: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
-          bottom: BorderSide(
-            color: const Color(0xFF0035FF),
-            width: 8,
-          ), // thick bottom
+          bottom: BorderSide(color: const Color(0xFF0035FF), width: 8),
           left: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
         ),
       ),
@@ -365,20 +424,20 @@ class VedaHomePage extends StatelessWidget {
             ),
             child: Icon(icon, color: Colors.blue.shade800, size: 30),
           ),
-          const SizedBox(width: 8), // matches gap: 12px from figma
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: GoogleFonts.instrumentSans(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(description, style: TextStyle(fontSize: 14)),
+                Text(description, style: GoogleFonts.poppins(fontSize: 14)),
               ],
             ),
           ),
@@ -392,7 +451,7 @@ class VedaHomePage extends StatelessWidget {
       builder: (context, constraints) {
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 100),
+          padding: const EdgeInsets.fromLTRB(100, 40, 100, 80),
           child: Center(
             // ✅ Center content horizontally
             child: ConstrainedBox(
@@ -424,7 +483,7 @@ class VedaHomePage extends StatelessWidget {
                             children: [
                               TextSpan(
                                 text: '// ',
-                                style: TextStyle(
+                                style: GoogleFonts.instrumentSans(
                                   color: const Color(0xFF0035FF),
                                   fontSize: 25,
                                   fontWeight: FontWeight.w900,
@@ -432,7 +491,7 @@ class VedaHomePage extends StatelessWidget {
                               ),
                               TextSpan(
                                 text: 'About Us',
-                                style: TextStyle(
+                                style: GoogleFonts.instrumentSans(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -446,14 +505,14 @@ class VedaHomePage extends StatelessWidget {
                             children: [
                               TextSpan(
                                 text: 'Where Experience Meets',
-                                style: TextStyle(
+                                style: GoogleFonts.instrumentSans(
                                   fontSize: 46,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                               TextSpan(
                                 text: '\nInnovation',
-                                style: TextStyle(
+                                style: GoogleFonts.instrumentSans(
                                   color: const Color(0xFF0035FF),
                                   fontSize: 46,
                                   fontWeight: FontWeight.w800,
@@ -463,18 +522,18 @@ class VedaHomePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra tortor venenatis pulvinar proin.',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             height: 1.6,
                             color: Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 15),
-                        const Text(
+                        Text(
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             height: 1.6,
                             color: Colors.black87,
@@ -516,7 +575,7 @@ class VedaHomePage extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: '// ',
-                          style: TextStyle(
+                          style: GoogleFonts.instrumentSans(
                             color: const Color(0xFF0035FF),
                             fontSize: 25,
                             fontWeight: FontWeight.w900,
@@ -524,7 +583,7 @@ class VedaHomePage extends StatelessWidget {
                         ),
                         TextSpan(
                           text: 'Our Services',
-                          style: TextStyle(
+                          style: GoogleFonts.instrumentSans(
                             fontSize: 22,
                             fontWeight: FontWeight.w500,
                           ),
@@ -538,14 +597,14 @@ class VedaHomePage extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: 'Smart Tech Services\n',
-                          style: TextStyle(
+                          style: GoogleFonts.instrumentSans(
                             fontSize: 46,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                         TextSpan(
                           text: 'That Drive Results',
-                          style: TextStyle(
+                          style: GoogleFonts.instrumentSans(
                             color: const Color(0xFF0035FF),
                             fontSize: 46,
                             fontWeight: FontWeight.w800,
@@ -628,7 +687,7 @@ class VedaHomePage extends StatelessWidget {
               // Title
               Text(
                 title,
-                style: const TextStyle(
+                style: GoogleFonts.instrumentSans(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
                 ),
@@ -637,19 +696,19 @@ class VedaHomePage extends StatelessWidget {
               // Description
               Text(
                 description,
-                style: const TextStyle(fontSize: 14, height: 1.5),
+                style: GoogleFonts.poppins(fontSize: 14, height: 1.5),
               ),
               const Spacer(),
               // Button
               TextButton(
                 onPressed: () {},
                 style: TextButton.styleFrom(foregroundColor: Color(0xFF0035FF)),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Contact Now',
-                      style: TextStyle(
+                      style: GoogleFonts.instrumentSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -678,7 +737,7 @@ class VedaHomePage extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '// ',
-                  style: TextStyle(
+                  style: GoogleFonts.instrumentSans(
                     color: const Color(0xFF0035FF),
                     fontSize: 25,
                     fontWeight: FontWeight.w900,
@@ -686,7 +745,10 @@ class VedaHomePage extends StatelessWidget {
                 ),
                 TextSpan(
                   text: 'Why Veda',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.instrumentSans(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -694,15 +756,18 @@ class VedaHomePage extends StatelessWidget {
           const SizedBox(height: 10),
           RichText(
             textAlign: TextAlign.center,
-            text: const TextSpan(
+            text: TextSpan(
               children: [
                 TextSpan(
                   text: 'Reasons Our Clients\n',
-                  style: TextStyle(fontSize: 44, fontWeight: FontWeight.w800),
+                  style: GoogleFonts.instrumentSans(
+                    fontSize: 44,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 TextSpan(
                   text: 'Stay With Us',
-                  style: TextStyle(
+                  style: GoogleFonts.instrumentSans(
                     fontSize: 44,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF0035FF),
@@ -779,7 +844,7 @@ class VedaHomePage extends StatelessWidget {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: const TextStyle(
+              style: GoogleFonts.instrumentSans(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
                 color: Colors.black,
@@ -791,7 +856,7 @@ class VedaHomePage extends StatelessWidget {
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               color: Colors.black.withOpacity(0.8),
               height: 1.5,
@@ -830,11 +895,11 @@ class VedaHomePage extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color.fromRGBO(3, 9, 35, 0.9),
+                  Color.fromRGBO(3, 9, 35, 0.94),
+                  Color.fromRGBO(3, 9, 35, 0.90),
                   Color.fromRGBO(3, 9, 35, 0.85),
-                  Color.fromRGBO(3, 9, 35, 0.8),
-                  Color.fromRGBO(3, 9, 35, 0.7),
-                  Color.fromRGBO(3, 9, 35, 0.6),
+                  Color.fromRGBO(3, 9, 35, 0.80),
+                  Color.fromRGBO(3, 9, 35, 0.75),
                 ],
                 stops: [0.0, 0.25, 0.5, 0.75, 1.0],
               ),
@@ -851,7 +916,7 @@ class VedaHomePage extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '// ',
-                        style: TextStyle(
+                        style: GoogleFonts.instrumentSans(
                           color: const Color(0xFF0035FF),
                           fontSize: 25,
                           fontWeight: FontWeight.w900,
@@ -859,7 +924,7 @@ class VedaHomePage extends StatelessWidget {
                       ),
                       TextSpan(
                         text: "Let's Talk",
-                        style: TextStyle(
+                        style: GoogleFonts.instrumentSans(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
@@ -874,7 +939,7 @@ class VedaHomePage extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: "Tell us what you're\n",
-                        style: TextStyle(
+                        style: GoogleFonts.instrumentSans(
                           color: Colors.white,
                           fontSize: 46,
                           fontWeight: FontWeight.w800,
@@ -882,7 +947,7 @@ class VedaHomePage extends StatelessWidget {
                       ),
                       TextSpan(
                         text: "Working on",
-                        style: TextStyle(
+                        style: GoogleFonts.instrumentSans(
                           color: const Color(0xFF0035FF),
                           fontSize: 46,
                           fontWeight: FontWeight.w800,
@@ -903,10 +968,10 @@ class VedaHomePage extends StatelessWidget {
                       flex: 1,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             "We'll help you\nbuild the right solution",
-                            style: TextStyle(
+                            style: GoogleFonts.instrumentSans(
                               fontSize: 22,
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
@@ -942,21 +1007,30 @@ class VedaHomePage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildCustomTextField(label: 'Name'),
+                            _buildCustomTextField(
+                              label: 'Name',
+                              icon: Icons.person_4_outlined,
+                            ),
                             const SizedBox(height: 12),
-                            _buildCustomTextField(label: 'Email'),
+                            _buildCustomTextField(
+                              label: 'Email',
+                              icon: Icons.email_outlined,
+                            ),
                             const SizedBox(height: 12),
-                            _buildCustomTextField(label: 'Phone'),
+                            _buildCustomTextField(
+                              label: 'Phone',
+                              icon: Icons.phone_outlined,
+                            ),
                             const SizedBox(height: 12),
                             SizedBox(
                               width: 564,
                               height: 102, // desired height
                               child: TextField(
-                                style: const TextStyle(color: Colors.white),
+                                style: GoogleFonts.poppins(color: Colors.white),
                                 maxLines: 5,
                                 decoration: InputDecoration(
                                   labelText: 'Message',
-                                  labelStyle: const TextStyle(
+                                  labelStyle: GoogleFonts.poppins(
                                     color: Colors.white70,
                                   ),
                                   filled: true,
@@ -987,7 +1061,7 @@ class VedaHomePage extends StatelessWidget {
                             const SizedBox(height: 12),
                             SizedBox(
                               width: 157,
-                              height: 54,
+                              height: 50,
                               child: ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
@@ -1013,9 +1087,11 @@ class VedaHomePage extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Submit',
-                                      style: TextStyle(fontSize: 16),
+                                      style: GoogleFonts.instrumentSans(
+                                        fontSize: 16,
+                                      ),
                                     ),
                                     Icon(Icons.arrow_forward_rounded),
                                   ],
@@ -1036,7 +1112,10 @@ class VedaHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomTextField({required String label}) {
+  Widget _buildCustomTextField({
+    required String label,
+    IconData? icon, // optional icon
+  }) {
     return SizedBox(
       width: 564, // fixed width
       height: 48, // fixed height
@@ -1044,18 +1123,16 @@ class VedaHomePage extends StatelessWidget {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.white70),
+          labelStyle: GoogleFonts.poppins(color: Colors.white70),
           filled: true,
           fillColor: Colors.white.withOpacity(0.16), // translucent background
-          contentPadding: const EdgeInsets.fromLTRB(
-            16,
-            12,
-            16,
-            12,
-          ), // padding inside
+          contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          prefixIcon: icon != null
+              ? Icon(icon, color: Colors.white70)
+              : null, // add icon if provided
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12), // rounded corners
-            borderSide: BorderSide.none, // remove default border
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -1069,53 +1146,6 @@ class VedaHomePage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildFooterSection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-      color: Colors.grey.shade900,
-      child: Column(
-        children: [
-          Image.asset(
-            'last.png', // Replace with your white logo asset
-            height: 40,
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Smart, secure, and scalable tech solutions — helping businesses in Bahrain and beyond grow through custom software, modern web apps, and strong IT infrastructure.',
-            style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.6),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 30),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Company',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 15),
-              FooterLink(text: 'About Us'),
-              FooterLink(text: 'Our Services'),
-              FooterLink(text: 'Why Us?'),
-              FooterLink(text: 'Contact Us'),
-            ],
-          ),
-          const SizedBox(height: 40),
-          const Divider(color: Colors.white24),
-          const SizedBox(height: 20),
-          const Text(
-            '© 2025 Veda Systems Solutions - Bahrain. All rights reserved.',
-            style: TextStyle(color: Colors.white54, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class ContactInfoItem extends StatelessWidget {
@@ -1124,6 +1154,7 @@ class ContactInfoItem extends StatelessWidget {
   final Color textColor;
 
   const ContactInfoItem({
+    super.key,
     required this.icon,
     required this.text,
     this.textColor = Colors.black,
@@ -1138,7 +1169,7 @@ class ContactInfoItem extends StatelessWidget {
         SizedBox(width: 10),
         Text(
           text,
-          style: TextStyle(
+          style: GoogleFonts.instrumentSans(
             color: textColor,
             fontSize: 18,
             fontWeight: FontWeight.w500,
