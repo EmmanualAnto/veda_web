@@ -11,7 +11,7 @@ class VedaMobileApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Veda System',
+      title: 'Veda System Solutions',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto', // You can use your preferred font
