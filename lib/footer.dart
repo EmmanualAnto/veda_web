@@ -30,7 +30,7 @@ class Footer extends StatelessWidget {
                           children: [
                             _buildLeftSection(isMobile),
                             const SizedBox(height: 30),
-                            _buildRightSection(isMobile),
+                            _buildRightSection(isMobile, context),
                           ],
                         )
                       : Row(
@@ -43,7 +43,7 @@ class Footer extends StatelessWidget {
                             const SizedBox(width: 40),
                             Expanded(
                               flex: 1,
-                              child: _buildRightSection(isMobile),
+                              child: _buildRightSection(isMobile, context),
                             ),
                           ],
                         ),
@@ -79,7 +79,12 @@ class Footer extends StatelessWidget {
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.start,
       children: [
-        Image.asset('logonew.png', height: 80, width: 220, fit: BoxFit.contain),
+        Image.asset(
+          'assets/logonew.png',
+          height: 80,
+          width: 220,
+          fit: BoxFit.contain,
+        ),
         const SizedBox(height: 16),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: isMobile ? 400 : 600),
@@ -111,20 +116,36 @@ class Footer extends StatelessWidget {
     );
   }
 
-  Widget _buildRightSection(bool isMobile) {
+  Widget _buildRightSection(bool isMobile, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
     return Column(
       crossAxisAlignment: isMobile
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.start,
       children: [
-        Text(
-          'Company',
-          style: GoogleFonts.instrumentSans(
-            color: const Color.fromRGBO(238, 238, 238, 1),
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-          ),
+        RichText(
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '// ',
+                style: GoogleFonts.instrumentSans(
+                  color: const Color(0xFF0035FF),
+                  fontSize: desktop ? 25 : 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              TextSpan(
+                text: 'Company',
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Color.fromRGBO(238, 238, 238, 1),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 20),
         const FooterLink(text: 'About Us'),

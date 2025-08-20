@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/footer.dart';
+import 'package:veda_main/hardwareandnetworkingpg.dart';
+import 'package:veda_main/softwarepg.dart';
+import 'package:veda_main/webapppg.dart';
 
 class VedaHomePage extends StatelessWidget {
   const VedaHomePage({super.key});
@@ -8,15 +11,25 @@ class VedaHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
     final isDesktop = screenWidth >= 1150;
 
     return Scaffold(
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            ListTile(title: const Text('Home'), onTap: () {}),
+            ListTile(title: const Text('About'), onTap: () {}),
+            ListTile(title: const Text('Services'), onTap: () {}),
+            ListTile(title: const Text('Contact'), onTap: () {}),
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildtopbarSection(),
+            _buildtopbarSection(context),
 
             if (isDesktop)
               Stack(
@@ -50,54 +63,46 @@ class VedaHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildtopbarSection() {
+  Widget _buildtopbarSection(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left-side logo
-          Image.asset(
-            'logonew.png', // Your Veda logo
-            height: 50,
-            width: 150,
-          ),
+          // Logo
+          Image.asset('assets/logonew.png', height: 50, width: 150),
 
-          // Right-side buttons
-          Row(
-            children: [
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Home',
-                  style: GoogleFonts.poppins(color: Colors.black),
+          // Desktop: nav buttons | Mobile: hamburger
+          desktop
+              ? Row(
+                  children: [
+                    _navButton('Home'),
+                    _navButton('About'),
+                    _navButton('Services'),
+                    _navButton('Contact'),
+                  ],
+                )
+              : Builder(
+                  // 👈 this fixes the Scaffold.of(context) issue
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Color(0xFF017697)),
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                  ),
                 ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'About',
-                  style: GoogleFonts.poppins(color: Colors.black),
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Services',
-                  style: GoogleFonts.poppins(color: Colors.black),
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Contact',
-                  style: GoogleFonts.poppins(color: Colors.black),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _navButton(String title) {
+    return TextButton(
+      onPressed: () {},
+      child: Text(title, style: GoogleFonts.poppins(color: Colors.black)),
     );
   }
 
@@ -108,7 +113,7 @@ class VedaHomePage extends StatelessWidget {
 
         return SizedBox(
           width: double.infinity,
-          height: 800,
+          height: 810,
           child: Stack(
             children: [
               // Background image
@@ -117,7 +122,7 @@ class VedaHomePage extends StatelessWidget {
                 height: double.infinity,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('1.png'),
+                    image: AssetImage('assets/1.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -329,31 +334,34 @@ class VedaHomePage extends StatelessWidget {
   Widget _buildServicesGridSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    if (screenWidth < 700) {
+    if (screenWidth < 800) {
       // Mobile: single column
-      return Column(
-        children: [
-          _buildServiceItem(
-            context,
-            'Web Applications',
-            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-            Icons.web,
-          ),
-          const SizedBox(height: 20),
-          _buildServiceItem(
-            context,
-            'Software Applications',
-            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-            Icons.apps,
-          ),
-          const SizedBox(height: 20),
-          _buildServiceItem(
-            context,
-            'Hardware & Networking',
-            'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-            Icons.settings_input_hdmi,
-          ),
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            _buildServiceItem(
+              context,
+              'Web Applications',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.web,
+            ),
+            const SizedBox(height: 20),
+            _buildServiceItem(
+              context,
+              'Software Applications',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.apps,
+            ),
+            const SizedBox(height: 20),
+            _buildServiceItem(
+              context,
+              'Hardware & Networking',
+              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+              Icons.settings_input_hdmi,
+            ),
+          ],
+        ),
       );
     } else {
       // Medium & Desktop: use Wrap for responsive layout
@@ -479,7 +487,7 @@ class VedaHomePage extends StatelessWidget {
                     height: desktop ? 400 : 300,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset('2.png', fit: BoxFit.cover),
+                      child: Image.asset('assets/2.png', fit: BoxFit.cover),
                     ),
                   ),
                   SizedBox(
@@ -640,22 +648,44 @@ class VedaHomePage extends StatelessWidget {
                     runSpacing: 20,
                     children: [
                       _buildServiceCard(
-                        '3.png',
+                        'assets/3.png',
                         'Web\nApplication',
                         'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                         context,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Webapppg()),
+                          );
+                        },
                       ),
                       _buildServiceCard(
-                        '4.png',
+                        'assets/4.png',
                         'Software\nApplications',
                         'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                         context,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Softwarepg(),
+                            ),
+                          );
+                        },
                       ),
                       _buildServiceCard(
-                        '5.png',
+                        'assets/5.png',
                         'Hardware &\nNetworking',
                         'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                         context,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Hardwareandnetworkingpg(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -672,22 +702,21 @@ class VedaHomePage extends StatelessWidget {
     String imagePath,
     String title,
     String description,
-    BuildContext context,
-  ) {
+    BuildContext context, {
+    required VoidCallback onPressed, // 👈 add callback
+  }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
+
     return SizedBox(
-      width: desktop ? 400 : 350, // close to 386.6667
-      height: desktop ? 460 : 420,
+      width: desktop ? 400 : 350,
+      height: desktop ? 460 : 430,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border(
-            bottom: BorderSide(
-              color: const Color(0xFF0035FF), // rgba(0,53,255,1)
-              width: 8,
-            ),
+            bottom: BorderSide(color: const Color(0xFF0035FF), width: 8),
           ),
           boxShadow: [
             BoxShadow(
@@ -698,7 +727,7 @@ class VedaHomePage extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16), // padding 16
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -717,7 +746,7 @@ class VedaHomePage extends StatelessWidget {
               Text(
                 title,
                 style: GoogleFonts.instrumentSans(
-                  fontSize: desktop ? 22 : 18,
+                  fontSize: desktop ? 22 : 20,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -733,19 +762,21 @@ class VedaHomePage extends StatelessWidget {
               const Spacer(),
               // Button
               TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(foregroundColor: Color(0xFF0035FF)),
+                onPressed: onPressed, // 👈 use callback
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF0035FF),
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Contact Now',
+                      'Learn More',
                       style: GoogleFonts.instrumentSans(
                         fontSize: desktop ? 18 : 15,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Icon(Icons.arrow_forward, size: desktop ? 24 : 20),
                   ],
                 ),
@@ -845,43 +876,46 @@ class VedaHomePage extends StatelessWidget {
                     ),
                   ],
                 )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildReasonItem(
-                      '100%\nCustom Solutions',
-                      'Tailored software, not templates. Built to match your business model.',
-                      Icons.construction,
-                      context,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: CustomPaint(
-                        size: const Size(100, 1),
-                        painter: _DottedLinePainter(),
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildReasonItem(
+                        '100%\nCustom Solutions',
+                        'Tailored software, not templates. Built to match your business model.',
+                        Icons.construction,
+                        context,
                       ),
-                    ),
-                    _buildReasonItem(
-                      'Local Support,\nGlobal Standards',
-                      'Serving Bohrdin-based enterprises with ISO-grade quality.',
-                      Icons.public,
-                      context,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: CustomPaint(
-                        size: const Size(100, 1),
-                        painter: _DottedLinePainter(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: CustomPaint(
+                          size: const Size(100, 1),
+                          painter: _DottedLinePainter(),
+                        ),
                       ),
-                    ),
-                    _buildReasonItem(
-                      'Fast\nTurnaround',
-                      'Rapid development cycles with clear timelines and zero guesswork.',
-                      Icons.speed,
-                      context,
-                    ),
-                  ],
+                      _buildReasonItem(
+                        'Local Support,\nGlobal Standards',
+                        'Serving Bahrain-based enterprises with ISO-grade quality.',
+                        Icons.public,
+                        context,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: CustomPaint(
+                          size: const Size(100, 1),
+                          painter: _DottedLinePainter(),
+                        ),
+                      ),
+                      _buildReasonItem(
+                        'Fast\nTurnaround',
+                        'Rapid development cycles with clear timelines and zero guesswork.',
+                        Icons.speed,
+                        context,
+                      ),
+                    ],
+                  ),
                 ),
         ],
       ),
@@ -949,7 +983,9 @@ class VedaHomePage extends StatelessWidget {
       child: Stack(
         children: [
           // Background image
-          Positioned.fill(child: Image.asset('last.png', fit: BoxFit.cover)),
+          Positioned.fill(
+            child: Image.asset('assets/last.png', fit: BoxFit.cover),
+          ),
 
           // Gradient overlay
           Positioned.fill(
@@ -988,7 +1024,7 @@ class VedaHomePage extends StatelessWidget {
                           text: '// ',
                           style: GoogleFonts.instrumentSans(
                             color: const Color(0xFF0035FF),
-                            fontSize: 25,
+                            fontSize: desktop ? 25 : 18,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -996,7 +1032,7 @@ class VedaHomePage extends StatelessWidget {
                           text: "Let's Talk",
                           style: GoogleFonts.instrumentSans(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: desktop ? 22 : 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1012,7 +1048,7 @@ class VedaHomePage extends StatelessWidget {
                           text: "Tell us what you're\n",
                           style: GoogleFonts.instrumentSans(
                             color: Colors.white,
-                            fontSize: desktop ? 46 : 32,
+                            fontSize: desktop ? 46 : 26,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -1020,7 +1056,7 @@ class VedaHomePage extends StatelessWidget {
                           text: "Working on",
                           style: GoogleFonts.instrumentSans(
                             color: const Color(0xFF0035FF),
-                            fontSize: desktop ? 46 : 32,
+                            fontSize: desktop ? 46 : 26,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -1035,7 +1071,7 @@ class VedaHomePage extends StatelessWidget {
                       ? Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: _buildContactInfo()),
+                            Expanded(child: _buildContactInfo(context)),
                             const SizedBox(width: 30),
                             Expanded(child: _buildFormFields(isMobile: false)),
                           ],
@@ -1043,7 +1079,7 @@ class VedaHomePage extends StatelessWidget {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildContactInfo(),
+                            _buildContactInfo(context),
                             const SizedBox(height: 30),
                             _buildFormFields(isMobile: true),
                           ],
@@ -1057,37 +1093,41 @@ class VedaHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactInfo() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "We'll help you\nbuild the right solution",
-        style: GoogleFonts.instrumentSans(
-          fontSize: 22,
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
+  Widget _buildContactInfo(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "We'll help you\nbuild the right solution",
+          style: GoogleFonts.instrumentSans(
+            fontSize: desktop ? 22 : 16,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-      SizedBox(height: 30),
-      ContactInfoItem(
-        icon: Icons.email_outlined,
-        text: 'info@vedabahrain.com',
-        textColor: Colors.white,
-      ),
-      SizedBox(height: 20),
-      ContactInfoItem(
-        icon: Icons.location_on_outlined,
-        text: 'Manama, Kingdom of Bahrain',
-        textColor: Colors.white,
-      ),
-      SizedBox(height: 20),
-      ContactInfoItem(
-        icon: Icons.local_phone_outlined,
-        text: '+973 17 374742',
-        textColor: Colors.white,
-      ),
-    ],
-  );
+        SizedBox(height: 30),
+        ContactInfoItem(
+          icon: Icons.email_outlined,
+          text: 'info@vedabahrain.com',
+          textColor: Colors.white,
+        ),
+        SizedBox(height: 20),
+        ContactInfoItem(
+          icon: Icons.location_on_outlined,
+          text: 'Manama, Kingdom of Bahrain',
+          textColor: Colors.white,
+        ),
+        SizedBox(height: 20),
+        ContactInfoItem(
+          icon: Icons.local_phone_outlined,
+          text: '+973 17 374742',
+          textColor: Colors.white,
+        ),
+      ],
+    );
+  }
 
   Widget _buildFormFields({required bool isMobile}) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1196,6 +1236,8 @@ class ContactInfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
     return Row(
       children: [
         SizedBox(width: 5),
@@ -1205,33 +1247,11 @@ class ContactInfoItem extends StatelessWidget {
           text,
           style: GoogleFonts.instrumentSans(
             color: textColor,
-            fontSize: 18,
+            fontSize: desktop ? 18 : 16,
             fontWeight: FontWeight.w500,
           ),
         ),
       ],
-    );
-  }
-}
-
-class FooterLink extends StatelessWidget {
-  final String text;
-
-  const FooterLink({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.white70,
-          fontSize: 14,
-          decoration: TextDecoration.underline,
-          decorationColor: Colors.white70,
-        ),
-      ),
     );
   }
 }

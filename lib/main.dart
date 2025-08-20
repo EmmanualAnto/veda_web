@@ -7,7 +7,6 @@ void main() {
 
 class VedaMobileApp extends StatelessWidget {
   const VedaMobileApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
