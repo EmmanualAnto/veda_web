@@ -55,7 +55,7 @@ class Footer extends StatelessWidget {
                   // Copyright
                   Center(
                     child: Text(
-                      '© 2025 Veda Systems Solutions – Bahrain. All rights reserved.',
+                      '© 2025 Veda Systems Solutions – Bahrain.\nAll rights reserved.',
                       style: GoogleFonts.poppins(
                         color: const Color.fromRGBO(217, 217, 217, 1),
                         fontSize: 14,
@@ -80,7 +80,7 @@ class Footer extends StatelessWidget {
           : CrossAxisAlignment.start,
       children: [
         Image.asset(
-          'assets/logonew.png',
+          'assets/logo.png',
           height: 80,
           width: 220,
           fit: BoxFit.contain,

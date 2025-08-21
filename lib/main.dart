@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:veda_main/home.dart';
+import 'package:veda_main/screens/home.dart';
 
 void main() {
   runApp(const VedaMobileApp());

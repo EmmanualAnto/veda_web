@@ -60,7 +60,19 @@ flutter:
     - assets/4.png
     - assets/5.png
     - assets/last.png
-    - assets/logonew.png
+    - assets/logo.png
+    - assets/software/1.png
+    - assets/software/2.png
+    - assets/software/3.png
+    - assets/software/4.png
+    - assets/software/5.png
+    - assets/web/1.jpg
+    - assets/web/2.jpg
+    - assets/web/3.jpg
+    - assets/web/4.jpg
+    - assets/web/5.jpg
+    - assets/web/6.png
+    - assets/web/7.png
 
 
   # The following line ensures that the Material Icons font is

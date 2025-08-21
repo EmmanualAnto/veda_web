@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/autoscroll.dart';
 import 'package:veda_main/footer.dart';
+import 'package:veda_main/letstalk.dart';
+import 'package:veda_main/stylecard.dart';
+import 'package:veda_main/topbar.dart';
 
 class Hardwareandnetworkingpg extends StatelessWidget {
   const Hardwareandnetworkingpg({super.key});
@@ -23,53 +27,16 @@ class Hardwareandnetworkingpg extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildtopbarSection(context),
+            TopBar(),
             _buildHeaderSection(context),
+            _buildFiveCardsSection(context),
+            _buildClientsSection(context),
+            const LetsTalkSection(),
+
             Footer(),
           ],
         ),
       ),
-    );
-  }
-
-  // ---- Reuse your same topbar & header ----
-
-  Widget _buildtopbarSection(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final desktop = screenWidth > 800;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Image.asset('assets/logonew.png', height: 50, width: 150),
-          desktop
-              ? Row(
-                  children: [
-                    _navButton('Home'),
-                    _navButton('About'),
-                    _navButton('Services'),
-                    _navButton('Contact'),
-                  ],
-                )
-              : Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Color(0xFF017697)),
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ),
-                ),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(String title) {
-    return TextButton(
-      onPressed: () {},
-      child: Text(title, style: GoogleFonts.poppins(color: Colors.black)),
     );
   }
 
@@ -134,7 +101,7 @@ class Hardwareandnetworkingpg extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'Powering Innovation Through Technology',
+                              text: 'We Offer',
                               style: GoogleFonts.instrumentSans(
                                 color: Colors.white,
                                 fontSize: isMobile ? 16 : 22,
@@ -146,7 +113,7 @@ class Hardwareandnetworkingpg extends StatelessWidget {
                       ),
                       SizedBox(height: isMobile ? 20 : 15),
                       Text(
-                        'Future-Ready Software & Tech\nSolutions for Modern Businesses',
+                        'Smart Tech Solutions\nDesigned for Growth',
                         textAlign: isMobile
                             ? TextAlign.center
                             : TextAlign.start,
@@ -159,7 +126,7 @@ class Hardwareandnetworkingpg extends StatelessWidget {
                       ),
                       SizedBox(height: isMobile ? 40 : 25),
                       Text(
-                        'Tailored software, powerful platforms, and reliable IT infrastructure everything your\nbusiness needs to scale, seamlessly.',
+                        'We provide end-to-end digital services tailored to your business needs. From custom web applications to seamless system integrations, our solutions are built to optimize operations, enhance user experience, and drive measurable results.',
                         textAlign: isMobile
                             ? TextAlign.center
                             : TextAlign.start,
@@ -255,4 +222,160 @@ class Hardwareandnetworkingpg extends StatelessWidget {
       ],
     ),
   );
+  Widget _buildFiveCardsSection(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isMobile = constraints.maxWidth < 800;
+
+        return Padding(
+          padding: EdgeInsets.all(isMobile ? 10 : 20),
+          child: isMobile
+              ? Column(
+                  children: const [
+                    StyledCardSection(
+                      imagePath: "assets/software/1.png",
+                      title: "Customized Accounting Packages",
+                      description:
+                          "Streamline finances with tailored accounting software built for your business model.",
+                    ),
+                    SizedBox(height: 20),
+                    StyledCardSection(
+                      imagePath: "assets/software/2.png",
+                      title: "POS (Point of Sale) Systems",
+                      description:
+                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                    ),
+                    SizedBox(height: 20),
+                    StyledCardSection(
+                      imagePath: "assets/software/3.png",
+                      title: "Wholesale & Retail Inventory Software",
+                      description:
+                          "Track, manage, and optimize your inventory with ease.",
+                    ),
+                    SizedBox(height: 20),
+                    StyledCardSection(
+                      imagePath: "assets/software/4.png",
+                      title: "Customized Software for Organizations",
+                      description:
+                          "Custom-built software designed to fit unique organizational needs.",
+                    ),
+                    SizedBox(height: 20),
+                    StyledCardSection(
+                      imagePath: "assets/software/5.png",
+                      title: "Softwares for Personal Accounting",
+                      description:
+                          "Simplify your personal finances with user-friendly accounting software.",
+                    ),
+                  ],
+                )
+              : Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: const [
+                    StyledCardSection(
+                      imagePath: "assets/software/1.png",
+                      title: "Customized\nAccounting Packages",
+                      description:
+                          "Streamline finances with tailored accounting software built for your business model.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/2.png",
+                      title: "POS (Point of Sale) Systems",
+                      description:
+                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/3.png",
+                      title: "Wholesale & Retail Inventory Software",
+                      description:
+                          "Track, manage, and optimize your inventory with ease.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/4.png",
+                      title: "Customized Software for Organizations",
+                      description:
+                          "Custom-built software designed to fit unique organizational needs.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/5.png",
+                      title: "Softwares for Personal Accounting",
+                      description:
+                          "Simplify your personal finances with user-friendly accounting software.",
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _buildClientsSection(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 800;
+
+    List<String> clients = [
+      "Memo Express",
+      "Elie Jean",
+      "Markwell International WLL",
+      "Musthafa Muhammed Trading",
+      "Madan Electrical Contracting",
+    ];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 100,
+        vertical: 40,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '// ',
+                  style: GoogleFonts.instrumentSans(
+                    color: const Color(0xFF0035FF),
+                    fontSize: isMobile ? 18 : 25,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                TextSpan(
+                  text: 'Our Clients',
+                  style: GoogleFonts.instrumentSans(
+                    fontSize: isMobile ? 16 : 22,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Partners Who Believe\n',
+                  style: GoogleFonts.instrumentSans(
+                    fontSize: isMobile ? 26 : 46,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                TextSpan(
+                  text: 'In Our Solutions',
+                  style: GoogleFonts.instrumentSans(
+                    color: const Color(0xFF0035FF),
+                    fontSize: isMobile ? 26 : 46,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 50),
+          AutoScrollClients(clients: clients, isMobile: isMobile),
+        ],
+      ),
+    );
+  }
 }
