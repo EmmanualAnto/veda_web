@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:veda_main/autoscroll.dart';
+import 'package:veda_main/autoscrolltext.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
 import 'package:veda_main/stylecard.dart';
 import 'package:veda_main/topbar.dart';
 
-class Hardwareandnetworkingpg extends StatelessWidget {
+class Hardwareandnetworkingpg extends StatefulWidget {
   const Hardwareandnetworkingpg({super.key});
+
+  @override
+  State<Hardwareandnetworkingpg> createState() =>
+      _HardwareandnetworkingpgState();
+}
+
+class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 300 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +59,54 @@ class Hardwareandnetworkingpg extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TopBar(),
-            _buildHeaderSection(context),
-            _buildFiveCardsSection(context),
-            _buildClientsSection(context),
-            const LetsTalkSection(),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                TopBar(),
+                _buildHeaderSection(context),
+                _buildFiveCardsSection(context),
+                _buildClientsSection(context),
+                const LetsTalkSection(),
+                Footer(),
+              ],
+            ),
+          ),
 
-            Footer(),
-          ],
-        ),
+          // Transparent Circle Scroll-to-Top Button
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: AnimatedOpacity(
+              opacity: _showScrollToTop ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 400),
+              child: IgnorePointer(
+                ignoring: !_showScrollToTop,
+                child: GestureDetector(
+                  onTap: _scrollToTop,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade400, width: 2),
+                      color: Colors.white,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.arrow_upward,
+                        color: Colors.grey.shade400,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

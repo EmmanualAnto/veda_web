@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/fadeInAnime.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/screens/hardwareandnetworkingpg.dart';
 import 'package:veda_main/letstalk.dart';
@@ -7,8 +8,43 @@ import 'package:veda_main/screens/softwarepg.dart';
 import 'package:veda_main/topbar.dart';
 import 'package:veda_main/screens/webapppg.dart';
 
-class VedaHomePage extends StatelessWidget {
+class VedaHomePage extends StatefulWidget {
   const VedaHomePage({super.key});
+
+  @override
+  State<VedaHomePage> createState() => _VedaHomePageState();
+}
+
+class _VedaHomePageState extends State<VedaHomePage> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+  final List<bool> _serviceVisible = [false, false, false];
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 300 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,39 +64,73 @@ class VedaHomePage extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TopBar(),
-            if (isDesktop)
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                TopBar(),
+                if (isDesktop)
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      _buildHeaderSection(context),
+                      Positioned(
+                        bottom: -75,
+                        left: 0,
+                        right: 0,
+                        child: _buildServicesGridSection(context),
+                      ),
+                    ],
+                  )
+                else ...[
                   _buildHeaderSection(context),
-                  Positioned(
-                    bottom: -75,
-                    left: 0,
-                    right: 0,
-                    child: _buildServicesGridSection(context),
-                  ),
+                  const SizedBox(height: 40),
+                  _buildServicesGridSection(context),
                 ],
-              )
-            else ...[
-              _buildHeaderSection(context),
-              const SizedBox(height: 40),
-              _buildServicesGridSection(context),
-            ],
+                SizedBox(height: isDesktop ? 100 : 40),
+                _buildAboutUsSection(context),
+                _buildOurServicesSection(context),
+                _buildWhyVedaSection(context),
+                const LetsTalkSection(),
+                Footer(),
+              ],
+            ),
+          ),
 
-            SizedBox(height: isDesktop ? 100 : 40),
-
-            _buildAboutUsSection(context),
-            _buildOurServicesSection(context),
-            _buildWhyVedaSection(context),
-            const LetsTalkSection(),
-
-            Footer(),
-          ],
-        ),
+          // Transparent Circle Scroll-to-Top Button
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: AnimatedOpacity(
+              opacity: _showScrollToTop ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 400),
+              child: IgnorePointer(
+                ignoring: !_showScrollToTop,
+                child: GestureDetector(
+                  onTap: _scrollToTop,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade700, width: 2),
+                      color: Colors.transparent,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.arrow_upward,
+                        color: Colors.grey.shade700,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -299,36 +369,53 @@ class VedaHomePage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            _buildServiceItem(
-              context,
-              'Web Applications',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.web,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 300,
+              offsetY: 100,
+              visible: _serviceVisible[0],
+              child: _buildServiceItem(
+                context,
+                'Web Applications',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.web,
+              ),
             ),
             const SizedBox(height: 20),
-            _buildServiceItem(
-              context,
-              'Software Applications',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.apps,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 450,
+              offsetY: 100,
+              visible: _serviceVisible[1],
+              child: _buildServiceItem(
+                context,
+                'Software Applications',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.apps,
+              ),
             ),
             const SizedBox(height: 20),
-            _buildServiceItem(
-              context,
-              'Hardware & Networking',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.settings_input_hdmi,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 600,
+              offsetY: 100,
+              visible: _serviceVisible[2],
+              child: _buildServiceItem(
+                context,
+                'Hardware & Networking',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.settings_input_hdmi,
+              ),
             ),
           ],
         ),
       );
     } else {
-      // Medium & Desktop: use Wrap for responsive layout
+      // Medium & Desktop: Wrap for responsive layout
       double cardWidth = 370;
       if (screenWidth >= 600 && screenWidth < 1200) {
-        // Medium screens: max 2 cards per row
         cardWidth = (screenWidth / 2) - 30;
-        if (cardWidth > 370) cardWidth = 370; // max width
+        if (cardWidth > 370) cardWidth = 370;
       }
 
       return Center(
@@ -337,26 +424,42 @@ class VedaHomePage extends StatelessWidget {
           runSpacing: 20,
           alignment: WrapAlignment.center,
           children: [
-            _buildServiceItem(
-              context,
-              'Web Applications',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.web,
-              width: cardWidth,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 200,
+              visible: _serviceVisible[0],
+              child: _buildServiceItem(
+                context,
+                'Web Applications',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.web,
+                width: cardWidth,
+              ),
             ),
-            _buildServiceItem(
-              context,
-              'Software Applications',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.apps,
-              width: cardWidth,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 370,
+              visible: _serviceVisible[1],
+
+              child: _buildServiceItem(
+                context,
+                'Software Applications',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.apps,
+                width: cardWidth,
+              ),
             ),
-            _buildServiceItem(
-              context,
-              'Hardware & Networking',
-              'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-              Icons.settings_input_hdmi,
-              width: cardWidth,
+            FadeInUpOnScroll(
+              controller: _scrollController,
+              startOffset: 450,
+              visible: _serviceVisible[1],
+              child: _buildServiceItem(
+                context,
+                'Hardware & Networking',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                Icons.settings_input_hdmi,
+                width: cardWidth,
+              ),
             ),
           ],
         ),
@@ -364,7 +467,6 @@ class VedaHomePage extends StatelessWidget {
     }
   }
 
-  // Update _buildServiceItem to accept width
   Widget _buildServiceItem(
     BuildContext context,
     String title,
@@ -373,6 +475,7 @@ class VedaHomePage extends StatelessWidget {
     double width = 370,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
       width: width,
       height: 130,
@@ -606,45 +709,62 @@ class VedaHomePage extends StatelessWidget {
                     spacing: 20,
                     runSpacing: 20,
                     children: [
-                      _buildServiceCard(
-                        'assets/3.png',
-                        'Web\nApplication',
-                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                        context,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Webapppg()),
-                          );
-                        },
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: desktop ? 1100 : 1800,
+                        offsetY: 100,
+                        child: _buildServiceCard(
+                          'assets/3.png',
+                          'Web\nApplication',
+                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
+                          context,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Webapppg(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                      _buildServiceCard(
-                        'assets/4.png',
-                        'Software\nApplications',
-                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                        context,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Softwarepg(),
-                            ),
-                          );
-                        },
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: desktop ? 1200 : 2150,
+                        offsetY: 100,
+                        child: _buildServiceCard(
+                          'assets/4.png',
+                          'Software\nApplications',
+                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
+                          context,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Softwarepg(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                      _buildServiceCard(
-                        'assets/5.png',
-                        'Hardware &\nNetworking',
-                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                        context,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Hardwareandnetworkingpg(),
-                            ),
-                          );
-                        },
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: desktop ? 1300 : 2500,
+                        offsetY: 100,
+                        child: _buildServiceCard(
+                          'assets/5.png',
+                          'Hardware &\nNetworking',
+                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
+                          context,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Hardwareandnetworkingpg(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -807,31 +927,46 @@ class VedaHomePage extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _buildReasonItem(
-                      '100%\nCustom Solutions',
-                      'Tailored software, not templates. Built to match your business model.',
-                      Icons.construction,
-                      context,
+                    FadeInUpOnScroll(
+                      controller: _scrollController,
+                      startOffset: 3300,
+                      offsetY: 100,
+                      child: _buildReasonItem(
+                        '100%\nCustom Solutions',
+                        'Tailored software, not templates. Built to match your business model.',
+                        Icons.construction,
+                        context,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
-                    _buildReasonItem(
-                      'Local Support,\nGlobal Standards',
-                      'Serving Bohrdin-based enterprises with ISO-grade quality.',
-                      Icons.public,
-                      context,
+                    FadeInUpOnScroll(
+                      controller: _scrollController,
+                      startOffset: 3600,
+                      offsetY: 100,
+                      child: _buildReasonItem(
+                        'Local Support,\nGlobal Standards',
+                        'Serving Bohrdin-based enterprises with ISO-grade quality.',
+                        Icons.public,
+                        context,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
-                    _buildReasonItem(
-                      'Fast\nTurnaround',
-                      'Rapid development cycles with clear timelines and zero guesswork.',
-                      Icons.speed,
-                      context,
+                    FadeInUpOnScroll(
+                      controller: _scrollController,
+                      startOffset: 3900,
+                      offsetY: 100,
+                      child: _buildReasonItem(
+                        'Fast\nTurnaround',
+                        'Rapid development cycles with clear timelines and zero guesswork.',
+                        Icons.speed,
+                        context,
+                      ),
                     ),
                   ],
                 )
@@ -841,11 +976,16 @@ class VedaHomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildReasonItem(
-                        '100%\nCustom Solutions',
-                        'Tailored software, not templates. Built to match your business model.',
-                        Icons.construction,
-                        context,
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: 1700,
+                        offsetY: 100,
+                        child: _buildReasonItem(
+                          '100%\nCustom Solutions',
+                          'Tailored software, not templates. Built to match your business model.',
+                          Icons.construction,
+                          context,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 25),
@@ -854,11 +994,16 @@ class VedaHomePage extends StatelessWidget {
                           painter: _DottedLinePainter(),
                         ),
                       ),
-                      _buildReasonItem(
-                        'Local Support,\nGlobal Standards',
-                        'Serving Bahrain-based enterprises with ISO-grade quality.',
-                        Icons.public,
-                        context,
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: 1900,
+                        offsetY: 100,
+                        child: _buildReasonItem(
+                          'Local Support,\nGlobal Standards',
+                          'Serving Bahrain-based enterprises with ISO-grade quality.',
+                          Icons.public,
+                          context,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 25),
@@ -867,11 +1012,16 @@ class VedaHomePage extends StatelessWidget {
                           painter: _DottedLinePainter(),
                         ),
                       ),
-                      _buildReasonItem(
-                        'Fast\nTurnaround',
-                        'Rapid development cycles with clear timelines and zero guesswork.',
-                        Icons.speed,
-                        context,
+                      FadeInUpOnScroll(
+                        controller: _scrollController,
+                        startOffset: 2100,
+                        offsetY: 100,
+                        child: _buildReasonItem(
+                          'Fast\nTurnaround',
+                          'Rapid development cycles with clear timelines and zero guesswork.',
+                          Icons.speed,
+                          context,
+                        ),
                       ),
                     ],
                   ),
