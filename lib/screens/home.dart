@@ -18,7 +18,6 @@ class VedaHomePage extends StatefulWidget {
 class _VedaHomePageState extends State<VedaHomePage> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollToTop = false;
-  final List<bool> _serviceVisible = [false, false, false];
 
   @override
   void initState() {
@@ -373,7 +372,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
               controller: _scrollController,
               startOffset: 300,
               offsetY: 100,
-              visible: _serviceVisible[0],
               child: _buildServiceItem(
                 context,
                 'Web Applications',
@@ -386,7 +384,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
               controller: _scrollController,
               startOffset: 450,
               offsetY: 100,
-              visible: _serviceVisible[1],
               child: _buildServiceItem(
                 context,
                 'Software Applications',
@@ -399,7 +396,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
               controller: _scrollController,
               startOffset: 600,
               offsetY: 100,
-              visible: _serviceVisible[2],
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
@@ -427,7 +423,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
             FadeInUpOnScroll(
               controller: _scrollController,
               startOffset: 200,
-              visible: _serviceVisible[0],
               child: _buildServiceItem(
                 context,
                 'Web Applications',
@@ -439,7 +434,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
             FadeInUpOnScroll(
               controller: _scrollController,
               startOffset: 370,
-              visible: _serviceVisible[1],
 
               child: _buildServiceItem(
                 context,
@@ -452,7 +446,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
             FadeInUpOnScroll(
               controller: _scrollController,
               startOffset: 450,
-              visible: _serviceVisible[1],
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
