@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:veda_main/fadeInAnime.dart';
+import 'package:veda_main/fadeInanime.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/screens/hardwareandnetworkingpg.dart';
 import 'package:veda_main/letstalk.dart';
@@ -50,18 +50,23 @@ class _VedaHomePageState extends State<VedaHomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1150;
 
+    // GlobalKeys for smooth scrolling
+    final GlobalKey aboutKey = GlobalKey();
+    final GlobalKey servicesKey = GlobalKey();
+    final GlobalKey contactKey = GlobalKey();
+
+    void scrollToSection(GlobalKey key) {
+      final context = key.currentContext;
+      if (context != null) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
+
     return Scaffold(
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(title: const Text('Home'), onTap: () {}),
-            ListTile(title: const Text('About'), onTap: () {}),
-            ListTile(title: const Text('Services'), onTap: () {}),
-            ListTile(title: const Text('Contact'), onTap: () {}),
-          ],
-        ),
-      ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -69,7 +74,31 @@ class _VedaHomePageState extends State<VedaHomePage> {
             controller: _scrollController,
             child: Column(
               children: [
-                TopBar(),
+                // TopBar with callback for menu taps
+                TopBar(
+                  onMenuItemPressed: (title) {
+                    switch (title) {
+                      case 'Home':
+                        _scrollToTop();
+                        break;
+                      case 'About':
+                        // Only scroll if key exists
+                        if (aboutKey.currentContext != null) {
+                          scrollToSection(aboutKey);
+                        }
+                        break;
+                      case 'Services':
+                        if (servicesKey.currentContext != null) {
+                          scrollToSection(servicesKey);
+                        }
+                        break;
+                      case 'Contact':
+                        scrollToSection(contactKey);
+                        break;
+                    }
+                  },
+                ),
+
                 if (isDesktop)
                   Stack(
                     clipBehavior: Clip.none,
@@ -88,17 +117,24 @@ class _VedaHomePageState extends State<VedaHomePage> {
                   const SizedBox(height: 40),
                   _buildServicesGridSection(context),
                 ],
+
                 SizedBox(height: isDesktop ? 100 : 40),
-                _buildAboutUsSection(context),
-                _buildOurServicesSection(context),
-                _buildWhyVedaSection(context),
-                const LetsTalkSection(),
+
+                // Sections with keys for smooth scrolling
+                Container(key: aboutKey, child: _buildAboutUsSection(context)),
+                Container(
+                  key: servicesKey,
+                  child: _buildOurServicesSection(context),
+                ),
+                Container(child: _buildWhyVedaSection(context)),
+
+                Container(key: contactKey, child: const LetsTalkSection()),
                 Footer(),
               ],
             ),
           ),
 
-          // Transparent Circle Scroll-to-Top Button
+          // Scroll-to-top button
           Positioned(
             bottom: 30,
             right: 30,
@@ -281,21 +317,26 @@ class _VedaHomePageState extends State<VedaHomePage> {
     );
   }
 
-  // Keeping your same button styles
   Widget _buildPrimaryButton() => ElevatedButton(
     onPressed: () {},
     style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color>(
-        (states) => states.contains(WidgetState.hovered)
-            ? Colors.transparent
-            : const Color(0xFF0035FF),
-      ),
-      foregroundColor: WidgetStateProperty.all(Colors.white),
-      side: WidgetStateProperty.resolveWith<BorderSide>(
-        (states) => states.contains(WidgetState.hovered)
-            ? const BorderSide(color: Colors.white, width: 2)
-            : BorderSide.none,
-      ),
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : const Color(0xFF0035FF);
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.transparent,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
@@ -324,17 +365,23 @@ class _VedaHomePageState extends State<VedaHomePage> {
   Widget _buildSecondaryButton() => OutlinedButton(
     onPressed: () {},
     style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-        (states) => states.contains(WidgetState.hovered)
-            ? const Color(0xFF0035FF)
-            : Colors.transparent,
-      ),
-      foregroundColor: WidgetStateProperty.all(Colors.white),
-      side: WidgetStateProperty.resolveWith<BorderSide>(
-        (states) => states.contains(WidgetState.hovered)
-            ? BorderSide.none
-            : const BorderSide(color: Colors.white),
-      ),
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : Colors.transparent;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.white,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
@@ -354,7 +401,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
           ),
         ),
         const SizedBox(width: 8),
-        const Icon(Icons.arrow_forward, size: 24),
+        Icon(Icons.arrow_forward, size: 24), // inherits foregroundColor
       ],
     ),
   );
@@ -368,38 +415,42 @@ class _VedaHomePageState extends State<VedaHomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
+            // Mobile
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 300,
+              onceId: 'grid_web',
+              triggerFraction: 0.4,
               offsetY: 100,
+              delay: const Duration(milliseconds: 0),
               child: _buildServiceItem(
                 context,
                 'Web Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.web,
               ),
             ),
             const SizedBox(height: 20),
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 450,
+              onceId: 'grid_software',
+              triggerFraction: 0.4,
               offsetY: 100,
+              delay: const Duration(milliseconds: 200),
               child: _buildServiceItem(
                 context,
                 'Software Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.apps,
               ),
             ),
             const SizedBox(height: 20),
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 600,
+              onceId: 'grid_hardware',
+              triggerFraction: 0.4,
               offsetY: 100,
+              delay: const Duration(milliseconds: 400),
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.settings_input_hdmi,
               ),
             ),
@@ -420,36 +471,42 @@ class _VedaHomePageState extends State<VedaHomePage> {
           runSpacing: 20,
           alignment: WrapAlignment.center,
           children: [
+            // Desktop (same ids)
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 200,
+              onceId: 'grid_web',
+              triggerFraction: 0.4,
+              offsetY: 100,
+              delay: const Duration(milliseconds: 0),
               child: _buildServiceItem(
                 context,
                 'Web Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.web,
                 width: cardWidth,
               ),
             ),
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 370,
-
+              onceId: 'grid_software',
+              triggerFraction: 0.4,
+              offsetY: 100,
+              delay: const Duration(milliseconds: 200),
               child: _buildServiceItem(
                 context,
                 'Software Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.apps,
                 width: cardWidth,
               ),
             ),
             FadeInUpOnScroll(
-              controller: _scrollController,
-              startOffset: 450,
+              onceId: 'grid_hardware',
+              triggerFraction: 0.4,
+              offsetY: 100,
+              delay: const Duration(milliseconds: 400),
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
+                'Lorem ipsum...',
                 Icons.settings_input_hdmi,
                 width: cardWidth,
               ),
@@ -542,7 +599,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     height: desktop ? 400 : 300,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset('assets/2.png', fit: BoxFit.cover),
+                      child: Image.asset(
+                        gaplessPlayback: true,
+                        'assets/2.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -703,9 +764,12 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     runSpacing: 20,
                     children: [
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: desktop ? 1100 : 1800,
+                        onceId: 'web',
+                        triggerFraction: 0.5,
                         offsetY: 100,
+                        delay: const Duration(
+                          milliseconds: 0,
+                        ), // first appears immediately
                         child: _buildServiceCard(
                           'assets/3.png',
                           'Web\nApplication',
@@ -722,9 +786,13 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         ),
                       ),
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: desktop ? 1200 : 2150,
+                        onceId: 'sftwr',
+                        triggerFraction: 0.5,
                         offsetY: 100,
+                        delay: const Duration(
+                          milliseconds: 200,
+                        ), // second comes later
+
                         child: _buildServiceCard(
                           'assets/4.png',
                           'Software\nApplications',
@@ -741,9 +809,13 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         ),
                       ),
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: desktop ? 1300 : 2500,
+                        onceId: 'hrdwr',
+                        triggerFraction: 0.5,
                         offsetY: 100,
+                        delay: const Duration(
+                          milliseconds: 400,
+                        ), // third comes last
+
                         child: _buildServiceCard(
                           'assets/5.png',
                           'Hardware &\nNetworking',
@@ -807,6 +879,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
+                  gaplessPlayback: true,
                   imagePath,
                   height: 200,
                   width: double.infinity,
@@ -921,9 +994,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     FadeInUpOnScroll(
-                      controller: _scrollController,
-                      startOffset: 3300,
+                      onceId: '100%',
+                      triggerFraction: 0.6,
                       offsetY: 100,
+                      delay: const Duration(milliseconds: 0),
                       child: _buildReasonItem(
                         '100%\nCustom Solutions',
                         'Tailored software, not templates. Built to match your business model.',
@@ -936,9 +1010,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     FadeInUpOnScroll(
-                      controller: _scrollController,
-                      startOffset: 3600,
+                      onceId: 'lclsprt',
+                      triggerFraction: 0.6,
                       offsetY: 100,
+                      delay: const Duration(milliseconds: 200),
+
                       child: _buildReasonItem(
                         'Local Support,\nGlobal Standards',
                         'Serving Bohrdin-based enterprises with ISO-grade quality.',
@@ -951,9 +1027,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     FadeInUpOnScroll(
-                      controller: _scrollController,
-                      startOffset: 3900,
+                      onceId: 'fst',
+                      triggerFraction: 0.6,
                       offsetY: 100,
+                      delay: const Duration(milliseconds: 400),
                       child: _buildReasonItem(
                         'Fast\nTurnaround',
                         'Rapid development cycles with clear timelines and zero guesswork.',
@@ -970,9 +1047,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: 1700,
+                        onceId: '100%',
+                        triggerFraction: 0.6,
                         offsetY: 100,
+                        delay: const Duration(milliseconds: 0),
                         child: _buildReasonItem(
                           '100%\nCustom Solutions',
                           'Tailored software, not templates. Built to match your business model.',
@@ -988,9 +1066,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         ),
                       ),
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: 1900,
+                        onceId: 'lclsprt',
+                        triggerFraction: 0.6,
                         offsetY: 100,
+                        delay: const Duration(milliseconds: 200),
                         child: _buildReasonItem(
                           'Local Support,\nGlobal Standards',
                           'Serving Bahrain-based enterprises with ISO-grade quality.',
@@ -1006,9 +1085,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         ),
                       ),
                       FadeInUpOnScroll(
-                        controller: _scrollController,
-                        startOffset: 2100,
+                        onceId: 'fst',
+                        triggerFraction: 0.6,
                         offsetY: 100,
+                        delay: const Duration(milliseconds: 400),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',
                           'Rapid development cycles with clear timelines and zero guesswork.',

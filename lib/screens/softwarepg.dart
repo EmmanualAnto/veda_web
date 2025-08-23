@@ -238,14 +238,30 @@ class _SoftwarepgState extends State<Softwarepg> {
   Widget _buildPrimaryButton() => ElevatedButton(
     onPressed: () {},
     style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.all(const Color(0xFF0035FF)),
-      foregroundColor: WidgetStateProperty.all(Colors.white),
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : const Color(0xFF0035FF);
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.transparent,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
       shape: WidgetStateProperty.all(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
+      elevation: WidgetStateProperty.all(0),
       minimumSize: WidgetStateProperty.all(const Size(205, 54)),
     ),
     child: Row(
@@ -267,8 +283,23 @@ class _SoftwarepgState extends State<Softwarepg> {
   Widget _buildSecondaryButton() => OutlinedButton(
     onPressed: () {},
     style: ButtonStyle(
-      foregroundColor: WidgetStateProperty.all(Colors.white),
-      side: WidgetStateProperty.all(const BorderSide(color: Colors.white)),
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : Colors.transparent;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.white,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
@@ -288,10 +319,11 @@ class _SoftwarepgState extends State<Softwarepg> {
           ),
         ),
         const SizedBox(width: 8),
-        const Icon(Icons.arrow_forward, size: 24),
+        Icon(Icons.arrow_forward, size: 24), // inherits foregroundColor
       ],
     ),
   );
+
   Widget _buildFiveCardsSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -300,43 +332,46 @@ class _SoftwarepgState extends State<Softwarepg> {
         return Padding(
           padding: EdgeInsets.all(isMobile ? 10 : 20),
           child: isMobile
-              ? Column(
-                  children: const [
-                    StyledCardSection(
-                      imagePath: "assets/software/1.png",
-                      title: "Customized Accounting Packages",
-                      description:
-                          "Streamline finances with tailored accounting software built for your business model.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/software/2.png",
-                      title: "POS (Point of Sale) Systems",
-                      description:
-                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/software/3.png",
-                      title: "Wholesale & Retail Inventory Software",
-                      description:
-                          "Track, manage, and optimize your inventory with ease.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/software/4.png",
-                      title: "Customized Software for Organizations",
-                      description:
-                          "Custom-built software designed to fit unique organizational needs.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.png",
-                      title: "Softwares for Personal Accounting",
-                      description:
-                          "Simplify your personal finances with user-friendly accounting software.",
-                    ),
-                  ],
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Column(
+                    children: const [
+                      StyledCardSection(
+                        imagePath: "assets/software/1.png",
+                        title: "Customized Accounting Packages",
+                        description:
+                            "Streamline finances with tailored accounting software built for your business model.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/2.png",
+                        title: "POS (Point of Sale) Systems",
+                        description:
+                            "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/3.png",
+                        title: "Wholesale & Retail Inventory Software",
+                        description:
+                            "Track, manage, and optimize your inventory with ease.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/4.png",
+                        title: "Customized Software for Organizations",
+                        description:
+                            "Custom-built software designed to fit unique organizational needs.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/5.png",
+                        title: "Softwares for Personal Accounting",
+                        description:
+                            "Simplify your personal finances with user-friendly accounting software.",
+                      ),
+                    ],
+                  ),
                 )
               : Wrap(
                   spacing: 20,

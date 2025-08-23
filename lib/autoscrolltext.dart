@@ -125,7 +125,7 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
               Text(
                 client,
                 style: GoogleFonts.poppins(
-                  fontSize: widget.isMobile ? 22 : 26,
+                  fontSize: widget.isMobile ? 20 : 26,
                   fontWeight: FontWeight.w500,
                   color: const Color.fromRGBO(13, 20, 45, 1),
                 ),

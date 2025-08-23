@@ -17,7 +17,11 @@ class LetsTalkSection extends StatelessWidget {
         children: [
           // Background image
           Positioned.fill(
-            child: Image.asset('assets/last.png', fit: BoxFit.cover),
+            child: Image.asset(
+              gaplessPlayback: true,
+              'assets/last.png',
+              fit: BoxFit.cover,
+            ),
           ),
 
           // Gradient overlay

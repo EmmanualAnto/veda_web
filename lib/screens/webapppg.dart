@@ -238,14 +238,30 @@ class _WebapppgState extends State<Webapppg> {
   Widget _buildPrimaryButton() => ElevatedButton(
     onPressed: () {},
     style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.all(const Color(0xFF0035FF)),
-      foregroundColor: WidgetStateProperty.all(Colors.white),
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : const Color(0xFF0035FF);
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.transparent,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
       shape: WidgetStateProperty.all(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
+      elevation: WidgetStateProperty.all(0),
       minimumSize: WidgetStateProperty.all(const Size(205, 54)),
     ),
     child: Row(
@@ -267,8 +283,23 @@ class _WebapppgState extends State<Webapppg> {
   Widget _buildSecondaryButton() => OutlinedButton(
     onPressed: () {},
     style: ButtonStyle(
-      foregroundColor: WidgetStateProperty.all(Colors.white),
-      side: WidgetStateProperty.all(const BorderSide(color: Colors.white)),
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : Colors.transparent;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.white,
+        );
+      }),
       padding: WidgetStateProperty.all(
         const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
       ),
@@ -288,10 +319,11 @@ class _WebapppgState extends State<Webapppg> {
           ),
         ),
         const SizedBox(width: 8),
-        const Icon(Icons.arrow_forward, size: 24),
+        Icon(Icons.arrow_forward, size: 24), // inherits foregroundColor
       ],
     ),
   );
+
   Widget _buildFiveCardsSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -300,58 +332,61 @@ class _WebapppgState extends State<Webapppg> {
         return Padding(
           padding: EdgeInsets.all(isMobile ? 10 : 20),
           child: isMobile
-              ? Column(
-                  children: const [
-                    StyledCardSection(
-                      imagePath: "assets/web/1.jpg",
-                      title: "Design & Development",
-                      description:
-                          "Insight-driven strategies to grow traffic, engagement, and conversions.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/2.jpg",
-                      title: "Marketing & Analysis",
-                      description:
-                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/4.jpg",
-                      title: "Domain & Hosting Management",
-                      description:
-                          "Seamless domain registration, hosting, and long-term maintenance.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/3.jpg",
-                      title: "E-Commerce Development",
-                      description:
-                          "Custom online stores with secure transactions and smooth user experience.",
-                    ),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: Column(
+                    children: const [
+                      StyledCardSection(
+                        imagePath: "assets/web/1.jpg",
+                        title: "Design & Development",
+                        description:
+                            "Insight-driven strategies to grow traffic, engagement, and conversions.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/2.jpg",
+                        title: "Marketing & Analysis",
+                        description:
+                            "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/4.jpg",
+                        title: "Domain & Hosting Management",
+                        description:
+                            "Seamless domain registration, hosting, and long-term maintenance.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/3.jpg",
+                        title: "E-Commerce Development",
+                        description:
+                            "Custom online stores with secure transactions and smooth user experience.",
+                      ),
 
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/6.png",
-                      title: "Website Upgrades & Renovations",
-                      description:
-                          "Redesign and revamp outdated websites with modern UI/UX.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/5.jpg",
-                      title: "Application Development",
-                      description:
-                          "Interactive solutions like chatrooms, polls, message boards, and more.",
-                    ),
-                    SizedBox(height: 20),
-                    StyledCardSection(
-                      imagePath: "assets/web/7.png",
-                      title: "Database Construction",
-                      description:
-                          "Powerful, scalable databases designed to handle business growth.",
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/6.png",
+                        title: "Website Upgrades & Renovations",
+                        description:
+                            "Redesign and revamp outdated websites with modern UI/UX.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/5.jpg",
+                        title: "Application Development",
+                        description:
+                            "Interactive solutions like chatrooms, polls, message boards, and more.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/web/7.png",
+                        title: "Database Construction",
+                        description:
+                            "Powerful, scalable databases designed to handle business growth.",
+                      ),
+                    ],
+                  ),
                 )
               : Wrap(
                   spacing: 20,

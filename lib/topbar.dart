@@ -23,21 +23,40 @@ class TopBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(logoPath, height: 50, width: 150),
-          isDesktop
-              ? Row(
-                  children: menuItems
-                      .map((item) => _navButton(item, context))
-                      .toList(),
-                )
-              : Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Color(0xFF017697)),
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ),
-                ),
+          // Logo
+          Image.asset(logoPath, height: 50, width: 150, fit: BoxFit.contain),
+
+          // Menu Items
+          if (isDesktop)
+            Row(
+              children: menuItems
+                  .map((item) => _navButton(item, context))
+                  .toList(),
+            )
+          else
+            PopupMenuButton<String>(
+              color: Colors.white,
+              icon: const Icon(Icons.menu, color: Color(0xFF017697)),
+              onSelected: (value) {
+                if (onMenuItemPressed != null) onMenuItemPressed!(value);
+              },
+              itemBuilder: (context) {
+                return menuItems
+                    .map(
+                      (item) => PopupMenuItem<String>(
+                        value: item,
+                        child: Text(
+                          item,
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList();
+              },
+            ),
         ],
       ),
     );
@@ -48,11 +67,13 @@ class TopBar extends StatelessWidget {
       onPressed: () {
         if (onMenuItemPressed != null) onMenuItemPressed!(title);
       },
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
+      child: Center(
+        child: Text(
+          title,
+          style: GoogleFonts.instrumentSans(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

@@ -20,7 +20,7 @@ class StyledCardSection extends StatelessWidget {
     final desktop = screenWidth > 800;
 
     return Container(
-      width: 386.67,
+      width: desktop ? 386.67 : 343,
       height: 348,
       padding: EdgeInsets.all(desktop ? 16 : 10),
       decoration: BoxDecoration(
@@ -43,6 +43,7 @@ class StyledCardSection extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.asset(
+              gaplessPlayback: true,
               imagePath,
               width: double.infinity,
               height: 180,
