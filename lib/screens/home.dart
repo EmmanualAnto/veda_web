@@ -146,17 +146,17 @@ class _VedaHomePageState extends State<VedaHomePage> {
                 child: GestureDetector(
                   onTap: _scrollToTop,
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    width: 30,
+                    height: 30,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade700, width: 2),
+                      border: Border.all(color: Color(0xFF0035FF), width: 2),
                       color: Colors.transparent,
                     ),
                     child: Center(
                       child: Icon(
                         Icons.arrow_upward,
-                        color: Colors.grey.shade700,
+                        color: Color(0xFF0035FF),
                         size: 24,
                       ),
                     ),
@@ -186,7 +186,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                 height: double.infinity,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/1.png'),
+                    image: AssetImage('assets/1.webp'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -424,7 +424,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
               child: _buildServiceItem(
                 context,
                 'Web Applications',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.web,
               ),
             ),
@@ -433,11 +433,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
               onceId: 'grid_software',
               triggerFraction: 0.4,
               offsetY: 100,
-              delay: const Duration(milliseconds: 200),
+              delay: const Duration(milliseconds: 100),
               child: _buildServiceItem(
                 context,
                 'Software Applications',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.apps,
               ),
             ),
@@ -446,11 +446,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
               onceId: 'grid_hardware',
               triggerFraction: 0.4,
               offsetY: 100,
-              delay: const Duration(milliseconds: 400),
+              delay: const Duration(milliseconds: 200),
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.settings_input_hdmi,
               ),
             ),
@@ -480,7 +480,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
               child: _buildServiceItem(
                 context,
                 'Web Applications',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.web,
                 width: cardWidth,
               ),
@@ -489,11 +489,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
               onceId: 'grid_software',
               triggerFraction: 0.4,
               offsetY: 100,
-              delay: const Duration(milliseconds: 200),
+              delay: const Duration(milliseconds: 100),
               child: _buildServiceItem(
                 context,
                 'Software Applications',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.apps,
                 width: cardWidth,
               ),
@@ -502,11 +502,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
               onceId: 'grid_hardware',
               triggerFraction: 0.4,
               offsetY: 100,
-              delay: const Duration(milliseconds: 400),
+              delay: const Duration(milliseconds: 200),
               child: _buildServiceItem(
                 context,
                 'Hardware & Networking',
-                'Lorem ipsum...',
+                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
                 Icons.settings_input_hdmi,
                 width: cardWidth,
               ),
@@ -601,7 +601,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
                         gaplessPlayback: true,
-                        'assets/2.png',
+                        'assets/2.webp',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -771,7 +771,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                           milliseconds: 0,
                         ), // first appears immediately
                         child: _buildServiceCard(
-                          'assets/3.png',
+                          'assets/3.webp',
                           'Web\nApplication',
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                           context,
@@ -790,11 +790,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         triggerFraction: 0.5,
                         offsetY: 100,
                         delay: const Duration(
-                          milliseconds: 200,
+                          milliseconds: 100,
                         ), // second comes later
 
                         child: _buildServiceCard(
-                          'assets/4.png',
+                          'assets/4.webp',
                           'Software\nApplications',
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                           context,
@@ -813,11 +813,11 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         triggerFraction: 0.5,
                         offsetY: 100,
                         delay: const Duration(
-                          milliseconds: 400,
+                          milliseconds: 200,
                         ), // third comes last
 
                         child: _buildServiceCard(
-                          'assets/5.png',
+                          'assets/5.webp',
                           'Hardware &\nNetworking',
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
                           context,
@@ -1013,7 +1013,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                       onceId: 'lclsprt',
                       triggerFraction: 0.6,
                       offsetY: 100,
-                      delay: const Duration(milliseconds: 200),
+                      delay: const Duration(milliseconds: 100),
 
                       child: _buildReasonItem(
                         'Local Support,\nGlobal Standards',
@@ -1030,7 +1030,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                       onceId: 'fst',
                       triggerFraction: 0.6,
                       offsetY: 100,
-                      delay: const Duration(milliseconds: 400),
+                      delay: const Duration(milliseconds: 200),
                       child: _buildReasonItem(
                         'Fast\nTurnaround',
                         'Rapid development cycles with clear timelines and zero guesswork.',
@@ -1069,7 +1069,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         onceId: 'lclsprt',
                         triggerFraction: 0.6,
                         offsetY: 100,
-                        delay: const Duration(milliseconds: 200),
+                        delay: const Duration(milliseconds: 100),
                         child: _buildReasonItem(
                           'Local Support,\nGlobal Standards',
                           'Serving Bahrain-based enterprises with ISO-grade quality.',
@@ -1088,7 +1088,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         onceId: 'fst',
                         triggerFraction: 0.6,
                         offsetY: 100,
-                        delay: const Duration(milliseconds: 400),
+                        delay: const Duration(milliseconds: 200),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',
                           'Rapid development cycles with clear timelines and zero guesswork.',

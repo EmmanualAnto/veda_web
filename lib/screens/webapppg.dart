@@ -123,7 +123,7 @@ class _WebapppgState extends State<Webapppg> {
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/1.png'),
+                    image: AssetImage('assets/1.webp'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -337,28 +337,28 @@ class _WebapppgState extends State<Webapppg> {
                   child: Column(
                     children: const [
                       StyledCardSection(
-                        imagePath: "assets/web/1.jpg",
+                        imagePath: "assets/web/1.webp",
                         title: "Design & Development",
                         description:
                             "Insight-driven strategies to grow traffic, engagement, and conversions.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/2.jpg",
+                        imagePath: "assets/web/2.webp",
                         title: "Marketing & Analysis",
                         description:
                             "Fast, secure, and reliable POS solutions for retail and restaurants.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/4.jpg",
+                        imagePath: "assets/web/4.webp",
                         title: "Domain & Hosting Management",
                         description:
                             "Seamless domain registration, hosting, and long-term maintenance.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/3.jpg",
+                        imagePath: "assets/web/3.webp",
                         title: "E-Commerce Development",
                         description:
                             "Custom online stores with secure transactions and smooth user experience.",
@@ -366,21 +366,21 @@ class _WebapppgState extends State<Webapppg> {
 
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/6.png",
+                        imagePath: "assets/web/6.webp",
                         title: "Website Upgrades & Renovations",
                         description:
                             "Redesign and revamp outdated websites with modern UI/UX.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/5.jpg",
+                        imagePath: "assets/web/5.webp",
                         title: "Application Development",
                         description:
                             "Interactive solutions like chatrooms, polls, message boards, and more.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/web/7.png",
+                        imagePath: "assets/web/7.webp",
                         title: "Database Construction",
                         description:
                             "Powerful, scalable databases designed to handle business growth.",
@@ -393,44 +393,44 @@ class _WebapppgState extends State<Webapppg> {
                   runSpacing: 20,
                   children: const [
                     StyledCardSection(
-                      imagePath: "assets/web/1.jpg",
+                      imagePath: "assets/web/1.webp",
                       title: "Design & Development",
                       description:
                           "Insight-driven strategies to grow traffic, engagement, and conversions.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/web/2.jpg",
+                      imagePath: "assets/web/2.webp",
                       title: "Marketing & Analysis",
                       description:
                           "Fast, secure, and reliable POS solutions for retail and restaurants.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/web/4.jpg",
+                      imagePath: "assets/web/4.webp",
                       title: "Domain & Hosting Management",
                       description:
                           "Seamless domain registration, hosting, and long-term maintenance.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/web/3.jpg",
+                      imagePath: "assets/web/3.webp",
                       title: "E-Commerce Development",
                       description:
                           "Custom online stores with secure transactions and smooth user experience.",
                     ),
 
                     StyledCardSection(
-                      imagePath: "assets/web/5.jpg",
+                      imagePath: "assets/web/5.webp",
                       title: "Website Upgrades & Renovations",
                       description:
                           "Redesign and revamp outdated websites with modern UI/UX.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/web/6.png",
+                      imagePath: "assets/web/6.webp",
                       title: "Application Development",
                       description:
                           "Interactive solutions like chatrooms, polls, message boards, and more.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/web/7.png",
+                      imagePath: "assets/web/7.webp",
                       title: "Database Construction",
                       description:
                           "Powerful, scalable databases designed to handle business growth.",

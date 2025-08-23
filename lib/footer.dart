@@ -81,7 +81,7 @@ class Footer extends StatelessWidget {
       children: [
         Image.asset(
           gaplessPlayback: true,
-          'assets/logo.png',
+          'assets/logo.webp',
           height: 80,
           width: 220,
           fit: BoxFit.contain,

@@ -124,7 +124,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg> {
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/1.png'),
+                    image: AssetImage('assets/1.webp'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -338,35 +338,35 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg> {
                   child: Column(
                     children: const [
                       StyledCardSection(
-                        imagePath: "assets/software/1.png",
+                        imagePath: "assets/software/1.webp",
                         title: "Customized Accounting Packages",
                         description:
                             "Streamline finances with tailored accounting software built for your business model.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/software/2.png",
+                        imagePath: "assets/software/2.webp",
                         title: "POS (Point of Sale) Systems",
                         description:
                             "Fast, secure, and reliable POS solutions for retail and restaurants.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/software/3.png",
+                        imagePath: "assets/software/3.webp",
                         title: "Wholesale & Retail Inventory Software",
                         description:
                             "Track, manage, and optimize your inventory with ease.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/software/4.png",
+                        imagePath: "assets/software/4.webp",
                         title: "Customized Software for Organizations",
                         description:
                             "Custom-built software designed to fit unique organizational needs.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
-                        imagePath: "assets/software/5.png",
+                        imagePath: "assets/software/5.webp",
                         title: "Softwares for Personal Accounting",
                         description:
                             "Simplify your personal finances with user-friendly accounting software.",
@@ -379,31 +379,31 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg> {
                   runSpacing: 20,
                   children: const [
                     StyledCardSection(
-                      imagePath: "assets/software/1.png",
+                      imagePath: "assets/software/1.webp",
                       title: "Customized\nAccounting Packages",
                       description:
                           "Streamline finances with tailored accounting software built for your business model.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/software/2.png",
+                      imagePath: "assets/software/2.webp",
                       title: "POS (Point of Sale) Systems",
                       description:
                           "Fast, secure, and reliable POS solutions for retail and restaurants.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/software/3.png",
+                      imagePath: "assets/software/3.webp",
                       title: "Wholesale & Retail Inventory Software",
                       description:
                           "Track, manage, and optimize your inventory with ease.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/software/4.png",
+                      imagePath: "assets/software/4.webp",
                       title: "Customized Software for Organizations",
                       description:
                           "Custom-built software designed to fit unique organizational needs.",
                     ),
                     StyledCardSection(
-                      imagePath: "assets/software/5.png",
+                      imagePath: "assets/software/5.webp",
                       title: "Softwares for Personal Accounting",
                       description:
                           "Simplify your personal finances with user-friendly accounting software.",

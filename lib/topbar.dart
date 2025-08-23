@@ -9,7 +9,7 @@ class TopBar extends StatelessWidget {
   const TopBar({
     super.key,
     this.menuItems = const ['Home', 'About', 'Services', 'Contact'],
-    this.logoPath = 'assets/logo.png',
+    this.logoPath = 'assets/logo.webp',
     this.onMenuItemPressed,
   });
 

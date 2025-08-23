@@ -57,28 +57,26 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/1.png
-    - assets/2.png
-    - assets/3.png
-    - assets/4.png
-    - assets/5.png
-    - assets/last.png
-    - assets/logo.png
-    - assets/software/1.png
-    - assets/software/2.png
-    - assets/software/3.png
-    - assets/software/4.png
-    - assets/software/5.png
-    - assets/web/1.jpg
-    - assets/web/2.jpg
-    - assets/web/3.jpg
-    - assets/web/4.jpg
-    - assets/web/5.jpg
-    - assets/web/6.png
-    - assets/web/7.png
-    - assets/animations/web.json
-    - assets/animations/sotwr.json
-    - assets/animations/hrdwr.json
+    - assets/1.webp
+    - assets/2.webp
+    - assets/3.webp
+    - assets/4.webp
+    - assets/5.webp
+    - assets/last.webp
+    - assets/logo.webp
+    - assets/software/1.webp
+    - assets/software/2.webp
+    - assets/software/3.webp
+    - assets/software/4.webp
+    - assets/software/5.webp
+    - assets/web/1.webp
+    - assets/web/2.webp
+    - assets/web/3.webp
+    - assets/web/4.webp
+    - assets/web/5.webp
+    - assets/web/6.webp
+    - assets/web/7.webp
+   
 
 
   # The following line ensures that the Material Icons font is

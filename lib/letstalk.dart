@@ -19,7 +19,7 @@ class LetsTalkSection extends StatelessWidget {
           Positioned.fill(
             child: Image.asset(
               gaplessPlayback: true,
-              'assets/last.png',
+              'assets/last.webp',
               fit: BoxFit.cover,
             ),
           ),
