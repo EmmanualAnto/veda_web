@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 import 'package:veda_main/fadeInanime.dart';
 import 'package:veda_main/footer.dart';
+import 'package:veda_main/headercarousel.dart';
 import 'package:veda_main/screens/hardwareandnetworkingpg.dart';
 import 'package:veda_main/letstalk.dart';
 import 'package:veda_main/screens/softwarepg.dart';
@@ -15,18 +17,31 @@ class VedaHomePage extends StatefulWidget {
   State<VedaHomePage> createState() => _VedaHomePageState();
 }
 
-class _VedaHomePageState extends State<VedaHomePage> {
+class _VedaHomePageState extends State<VedaHomePage>
+    with SingleTickerProviderStateMixin {
+  // ✅ add this mixin
   final ScrollController _scrollController = ScrollController();
-  bool _showScrollToTop = false;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    _fadeController = AnimationController(
+      vsync: this, // ✅ works now
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+
     _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !_showScrollToTop) {
-        setState(() => _showScrollToTop = true);
-      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
-        setState(() => _showScrollToTop = false);
+      if (_scrollController.offset > 300) {
+        _fadeController.forward();
+      } else {
+        _fadeController.reverse();
       }
     });
   }
@@ -34,6 +49,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
@@ -43,6 +59,17 @@ class _VedaHomePageState extends State<VedaHomePage> {
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeInOut,
     );
+  }
+
+  void scrollToSection(GlobalKey key) {
+    final context = key.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -55,34 +82,22 @@ class _VedaHomePageState extends State<VedaHomePage> {
     final GlobalKey servicesKey = GlobalKey();
     final GlobalKey contactKey = GlobalKey();
 
-    void scrollToSection(GlobalKey key) {
-      final context = key.currentContext;
-      if (context != null) {
-        Scrollable.ensureVisible(
-          context,
-          duration: const Duration(milliseconds: 700),
-          curve: Curves.easeInOut,
-        );
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          SingleChildScrollView(
+          CustomScrollView(
             controller: _scrollController,
-            child: Column(
-              children: [
-                // TopBar with callback for menu taps
-                TopBar(
+            slivers: [
+              // TopBar
+              SliverToBoxAdapter(
+                child: TopBar(
                   onMenuItemPressed: (title) {
                     switch (title) {
                       case 'Home':
                         _scrollToTop();
                         break;
                       case 'About':
-                        // Only scroll if key exists
                         if (aboutKey.currentContext != null) {
                           scrollToSection(aboutKey);
                         }
@@ -98,67 +113,81 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     }
                   },
                 ),
+              ),
 
-                if (isDesktop)
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      _buildHeaderSection(context),
-                      Positioned(
-                        bottom: -75,
-                        left: 0,
-                        right: 0,
-                        child: _buildServicesGridSection(context),
+              // Header + Services Grid
+              SliverToBoxAdapter(
+                child: isDesktop
+                    ? Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          const HeaderCarousel(),
+                          Positioned(
+                            bottom: -75,
+                            left: 0,
+                            right: 0,
+                            child: _buildServicesGridSection(context),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          const HeaderCarousel(),
+                          const SizedBox(height: 40),
+                          _buildServicesGridSection(context),
+                        ],
                       ),
-                    ],
-                  )
-                else ...[
-                  _buildHeaderSection(context),
-                  const SizedBox(height: 40),
-                  _buildServicesGridSection(context),
-                ],
+              ),
 
-                SizedBox(height: isDesktop ? 100 : 40),
+              // Spacer
+              SliverToBoxAdapter(child: SizedBox(height: isDesktop ? 100 : 40)),
 
-                // Sections with keys for smooth scrolling
-                Container(key: aboutKey, child: _buildAboutUsSection(context)),
-                Container(
+              // Sections with keys
+              SliverToBoxAdapter(
+                child: Container(
+                  key: aboutKey,
+                  child: _buildAboutUsSection(context),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Container(
                   key: servicesKey,
                   child: _buildOurServicesSection(context),
                 ),
-                Container(child: _buildWhyVedaSection(context)),
-
-                Container(key: contactKey, child: const LetsTalkSection()),
-                Footer(),
-              ],
-            ),
+              ),
+              SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
+              SliverToBoxAdapter(
+                child: Container(
+                  key: contactKey,
+                  child: const LetsTalkSection(),
+                ),
+              ),
+              SliverToBoxAdapter(child: Footer()),
+            ],
           ),
-
-          // Scroll-to-top button
           Positioned(
             bottom: 30,
             right: 30,
-            child: AnimatedOpacity(
-              opacity: _showScrollToTop ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 400),
-              child: IgnorePointer(
-                ignoring: !_showScrollToTop,
-                child: GestureDetector(
-                  onTap: _scrollToTop,
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xFF0035FF), width: 2),
-                      color: Colors.transparent,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: GestureDetector(
+                onTap: _scrollToTop,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF0035FF),
+                      width: 2,
                     ),
-                    child: Center(
-                      child: Icon(
-                        Icons.arrow_upward,
-                        color: Color(0xFF0035FF),
-                        size: 24,
-                      ),
+                    color: Colors.transparent,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_upward,
+                      color: Color(0xFF0035FF),
+                      size: 24,
                     ),
                   ),
                 ),
@@ -170,242 +199,6 @@ class _VedaHomePageState extends State<VedaHomePage> {
     );
   }
 
-  Widget _buildHeaderSection(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 800;
-
-        return SizedBox(
-          width: double.infinity,
-          height: 810,
-          child: Stack(
-            children: [
-              // Background image
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/1.webp'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-              // Gradient overlay
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(3, 9, 35, 0.879),
-                      Color.fromRGBO(3, 9, 35, 0.867),
-                      Color.fromRGBO(3, 9, 35, 0.85),
-                      Color.fromRGBO(3, 9, 35, 0.67),
-                      Color.fromRGBO(3, 9, 35, 0.6),
-                    ],
-                    stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-                  ),
-                ),
-              ),
-
-              // Content
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 5 : 120,
-                  vertical: isMobile
-                      ? 0
-                      : 170, // remove vertical padding on mobile
-                ),
-                child: Align(
-                  alignment: isMobile ? Alignment.center : Alignment.topLeft,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // makes it shrink-wrap
-                    crossAxisAlignment: isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      RichText(
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '// ',
-                              style: TextStyle(
-                                color: const Color(0xFF0035FF),
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Powering Innovation Through Technology',
-                              style: GoogleFonts.instrumentSans(
-                                color: Colors.white,
-                                fontSize: isMobile ? 16 : 22,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: isMobile ? 20 : 15),
-
-                      // Heading
-                      Text(
-                        'Future-Ready Software & Tech\nSolutions for Modern Businesses',
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        style: GoogleFonts.instrumentSans(
-                          color: Colors.white,
-                          fontSize: isMobile ? 26 : 46,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
-                      ),
-
-                      SizedBox(height: isMobile ? 40 : 25),
-
-                      // Subtitle
-                      Text(
-                        'Tailored software, powerful platforms, and reliable IT infrastructure everything your\nbusiness needs to scale, seamlessly.',
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: isMobile ? 14 : 20,
-                          height: 1.5,
-                        ),
-                      ),
-
-                      SizedBox(height: isMobile ? 45 : 35),
-
-                      // Buttons
-                      isMobile
-                          ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildPrimaryButton(),
-                                const SizedBox(height: 15),
-                                _buildSecondaryButton(),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                _buildPrimaryButton(),
-                                const SizedBox(width: 15),
-                                _buildSecondaryButton(),
-                              ],
-                            ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPrimaryButton() => ElevatedButton(
-    onPressed: () {},
-    style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.white
-            : const Color(0xFF0035FF);
-      }),
-      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.black
-            : Colors.white;
-      }),
-      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-        return BorderSide(
-          color: states.contains(WidgetState.hovered)
-              ? Colors.black
-              : Colors.transparent,
-        );
-      }),
-      padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-      ),
-      shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      elevation: WidgetStateProperty.all(0),
-      minimumSize: WidgetStateProperty.all(const Size(205, 54)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Contact Now',
-          style: GoogleFonts.instrumentSans(
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(width: 8),
-        const Icon(Icons.arrow_forward, size: 24),
-      ],
-    ),
-  );
-
-  Widget _buildSecondaryButton() => OutlinedButton(
-    onPressed: () {},
-    style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.white
-            : Colors.transparent;
-      }),
-      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.black
-            : Colors.white;
-      }),
-      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-        return BorderSide(
-          color: states.contains(WidgetState.hovered)
-              ? Colors.black
-              : Colors.white,
-        );
-      }),
-      padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-      ),
-      shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      minimumSize: WidgetStateProperty.all(const Size(205, 54)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Explore more',
-          style: GoogleFonts.instrumentSans(
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Icon(Icons.arrow_forward, size: 24), // inherits foregroundColor
-      ],
-    ),
-  );
-
   Widget _buildServicesGridSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -416,42 +209,48 @@ class _VedaHomePageState extends State<VedaHomePage> {
         child: Column(
           children: [
             // Mobile
-            FadeInUpOnScroll(
-              onceId: 'grid_web',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 0),
-              child: _buildServiceItem(
-                context,
-                'Web Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.web,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_web',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 0),
+                child: _buildServiceItem(
+                  context,
+                  'Web Applications',
+                  'We build modern, responsive, and user-friendly web apps tailored to your business needs.',
+                  Icons.web,
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            FadeInUpOnScroll(
-              onceId: 'grid_software',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 100),
-              child: _buildServiceItem(
-                context,
-                'Software Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.apps,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_software',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 300),
+                child: _buildServiceItem(
+                  context,
+                  'Software Applications',
+                  'Custom software solutions designed to improve efficiency and streamline your business.',
+                  Icons.apps,
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            FadeInUpOnScroll(
-              onceId: 'grid_hardware',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 200),
-              child: _buildServiceItem(
-                context,
-                'Hardware & Networking',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.settings_input_hdmi,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_hardware',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 600),
+                child: _buildServiceItem(
+                  context,
+                  'Hardware & Networking',
+                  'Reliable hardware setup and networking solutions to keep your systems connected and secure.',
+                  Icons.settings_input_hdmi,
+                ),
               ),
             ),
           ],
@@ -472,43 +271,49 @@ class _VedaHomePageState extends State<VedaHomePage> {
           alignment: WrapAlignment.center,
           children: [
             // Desktop (same ids)
-            FadeInUpOnScroll(
-              onceId: 'grid_web',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 0),
-              child: _buildServiceItem(
-                context,
-                'Web Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.web,
-                width: cardWidth,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_web',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 0),
+                child: _buildServiceItem(
+                  context,
+                  'Web Applications',
+                  'We build modern, responsive, and user-friendly web apps tailored to your business needs.',
+                  Icons.web,
+                  width: cardWidth,
+                ),
               ),
             ),
-            FadeInUpOnScroll(
-              onceId: 'grid_software',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 100),
-              child: _buildServiceItem(
-                context,
-                'Software Applications',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.apps,
-                width: cardWidth,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_software',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 300),
+                child: _buildServiceItem(
+                  context,
+                  'Software Applications',
+                  'Custom software solutions designed to improve efficiency and streamline your business.',
+                  Icons.apps,
+                  width: cardWidth,
+                ),
               ),
             ),
-            FadeInUpOnScroll(
-              onceId: 'grid_hardware',
-              triggerFraction: 0.4,
-              offsetY: 100,
-              delay: const Duration(milliseconds: 200),
-              child: _buildServiceItem(
-                context,
-                'Hardware & Networking',
-                'Lorem ipsum dolor sit amet consectetur. Fringilla leo',
-                Icons.settings_input_hdmi,
-                width: cardWidth,
+            RepaintBoundary(
+              child: FadeInUpOnScroll(
+                onceId: 'grid_hardware',
+                triggerFraction: 0.4,
+                offsetY: 30,
+                delay: const Duration(milliseconds: 600),
+                child: _buildServiceItem(
+                  context,
+                  'Hardware & Networking',
+                  'Reliable hardware setup and networking solutions to keep your systems connected and secure.',
+                  Icons.settings_input_hdmi,
+                  width: cardWidth,
+                ),
               ),
             ),
           ],
@@ -525,10 +330,10 @@ class _VedaHomePageState extends State<VedaHomePage> {
     double width = 370,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
+    bool isMobile = screenWidth < 800;
 
     return Container(
       width: width,
-      height: 130,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -559,13 +364,14 @@ class _VedaHomePageState extends State<VedaHomePage> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: screenWidth > 600 ? 22 : 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.serviceTitle(isMobile: isMobile),
                 ),
                 const SizedBox(height: 8),
-                Text(description, style: GoogleFonts.poppins(fontSize: 14)),
+                Text(
+                  textAlign: TextAlign.justify,
+                  description,
+                  style: AppTextStyles.servicedescription(isMobile: isMobile),
+                ),
               ],
             ),
           ),
@@ -576,7 +382,8 @@ class _VedaHomePageState extends State<VedaHomePage> {
 
   Widget _buildAboutUsSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final desktop = screenWidth > 800;
+    final desktop = screenWidth >= 800;
+    final isMobile = screenWidth < 800;
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
@@ -617,17 +424,12 @@ class _VedaHomePageState extends State<VedaHomePage> {
                             children: [
                               TextSpan(
                                 text: '// ',
-                                style: GoogleFonts.instrumentSans(
-                                  color: const Color(0xFF0035FF),
-                                  fontSize: desktop ? 25 : 18,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                                style: AppTextStyles.slash(isMobile: isMobile),
                               ),
                               TextSpan(
                                 text: 'About Us',
-                                style: GoogleFonts.instrumentSans(
-                                  fontSize: desktop ? 22 : 16,
-                                  fontWeight: FontWeight.w500,
+                                style: AppTextStyles.slashTitle(
+                                  isMobile: isMobile,
                                 ),
                               ),
                             ],
@@ -667,6 +469,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
                         ),
                         const SizedBox(height: 15),
                         Text(
+                          textAlign: TextAlign.justify,
                           'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra',
                           style: GoogleFonts.poppins(
                             fontSize: desktop ? 16 : 14,
@@ -763,72 +566,79 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     spacing: 20,
                     runSpacing: 20,
                     children: [
-                      FadeInUpOnScroll(
-                        onceId: 'web',
-                        triggerFraction: 0.5,
-                        offsetY: 100,
-                        delay: const Duration(
-                          milliseconds: 0,
-                        ), // first appears immediately
-                        child: _buildServiceCard(
-                          'assets/3.webp',
-                          'Web\nApplication',
-                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                          context,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Webapppg(),
-                              ),
-                            );
-                          },
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: 'web',
+                          triggerFraction: 0.45,
+                          offsetY: 30,
+                          delay: const Duration(
+                            milliseconds: 0,
+                          ), // first appears immediately
+                          child: _buildServiceCard(
+                            'assets/3.webp',
+                            'Web\nApplication',
+                            'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
+                            context,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Webapppg(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
-                      FadeInUpOnScroll(
-                        onceId: 'sftwr',
-                        triggerFraction: 0.5,
-                        offsetY: 100,
-                        delay: const Duration(
-                          milliseconds: 100,
-                        ), // second comes later
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: 'sftwr',
+                          triggerFraction: 0.45,
+                          offsetY: 30,
+                          delay: const Duration(
+                            milliseconds: 300,
+                          ), // second comes later
 
-                        child: _buildServiceCard(
-                          'assets/4.webp',
-                          'Software\nApplications',
-                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                          context,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Softwarepg(),
-                              ),
-                            );
-                          },
+                          child: _buildServiceCard(
+                            'assets/4.webp',
+                            'Software\nApplications',
+                            'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
+                            context,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Softwarepg(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
-                      FadeInUpOnScroll(
-                        onceId: 'hrdwr',
-                        triggerFraction: 0.5,
-                        offsetY: 100,
-                        delay: const Duration(
-                          milliseconds: 200,
-                        ), // third comes last
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: 'hrdwr',
+                          triggerFraction: 0.45,
+                          offsetY: 30,
+                          delay: const Duration(
+                            milliseconds: 600,
+                          ), // third comes last
 
-                        child: _buildServiceCard(
-                          'assets/5.webp',
-                          'Hardware &\nNetworking',
-                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi',
-                          context,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Hardwareandnetworkingpg(),
-                              ),
-                            );
-                          },
+                          child: _buildServiceCard(
+                            'assets/5.webp',
+                            'Hardware &\nNetworking',
+                            'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
+                            context,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      Hardwareandnetworkingpg(),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -847,87 +657,85 @@ class _VedaHomePageState extends State<VedaHomePage> {
     String title,
     String description,
     BuildContext context, {
-    required VoidCallback onPressed, // 👈 add callback
+    required VoidCallback onPressed,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
 
-    return SizedBox(
-      width: desktop ? 400 : 350,
-      height: desktop ? 460 : 430,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border(
-            bottom: BorderSide(color: const Color(0xFF0035FF), width: 8),
+    return Container(
+      width: desktop ? 400 : 350, // keep width fixed
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: const Border(
+          bottom: BorderSide(color: Color(0xFF0035FF), width: 8),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset(
+                gaplessPlayback: true,
+                imagePath,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Title
+            Text(
+              title,
+              style: GoogleFonts.instrumentSans(
+                fontSize: desktop ? 22 : 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Description
+            Text(
+              textAlign: TextAlign.justify,
+              description,
+              style: GoogleFonts.poppins(
+                fontSize: desktop ? 15 : 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16), // instead of Spacer
+            // Button
+            TextButton(
+              onPressed: onPressed,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF0035FF),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Learn More',
+                    style: GoogleFonts.instrumentSans(
+                      fontSize: desktop ? 18 : 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(Icons.arrow_forward, size: desktop ? 24 : 20),
+                ],
+              ),
             ),
           ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  gaplessPlayback: true,
-                  imagePath,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Title
-              Text(
-                title,
-                style: GoogleFonts.instrumentSans(
-                  fontSize: desktop ? 22 : 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Description
-              Text(
-                description,
-                style: GoogleFonts.poppins(
-                  fontSize: desktop ? 14 : 12,
-                  height: 1.5,
-                ),
-              ),
-              const Spacer(),
-              // Button
-              TextButton(
-                onPressed: onPressed, // 👈 use callback
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF0035FF),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Learn More',
-                      style: GoogleFonts.instrumentSans(
-                        fontSize: desktop ? 18 : 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(Icons.arrow_forward, size: desktop ? 24 : 20),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -993,49 +801,55 @@ class _VedaHomePageState extends State<VedaHomePage> {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    FadeInUpOnScroll(
-                      onceId: '100%',
-                      triggerFraction: 0.6,
-                      offsetY: 100,
-                      delay: const Duration(milliseconds: 0),
-                      child: _buildReasonItem(
-                        '100%\nCustom Solutions',
-                        'Tailored software, not templates. Built to match your business model.',
-                        Icons.construction,
-                        context,
+                    RepaintBoundary(
+                      child: FadeInUpOnScroll(
+                        onceId: '100%',
+                        triggerFraction: 0.6,
+                        offsetY: 30,
+                        delay: const Duration(milliseconds: 0),
+                        child: _buildReasonItem(
+                          '100%\nCustom Solutions',
+                          'Tailored software, not templates. Built to match your business model.',
+                          Icons.construction,
+                          context,
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
-                    FadeInUpOnScroll(
-                      onceId: 'lclsprt',
-                      triggerFraction: 0.6,
-                      offsetY: 100,
-                      delay: const Duration(milliseconds: 100),
+                    RepaintBoundary(
+                      child: FadeInUpOnScroll(
+                        onceId: 'lclsprt',
+                        triggerFraction: 0.6,
+                        offsetY: 30,
+                        delay: const Duration(milliseconds: 300),
 
-                      child: _buildReasonItem(
-                        'Local Support,\nGlobal Standards',
-                        'Serving Bohrdin-based enterprises with ISO-grade quality.',
-                        Icons.public,
-                        context,
+                        child: _buildReasonItem(
+                          'Local Support,\nGlobal Standards',
+                          'Serving Bahrain-based enterprises with ISO-grade quality.',
+                          Icons.public,
+                          context,
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
-                    FadeInUpOnScroll(
-                      onceId: 'fst',
-                      triggerFraction: 0.6,
-                      offsetY: 100,
-                      delay: const Duration(milliseconds: 200),
-                      child: _buildReasonItem(
-                        'Fast\nTurnaround',
-                        'Rapid development cycles with clear timelines and zero guesswork.',
-                        Icons.speed,
-                        context,
+                    RepaintBoundary(
+                      child: FadeInUpOnScroll(
+                        onceId: 'fst',
+                        triggerFraction: 0.6,
+                        offsetY: 30,
+                        delay: const Duration(milliseconds: 600),
+                        child: _buildReasonItem(
+                          'Fast\nTurnaround',
+                          'Rapid development cycles with clear timelines and zero guesswork.',
+                          Icons.speed,
+                          context,
+                        ),
                       ),
                     ),
                   ],
@@ -1046,16 +860,18 @@ class _VedaHomePageState extends State<VedaHomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FadeInUpOnScroll(
-                        onceId: '100%',
-                        triggerFraction: 0.6,
-                        offsetY: 100,
-                        delay: const Duration(milliseconds: 0),
-                        child: _buildReasonItem(
-                          '100%\nCustom Solutions',
-                          'Tailored software, not templates. Built to match your business model.',
-                          Icons.construction,
-                          context,
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: '100%',
+                          triggerFraction: 0.6,
+                          offsetY: 30,
+                          delay: const Duration(milliseconds: 0),
+                          child: _buildReasonItem(
+                            '100%\nCustom Solutions',
+                            'Tailored software, not templates. Built to match your business model.',
+                            Icons.construction,
+                            context,
+                          ),
                         ),
                       ),
                       Padding(
@@ -1065,16 +881,18 @@ class _VedaHomePageState extends State<VedaHomePage> {
                           painter: _DottedLinePainter(),
                         ),
                       ),
-                      FadeInUpOnScroll(
-                        onceId: 'lclsprt',
-                        triggerFraction: 0.6,
-                        offsetY: 100,
-                        delay: const Duration(milliseconds: 100),
-                        child: _buildReasonItem(
-                          'Local Support,\nGlobal Standards',
-                          'Serving Bahrain-based enterprises with ISO-grade quality.',
-                          Icons.public,
-                          context,
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: 'lclsprt',
+                          triggerFraction: 0.6,
+                          offsetY: 30,
+                          delay: const Duration(milliseconds: 300),
+                          child: _buildReasonItem(
+                            'Local Support,\nGlobal Standards',
+                            'Serving Bahrain-based enterprises with ISO-grade quality.',
+                            Icons.public,
+                            context,
+                          ),
                         ),
                       ),
                       Padding(
@@ -1084,16 +902,18 @@ class _VedaHomePageState extends State<VedaHomePage> {
                           painter: _DottedLinePainter(),
                         ),
                       ),
-                      FadeInUpOnScroll(
-                        onceId: 'fst',
-                        triggerFraction: 0.6,
-                        offsetY: 100,
-                        delay: const Duration(milliseconds: 200),
-                        child: _buildReasonItem(
-                          'Fast\nTurnaround',
-                          'Rapid development cycles with clear timelines and zero guesswork.',
-                          Icons.speed,
-                          context,
+                      RepaintBoundary(
+                        child: FadeInUpOnScroll(
+                          onceId: 'fst',
+                          triggerFraction: 0.6,
+                          offsetY: 30,
+                          delay: const Duration(milliseconds: 600),
+                          child: _buildReasonItem(
+                            'Fast\nTurnaround',
+                            'Rapid development cycles with clear timelines and zero guesswork.',
+                            Icons.speed,
+                            context,
+                          ),
                         ),
                       ),
                     ],
@@ -1143,7 +963,7 @@ class _VedaHomePageState extends State<VedaHomePage> {
             description,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              fontSize: desktop ? 14 : 12,
+              fontSize: desktop ? 15 : 13,
               color: Colors.black.withOpacity(0.8),
               height: 1.5,
               fontWeight: FontWeight.w400,

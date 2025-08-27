@@ -19,12 +19,12 @@ class TopBar extends StatelessWidget {
     final isDesktop = screenWidth > 800;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Logo
-          Image.asset(logoPath, height: 50, width: 150, fit: BoxFit.contain),
+          Image.asset(logoPath, height: 40, width: 120, fit: BoxFit.contain),
 
           // Menu Items
           if (isDesktop)
@@ -63,17 +63,63 @@ class TopBar extends StatelessWidget {
   }
 
   Widget _navButton(String title, BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        if (onMenuItemPressed != null) onMenuItemPressed!(title);
-      },
-      child: Center(
-        child: Text(
-          title,
-          style: GoogleFonts.instrumentSans(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: _NavButton(title: title, onPressed: onMenuItemPressed),
+    );
+  }
+}
+
+class _NavButton extends StatefulWidget {
+  final String title;
+  final Function(String)? onPressed;
+
+  const _NavButton({required this.title, this.onPressed});
+
+  @override
+  State<_NavButton> createState() => _NavButtonState();
+}
+
+class _NavButtonState extends State<_NavButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: () {
+          if (widget.onPressed != null) widget.onPressed!(widget.title);
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Text
+            Text(
+              widget.title,
+              style: GoogleFonts.instrumentSans(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Underline animation
+            AnimatedAlign(
+              duration: const Duration(milliseconds: 300),
+              alignment: _isHovered
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              curve: Curves.easeInOut,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                height: 2,
+                width: _isHovered ? 40 : 0, // underline width
+                color: const Color(0xFF017697),
+              ),
+            ),
+          ],
         ),
       ),
     );

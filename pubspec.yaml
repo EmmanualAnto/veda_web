@@ -39,6 +39,7 @@ dependencies:
   flutter_animate: ^2.0.0
   lottie: ^2.4.0
   visibility_detector: ^0.4.0+2
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -76,7 +77,14 @@ flutter:
     - assets/web/5.webp
     - assets/web/6.webp
     - assets/web/7.webp
-   
+    - assets/carousel/hrdwr1.webp
+    - assets/carousel/hrdwr2.webp
+    - assets/carousel/main1.webp
+    - assets/carousel/main2.webp
+    - assets/carousel/sftwr1.webp
+    - assets/carousel/sftwr2.webp
+    - assets/carousel/web1.webp
+    - assets/carousel/web2.webp
 
 
   # The following line ensures that the Material Icons font is

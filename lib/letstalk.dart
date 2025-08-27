@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class LetsTalkSection extends StatelessWidget {
   const LetsTalkSection({super.key});
@@ -175,87 +178,317 @@ class _ContactInfo extends StatelessWidget {
   }
 }
 
-// ---------------------- Form Fields ----------------------
-class _FormFields extends StatelessWidget {
+class _FormFields extends StatefulWidget {
   final bool isMobile;
   const _FormFields({required this.isMobile});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _CustomTextField(label: 'Name', icon: Icons.person_4_outlined),
-        const SizedBox(height: 12),
-        _CustomTextField(label: 'Email', icon: Icons.email_outlined),
-        const SizedBox(height: 12),
-        _CustomTextField(label: 'Phone', icon: Icons.phone_outlined),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 90,
-          width: 564,
-          child: TextField(
-            style: GoogleFonts.poppins(color: Colors.white),
-            maxLines: 5,
-            decoration: InputDecoration(
-              labelText: 'Message',
-              labelStyle: GoogleFonts.poppins(color: Colors.white70),
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+  State<_FormFields> createState() => _FormFieldsState();
+}
+
+class _FormFieldsState extends State<_FormFields> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final message = _messageController.text.trim();
+
+    // Show sending snackbar (no duration, stays until next snackbar)
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF0035FF), // same as success snackbar
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        content: Row(
+          children: const [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
               ),
-              alignLabelWithHint: true,
             ),
-            textAlignVertical: TextAlignVertical.top,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: 157,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Sending...",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    'Submit',
-                    style: GoogleFonts.instrumentSans(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Hide sending snackbar (before async gap is fine)
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      final response = await http.post(
+        Uri.parse("https://veda-backend-4v5h.onrender.com/send"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "name": name,
+          "email": email,
+          "phone": phone,
+          "message": message,
+        }),
+      );
+
+      if (!mounted) return; // <-- add this check
+
+      // Now it's safe to use context
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFF0035FF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            content: Row(
+              children: const [
+                Icon(Icons.check_circle_outline, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Thank you for contacting us. We will get back to you soon.",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const Icon(Icons.arrow_forward_rounded),
-                ],
+                ),
+              ],
+            ),
+            duration: Duration(seconds: 4),
+          ),
+        );
+
+        _formKey.currentState!.reset();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.redAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            content: Row(
+              children: const [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Failed to send message. Please try again.",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return; // <-- add this check
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          content: Row(
+            children: const [
+              Icon(Icons.error_outline, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  "Error connecting to server.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CustomTextField(
+            controller: _nameController,
+            label: 'Name',
+            icon: Icons.person_4_outlined,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Name is required';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+
+          _CustomTextField(
+            controller: _emailController,
+            label: 'Email',
+            icon: Icons.email_outlined,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Email is required';
+              }
+              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+              if (!emailRegex.hasMatch(value)) {
+                return 'Enter a valid email';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+
+          _CustomTextField(
+            controller: _phoneController,
+            label: 'Phone',
+            icon: Icons.phone_outlined,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Phone number is required';
+              }
+              if (!RegExp(r'^\+?\d{7,15}$').hasMatch(value)) {
+                return 'Enter a valid phone number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+
+          SizedBox(
+            height: 90,
+            width: 564,
+            child: TextFormField(
+              controller: _messageController,
+              style: GoogleFonts.poppins(color: Colors.white),
+              maxLines: 5,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Message cannot be empty';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                labelText: 'Message',
+                labelStyle: GoogleFonts.poppins(color: Colors.white70),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                alignLabelWithHint: true,
+              ),
+              textAlignVertical: TextAlignVertical.top,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 157,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Submit',
+                      style: GoogleFonts.instrumentSans(fontSize: 16),
+                    ),
+                    const Icon(Icons.arrow_forward_rounded),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-// ---------------------- Custom Text Field ----------------------
 class _CustomTextField extends StatelessWidget {
   final String label;
   final IconData? icon;
-  const _CustomTextField({required this.label, this.icon});
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+
+  const _CustomTextField({
+    required this.label,
+    this.icon,
+    this.controller,
+    this.validator,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 564,
       height: 48,
-      child: TextField(
+      child: TextFormField(
+        controller: controller,
+        validator: validator,
+        keyboardType: label == "Phone"
+            ? TextInputType.phone
+            : TextInputType.text, // ✅ here
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,

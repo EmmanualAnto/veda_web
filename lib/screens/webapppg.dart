@@ -13,18 +13,30 @@ class Webapppg extends StatefulWidget {
   State<Webapppg> createState() => _WebapppgState();
 }
 
-class _WebapppgState extends State<Webapppg> {
+class _WebapppgState extends State<Webapppg>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
-  bool _showScrollToTop = false;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    _fadeController = AnimationController(
+      vsync: this, // ✅ works now
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+
     _scrollController.addListener(() {
-      if (_scrollController.offset > 300 && !_showScrollToTop) {
-        setState(() => _showScrollToTop = true);
-      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
-        setState(() => _showScrollToTop = false);
+      if (_scrollController.offset > 300) {
+        _fadeController.forward();
+      } else {
+        _fadeController.reverse();
       }
     });
   }
@@ -32,6 +44,7 @@ class _WebapppgState extends State<Webapppg> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
@@ -60,45 +73,46 @@ class _WebapppgState extends State<Webapppg> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          SingleChildScrollView(
+          CustomScrollView(
             controller: _scrollController,
-            child: Column(
-              children: [
-                TopBar(),
-                _buildHeaderSection(context),
-                _buildFiveCardsSection(context),
-                _buildClientsSection(context),
-                const LetsTalkSection(),
-                Footer(),
-              ],
-            ),
+            slivers: [
+              SliverToBoxAdapter(child: Center(child: TopBar())),
+              SliverToBoxAdapter(
+                child: Center(child: _buildHeaderSection(context)),
+              ),
+              SliverToBoxAdapter(
+                child: Center(child: _buildFiveCardsSection(context)),
+              ),
+              SliverToBoxAdapter(
+                child: Center(child: _buildClientsSection(context)),
+              ),
+              const SliverToBoxAdapter(child: Center(child: LetsTalkSection())),
+              SliverToBoxAdapter(child: Center(child: Footer())),
+            ],
           ),
-
-          // Transparent Circle Scroll-to-Top Button
           Positioned(
             bottom: 30,
             right: 30,
-            child: AnimatedOpacity(
-              opacity: _showScrollToTop ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 400),
-              child: IgnorePointer(
-                ignoring: !_showScrollToTop,
-                child: GestureDetector(
-                  onTap: _scrollToTop,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade800, width: 2),
-                      color: Colors.transparent,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: GestureDetector(
+                onTap: _scrollToTop,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF0035FF),
+                      width: 2,
                     ),
-                    child: Center(
-                      child: Icon(
-                        Icons.arrow_upward,
-                        color: Colors.grey.shade800,
-                        size: 24,
-                      ),
+                    color: Colors.transparent,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_upward,
+                      color: Color(0xFF0035FF),
+                      size: 24,
                     ),
                   ),
                 ),

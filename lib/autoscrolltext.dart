@@ -119,6 +119,7 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
       child: Row(
         children: List.generate(clients.length, (index) {
           final client = clients[index];
+          final isLast = index == clients.length - 1;
 
           return Row(
             children: [
@@ -131,7 +132,7 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.only(left: 20, right: isLast ? 0 : 20),
                 child: Container(
                   width: 10,
                   height: 10,

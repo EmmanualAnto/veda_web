@@ -21,7 +21,7 @@ class StyledCardSection extends StatelessWidget {
 
     return Container(
       width: desktop ? 386.67 : 343,
-      height: 348,
+      height: 355,
       padding: EdgeInsets.all(desktop ? 16 : 10),
       decoration: BoxDecoration(
         color: Colors.white,
