@@ -196,6 +196,8 @@ class _FormFieldsState extends State<_FormFields> {
 
   bool _isSubmitting = false; // 👈 track submit state
 
+  AutovalidateMode _autoValidate = AutovalidateMode.onUserInteraction;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -217,7 +219,7 @@ class _FormFieldsState extends State<_FormFields> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://localhost:5000/send"),
+        Uri.parse("https://veda-backend-4v5h.onrender.com/send"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "name": name,
@@ -227,19 +229,25 @@ class _FormFieldsState extends State<_FormFields> {
         }),
       );
 
-      // Log for debugging
-      print('Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (!mounted) return;
 
       if (response.statusCode == 200) {
-        // Reset form state first
         _formKey.currentState!.reset();
+        // Temporarily disable autovalidation
+        setState(() => _autoValidate = AutovalidateMode.disabled);
+
+        // Clear controllers
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
         _messageController.clear();
+
+        // Reset form state
+        // Re-enable autovalidation after a short delay
+        Future.delayed(const Duration(milliseconds: 50), () {
+          if (!mounted) return;
+          setState(() => _autoValidate = AutovalidateMode.onUserInteraction);
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -268,15 +276,7 @@ class _FormFieldsState extends State<_FormFields> {
           ),
         );
       } else {
-        // Show server error message if available
-        String errorMsg = "Failed to send message. Please try again.";
-        try {
-          final data = jsonDecode(response.body);
-          if (data['message'] != null) {
-            errorMsg = data['message'];
-          }
-        } catch (_) {}
-
+        // Failed response
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -286,13 +286,13 @@ class _FormFieldsState extends State<_FormFields> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 12),
+              children: const [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    errorMsg,
-                    style: const TextStyle(
+                    "Failed to send message. Please try again.",
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
@@ -300,15 +300,11 @@ class _FormFieldsState extends State<_FormFields> {
                 ),
               ],
             ),
-            duration: const Duration(seconds: 4),
+            duration: Duration(seconds: 4),
           ),
         );
       }
-    } catch (e, stack) {
-      // Log exact error for debugging
-      print('Error sending message: $e');
-      print(stack);
-
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -344,150 +340,149 @@ class _FormFieldsState extends State<_FormFields> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height - 32,
-        ),
-        child: IntrinsicHeight(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _CustomTextField(
-                  controller: _nameController,
-                  label: 'Name',
-                  icon: Icons.person_4_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Name is required';
-                    }
-                    return null;
-                  },
+    return Form(
+      key: _formKey,
+      autovalidateMode: _autoValidate,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CustomTextField(
+            controller: _nameController,
+            label: 'Name',
+            icon: Icons.person_4_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Name is required';
+              }
+              return null;
+            },
+            autoValidateMode: _autoValidate,
+          ),
+          const SizedBox(height: 12),
+          _CustomTextField(
+            controller: _emailController,
+            label: 'Email',
+            icon: Icons.email_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Email is required';
+              }
+              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+              if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+              return null;
+            },
+            autoValidateMode: _autoValidate,
+          ),
+          const SizedBox(height: 12),
+          _CustomTextField(
+            controller: _phoneController,
+            label: 'Phone',
+            icon: Icons.phone_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Phone number is required';
+              }
+              if (!RegExp(r'^\+?\d{7,15}$').hasMatch(value)) {
+                return 'Enter a valid phone number';
+              }
+              return null;
+            },
+            autoValidateMode: _autoValidate,
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 90,
+            width: 564,
+            child: TextFormField(
+              controller: _messageController,
+              maxLines: null, // allow flexible height
+              minLines: 5,
+              style: GoogleFonts.poppins(color: Colors.white),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty)
+                  return 'Message cannot be empty';
+                return null;
+              },
+              decoration: InputDecoration(
+                labelText: 'Message',
+                labelStyle: GoogleFonts.poppins(color: Colors.white70),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
-                const SizedBox(height: 12),
-                _CustomTextField(
-                  controller: _emailController,
-                  label: 'Email',
-                  icon: Icons.email_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
-                    }
-                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    if (!emailRegex.hasMatch(value))
-                      return 'Enter a valid email';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                _CustomTextField(
-                  controller: _phoneController,
-                  label: 'Phone',
-                  icon: Icons.phone_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Phone number is required';
-                    }
-                    if (!RegExp(r'^\+?\d{7,15}$').hasMatch(value)) {
-                      return 'Enter a valid phone number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 90,
-                  child: TextFormField(
-                    controller: _messageController,
-                    maxLines: null,
-                    minLines: 5,
-                    style: GoogleFonts.poppins(color: Colors.white),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty)
-                        return 'Message cannot be empty';
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Message',
-                      labelStyle: GoogleFonts.poppins(color: Colors.white70),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      alignLabelWithHint: true,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 157,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Submit',
-                                style: GoogleFonts.instrumentSans(fontSize: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              if (!_isSubmitting)
-                                const Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 20,
-                                ),
-                            ],
-                          ),
-                          if (_isSubmitting)
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                alignLabelWithHint: true,
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 157,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : _submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(
+                    0,
+                    53,
+                    255,
+                    1,
+                  ), // always blue
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Text + arrow always visible, arrow replaced by loader
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Submit',
+                          style: GoogleFonts.instrumentSans(fontSize: 16),
+                        ),
+                        const SizedBox(width: 8),
+                        if (!_isSubmitting)
+                          const Icon(Icons.arrow_forward_rounded, size: 20),
+                      ],
+                    ),
+                    // Loader on top
+                    if (_isSubmitting)
+                      const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _CustomTextField extends StatefulWidget {
+class _CustomTextField extends StatelessWidget {
   final String label;
   final IconData? icon;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputAction textInputAction;
+  final AutovalidateMode? autoValidateMode;
 
   const _CustomTextField({
     required this.label,
@@ -495,45 +490,24 @@ class _CustomTextField extends StatefulWidget {
     this.controller,
     this.validator,
     this.textInputAction = TextInputAction.next,
+    this.autoValidateMode,
   });
-
-  @override
-  State<_CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<_CustomTextField> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller?.addListener(_onTextChanged);
-  }
-
-  void _onTextChanged() {
-    // Rebuild field to remove validation error when user types
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    widget.controller?.removeListener(_onTextChanged);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.controller,
-      validator: widget.validator,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      keyboardType: widget.label == "Phone"
+      controller: controller,
+      validator: validator,
+      keyboardType: label == "Phone"
           ? TextInputType.phone
-          : (widget.label == "Email"
+          : (label == "Email"
                 ? TextInputType.emailAddress
                 : TextInputType.text),
-      textInputAction: widget.textInputAction,
+      textInputAction: textInputAction,
+      autovalidateMode: autoValidateMode,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: widget.label,
+        labelText: label,
         labelStyle: GoogleFonts.poppins(color: Colors.white70),
         filled: true,
         fillColor: Colors.white.withOpacity(0.16),
@@ -541,9 +515,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           horizontal: 16,
           vertical: 12,
         ),
-        prefixIcon: widget.icon != null
-            ? Icon(widget.icon, color: Colors.white70)
-            : null,
+        prefixIcon: icon != null ? Icon(icon, color: Colors.white70) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

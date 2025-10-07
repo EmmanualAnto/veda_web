@@ -83,6 +83,7 @@ class _VedaHomePageState extends State<VedaHomePage>
     final GlobalKey contactKey = GlobalKey();
 
     return Scaffold(
+      resizeToAvoidBottomInset: true, // 👈 important
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -159,9 +160,15 @@ class _VedaHomePageState extends State<VedaHomePage>
               SliverToBoxAdapter(
                 child: Container(
                   key: contactKey,
-                  child: const LetsTalkSection(),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: const LetsTalkSection(),
+                  ),
                 ),
               ),
+
               SliverToBoxAdapter(child: Footer()),
             ],
           ),
@@ -229,7 +236,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 onceId: 'grid_software',
                 triggerFraction: 0.4,
                 offsetY: 30,
-                delay: const Duration(milliseconds: 300),
+                delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
                   'Software Applications',
@@ -244,7 +251,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 onceId: 'grid_hardware',
                 triggerFraction: 0.4,
                 offsetY: 30,
-                delay: const Duration(milliseconds: 600),
+                delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
                   'Hardware & Networking',
@@ -291,7 +298,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 onceId: 'grid_software',
                 triggerFraction: 0.4,
                 offsetY: 30,
-                delay: const Duration(milliseconds: 300),
+                delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
                   'Software Applications',
@@ -306,7 +313,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 onceId: 'grid_hardware',
                 triggerFraction: 0.4,
                 offsetY: 30,
-                delay: const Duration(milliseconds: 600),
+                delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
                   'Hardware & Networking',
@@ -562,86 +569,88 @@ class _VedaHomePageState extends State<VedaHomePage>
                   ),
                   const SizedBox(height: 30),
 
-                  Wrap(
-                    spacing: 20,
-                    runSpacing: 20,
-                    children: [
-                      RepaintBoundary(
-                        child: FadeInUpOnScroll(
-                          onceId: 'web',
-                          triggerFraction: 0.45,
-                          offsetY: 30,
-                          delay: const Duration(
-                            milliseconds: 0,
-                          ), // first appears immediately
-                          child: _buildServiceCard(
-                            'assets/3.webp',
-                            'Web\nApplication',
-                            'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
-                            context,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Webapppg(),
-                                ),
-                              );
-                            },
+                  Center(
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 20,
+                      children: [
+                        RepaintBoundary(
+                          child: FadeInUpOnScroll(
+                            onceId: 'web',
+                            triggerFraction: 0.45,
+                            offsetY: 30,
+                            delay: const Duration(
+                              milliseconds: 0,
+                            ), // first appears immediately
+                            child: _buildServiceCard(
+                              'assets/3.webp',
+                              'Web\nApplication',
+                              'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
+                              context,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Webapppg(),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      RepaintBoundary(
-                        child: FadeInUpOnScroll(
-                          onceId: 'sftwr',
-                          triggerFraction: 0.45,
-                          offsetY: 30,
-                          delay: const Duration(
-                            milliseconds: 300,
-                          ), // second comes later
+                        RepaintBoundary(
+                          child: FadeInUpOnScroll(
+                            onceId: 'sftwr',
+                            triggerFraction: 0.45,
+                            offsetY: 30,
+                            delay: const Duration(
+                              milliseconds: 50,
+                            ), // second comes later
 
-                          child: _buildServiceCard(
-                            'assets/4.webp',
-                            'Software\nApplications',
-                            'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
-                            context,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Softwarepg(),
-                                ),
-                              );
-                            },
+                            child: _buildServiceCard(
+                              'assets/4.webp',
+                              'Software\nApplications',
+                              'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
+                              context,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Softwarepg(),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      RepaintBoundary(
-                        child: FadeInUpOnScroll(
-                          onceId: 'hrdwr',
-                          triggerFraction: 0.45,
-                          offsetY: 30,
-                          delay: const Duration(
-                            milliseconds: 600,
-                          ), // third comes last
+                        RepaintBoundary(
+                          child: FadeInUpOnScroll(
+                            onceId: 'hrdwr',
+                            triggerFraction: 0.45,
+                            offsetY: 30,
+                            delay: const Duration(
+                              milliseconds: 100,
+                            ), // third comes last
 
-                          child: _buildServiceCard(
-                            'assets/5.webp',
-                            'Hardware &\nNetworking',
-                            'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
-                            context,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      Hardwareandnetworkingpg(),
-                                ),
-                              );
-                            },
+                            child: _buildServiceCard(
+                              'assets/5.webp',
+                              'Hardware &\nNetworking',
+                              'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
+                              context,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        Hardwareandnetworkingpg(),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -824,7 +833,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         onceId: 'lclsprt',
                         triggerFraction: 0.6,
                         offsetY: 30,
-                        delay: const Duration(milliseconds: 300),
+                        delay: const Duration(milliseconds: 50),
 
                         child: _buildReasonItem(
                           'Local Support,\nGlobal Standards',
@@ -843,7 +852,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         onceId: 'fst',
                         triggerFraction: 0.6,
                         offsetY: 30,
-                        delay: const Duration(milliseconds: 600),
+                        delay: const Duration(milliseconds: 100),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',
                           'Rapid development cycles with clear timelines and zero guesswork.',
@@ -886,7 +895,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                           onceId: 'lclsprt',
                           triggerFraction: 0.6,
                           offsetY: 30,
-                          delay: const Duration(milliseconds: 300),
+                          delay: const Duration(milliseconds: 50),
                           child: _buildReasonItem(
                             'Local Support,\nGlobal Standards',
                             'Serving Bahrain-based enterprises with ISO-grade quality.',
@@ -907,7 +916,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                           onceId: 'fst',
                           triggerFraction: 0.6,
                           offsetY: 30,
-                          delay: const Duration(milliseconds: 600),
+                          delay: const Duration(milliseconds: 100),
                           child: _buildReasonItem(
                             'Fast\nTurnaround',
                             'Rapid development cycles with clear timelines and zero guesswork.',

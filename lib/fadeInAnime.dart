@@ -40,16 +40,14 @@ class _FadeInUpOnScrollState extends State<FadeInUpOnScroll>
 
     _controller = AnimationController(vsync: this, duration: widget.duration);
 
-    _opacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
     _translateY = Tween<double>(
       begin: widget.offsetY,
       end: 0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
+    // If already played once, skip
     if (widget.playOnce &&
         widget.onceId != null &&
         _playedIds.contains(widget.onceId)) {
@@ -93,18 +91,19 @@ class _FadeInUpOnScrollState extends State<FadeInUpOnScroll>
           _trigger();
         }
       },
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (_, child) {
-          return Opacity(
-            opacity: _opacity.value,
-            child: Transform.translate(
+      child: FadeTransition(
+        opacity: _opacity,
+        child: AnimatedBuilder(
+          animation: _translateY,
+          builder: (context, child) {
+            return Transform.translate(
               offset: Offset(0, _translateY.value),
+              transformHitTests: false, // ✅ ensures no layout reflow
               child: child,
-            ),
-          );
-        },
-        child: widget.child,
+            );
+          },
+          child: widget.child,
+        ),
       ),
     );
   }

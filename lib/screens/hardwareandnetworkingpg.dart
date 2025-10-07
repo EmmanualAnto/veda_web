@@ -354,37 +354,58 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                     children: const [
                       StyledCardSection(
                         imagePath: "assets/software/1.webp",
-                        title: "Customized Accounting Packages",
+                        title: "Network Setup & Configuration",
                         description:
-                            "Streamline finances with tailored accounting software built for your business model.",
+                            "Complete wired & wireless LAN/WAN setup for offices, including routers, switches, and structured cabling.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
                         imagePath: "assets/software/2.webp",
-                        title: "POS (Point of Sale) Systems",
+                        title: "Firewall & Network Security",
                         description:
-                            "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                            "Installation of firewalls, antivirus, and other cybersecurity solutions to protect client data and networks.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
                         imagePath: "assets/software/3.webp",
-                        title: "Wholesale & Retail Inventory Software",
+                        title: "Computer & Server Installation",
                         description:
-                            "Track, manage, and optimize your inventory with ease.",
+                            "Supply and setup of desktops, laptops, and servers tailored to business needs.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
                         imagePath: "assets/software/4.webp",
-                        title: "Customized Software for Organizations",
+                        title: "Hardware Maintenance & AMC",
                         description:
-                            "Custom-built software designed to fit unique organizational needs.",
+                            "Regular servicing, troubleshooting, and repair of IT hardware with flexible support plans.",
                       ),
                       SizedBox(height: 20),
                       StyledCardSection(
                         imagePath: "assets/software/5.webp",
-                        title: "Softwares for Personal Accounting",
+                        title: "Remote Access & VPN Solutions",
                         description:
-                            "Simplify your personal finances with user-friendly accounting software.",
+                            "Secure remote connectivity for employees and branch offices via VPN setups.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/5.webp",
+                        title: "Data Backup & Storage Solutions",
+                        description:
+                            "Setup of local and cloud-based backup systems, NAS devices, and secure storage management.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/5.webp",
+                        title: "Cloud & Hybrid Network Integration",
+                        description:
+                            "Helping businesses connect and manage cloud platforms (like AWS, Azure) with their on-premise network.",
+                      ),
+                      SizedBox(height: 20),
+                      StyledCardSection(
+                        imagePath: "assets/software/5.webp",
+                        title: "IT Infrastructure Consulting",
+                        description:
+                            "Tailored consultation for setting up or upgrading IT infrastructure based on client needs and budget.",
                       ),
                     ],
                   ),
@@ -395,33 +416,51 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                   children: const [
                     StyledCardSection(
                       imagePath: "assets/software/1.webp",
-                      title: "Customized\nAccounting Packages",
+                      title: "Network Setup & Configuration",
                       description:
-                          "Streamline finances with tailored accounting software built for your business model.",
+                          "Complete wired & wireless LAN/WAN setup for offices, including routers, switches, and structured cabling.",
                     ),
                     StyledCardSection(
                       imagePath: "assets/software/2.webp",
-                      title: "POS (Point of Sale) Systems",
+                      title: "Firewall & Network Security",
                       description:
-                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
+                          "Installation of firewalls, antivirus, and other cybersecurity solutions to protect client data and networks.",
                     ),
                     StyledCardSection(
                       imagePath: "assets/software/3.webp",
-                      title: "Wholesale & Retail Inventory Software",
+                      title: "Computer & Server Installation",
                       description:
-                          "Track, manage, and optimize your inventory with ease.",
+                          "Supply and setup of desktops, laptops, and servers tailored to business needs.",
                     ),
                     StyledCardSection(
                       imagePath: "assets/software/4.webp",
-                      title: "Customized Software for Organizations",
+                      title: "Hardware Maintenance & AMC",
                       description:
-                          "Custom-built software designed to fit unique organizational needs.",
+                          "Regular servicing, troubleshooting, and repair of IT hardware with flexible support plans.",
                     ),
                     StyledCardSection(
                       imagePath: "assets/software/5.webp",
-                      title: "Softwares for Personal Accounting",
+                      title: "Remote Access & VPN Solutions",
                       description:
-                          "Simplify your personal finances with user-friendly accounting software.",
+                          "Secure remote connectivity for employees and branch offices via VPN setups.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/5.webp",
+                      title: "Data Backup & Storage Solutions",
+                      description:
+                          "Setup of local and cloud-based backup systems, NAS devices, and secure storage management.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/5.webp",
+                      title: "Cloud & Hybrid Network Integration",
+                      description:
+                          "Helping businesses connect and manage cloud platforms (like AWS, Azure) with their on-premise network.",
+                    ),
+                    StyledCardSection(
+                      imagePath: "assets/software/5.webp",
+                      title: "IT Infrastructure Consulting",
+                      description:
+                          "Tailored consultation for setting up or upgrading IT infrastructure based on client needs and budget.",
                     ),
                   ],
                 ),

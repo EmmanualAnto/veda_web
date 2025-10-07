@@ -61,6 +61,7 @@ class StyledCardSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
+            textAlign: TextAlign.justify,
             description,
             style: GoogleFonts.poppins(
               fontSize: 14,
