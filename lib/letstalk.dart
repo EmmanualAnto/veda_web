@@ -227,10 +227,6 @@ class _FormFieldsState extends State<_FormFields> {
         }),
       );
 
-      // Log for debugging
-      print('Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (!mounted) return;
 
       if (response.statusCode == 200) {

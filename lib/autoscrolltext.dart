@@ -4,15 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 class AutoScrollClients extends StatefulWidget {
   final List<String> clients;
   final bool isMobile;
-  final double topRowSpeed; // e.g., 0.8 = normal
-  final double bottomRowSpeed; // e.g., 1.2 = faster
+  final double topRowSpeedFactor;
+  final double bottomRowSpeedFactor;
 
   const AutoScrollClients({
     super.key,
     required this.clients,
     required this.isMobile,
-    this.topRowSpeed = 0.8,
-    this.bottomRowSpeed = 1.2,
+    this.topRowSpeedFactor = 1.0,
+    this.bottomRowSpeedFactor = 1.0,
   });
 
   @override
@@ -22,35 +22,23 @@ class AutoScrollClients extends StatefulWidget {
 class _AutoScrollClientsState extends State<AutoScrollClients>
     with TickerProviderStateMixin {
   late AnimationController _topController;
-  late Animation<double> _topAnimation;
-
   late AnimationController _bottomController;
-  late Animation<double> _bottomAnimation;
+
+  // Constant scroll velocity in pixels per second
+  static const double _pixelsPerSecond = 90;
 
   @override
   void initState() {
     super.initState();
 
-    const baseDuration = 20.0;
+    // Constant loop duration (arbitrary, we use elapsed time not value)
+    const loopDuration = Duration(seconds: 1000);
 
-    _topController = AnimationController(
-      duration: Duration(seconds: (baseDuration / widget.topRowSpeed).round()),
-      vsync: this,
-    )..repeat();
+    _topController = AnimationController(duration: loopDuration, vsync: this)
+      ..repeat();
 
-    _topAnimation = Tween<double>(begin: 0, end: 1).animate(_topController);
-
-    _bottomController = AnimationController(
-      duration: Duration(
-        seconds: (baseDuration / widget.bottomRowSpeed).round(),
-      ),
-      vsync: this,
-    )..repeat();
-
-    _bottomAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(_bottomController);
+    _bottomController = AnimationController(duration: loopDuration, vsync: this)
+      ..repeat();
   }
 
   @override
@@ -60,7 +48,13 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
     super.dispose();
   }
 
-  Widget _buildScrollingRow(List<String> clients, Animation<double> animation) {
+  Widget _buildScrollingRow({
+    required List<String> clients,
+    required AnimationController controller,
+    required double speedFactor,
+  }) {
+    if (clients.isEmpty) return const SizedBox.shrink();
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final textStyle = GoogleFonts.poppins(
@@ -69,37 +63,35 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
           color: const Color.fromRGBO(13, 20, 45, 1),
         );
 
-        // calculate total width of items
+        const double itemSpacing = 50.0;
+        const double dotWidthAndSpacing = 10.0 + 20.0;
+
         double totalContentWidth = 0;
-        final List<double> itemWidths = [];
         for (final client in clients) {
           final textPainter = TextPainter(
             text: TextSpan(text: client, style: textStyle),
             textDirection: TextDirection.ltr,
           )..layout();
-          final width = textPainter.width + 30; // add spacing
-          itemWidths.add(width);
-          totalContentWidth += width;
+          totalContentWidth +=
+              textPainter.width + dotWidthAndSpacing + itemSpacing;
         }
-
-        totalContentWidth += (clients.length) * 20; // dots
-        totalContentWidth += 80; // horizontal padding
 
         return SizedBox(
           height: 40,
           child: AnimatedBuilder(
-            animation: animation,
+            animation: controller,
             builder: (context, child) {
-              final offset = animation.value * totalContentWidth;
+              final elapsedMs =
+                  controller.lastElapsedDuration?.inMilliseconds ?? 0;
+              final pxPerSec = _pixelsPerSecond * speedFactor;
+              final offset =
+                  (elapsedMs / 1000.0 * pxPerSec) % totalContentWidth;
+
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  _buildRowContent(clients, itemWidths, -offset),
-                  _buildRowContent(
-                    clients,
-                    itemWidths,
-                    totalContentWidth - offset,
-                  ),
+                  _buildRowContent(clients, -offset),
+                  _buildRowContent(clients, totalContentWidth - offset),
                 ],
               );
             },
@@ -109,62 +101,79 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
     );
   }
 
-  Widget _buildRowContent(
-    List<String> clients,
-    List<double> itemWidths,
-    double offset,
-  ) {
+  Widget _buildDotAndSpacing() {
+    const double halfSpacing = 12.5; // half of desired spacing (25px)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: halfSpacing),
+      child: SizedBox(
+        width: 10,
+        height: 10,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(0, 53, 255, 1),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRowContent(List<String> clients, double offset) {
     return Positioned(
       left: offset,
       child: Row(
-        children: List.generate(clients.length, (index) {
-          final client = clients[index];
-          final isLast = index == clients.length - 1;
-
-          return Row(
-            children: [
-              Text(
-                client,
-                style: GoogleFonts.poppins(
-                  fontSize: widget.isMobile ? 20 : 26,
-                  fontWeight: FontWeight.w500,
-                  color: const Color.fromRGBO(13, 20, 45, 1),
-                ),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (int i = 0; i < clients.length; i++) ...[
+            Text(
+              clients[i],
+              style: GoogleFonts.poppins(
+                fontSize: widget.isMobile ? 20 : 26,
+                fontWeight: FontWeight.w500,
+                color: const Color.fromRGBO(13, 20, 45, 1),
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 20, right: isLast ? 0 : 20),
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                    color: Color.fromRGBO(0, 53, 255, 1),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          );
-        }),
+            ),
+            // Add dot + spacing only if not the last client in the list
+            _buildDotAndSpacing(),
+          ],
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.clients.isEmpty) return const SizedBox.shrink();
+
     if (!widget.isMobile) {
-      return _buildScrollingRow(widget.clients, _topAnimation);
+      return _buildScrollingRow(
+        clients: widget.clients,
+        controller: _topController,
+        speedFactor: widget.topRowSpeedFactor,
+      );
     }
 
-    // split for mobile
     final mid = (widget.clients.length / 2).ceil();
     final firstRowClients = widget.clients.sublist(0, mid);
     final secondRowClients = widget.clients.sublist(mid);
 
+    if (firstRowClients.isEmpty && secondRowClients.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       children: [
-        _buildScrollingRow(firstRowClients, _topAnimation),
+        _buildScrollingRow(
+          clients: firstRowClients,
+          controller: _topController,
+          speedFactor: widget.topRowSpeedFactor,
+        ),
         const SizedBox(height: 10),
-        _buildScrollingRow(secondRowClients, _bottomAnimation),
+        _buildScrollingRow(
+          clients: secondRowClients,
+          controller: _bottomController,
+          speedFactor: widget.bottomRowSpeedFactor,
+        ),
       ],
     );
   }

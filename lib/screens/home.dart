@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/constants.dart';
-import 'package:veda_main/fadeInanime.dart';
+import 'package:veda_main/popupanime.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/headercarousel.dart';
-import 'package:veda_main/screens/hardwareandnetworkingpg.dart';
 import 'package:veda_main/letstalk.dart';
-import 'package:veda_main/screens/softwarepg.dart';
 import 'package:veda_main/topbar.dart';
-import 'package:veda_main/screens/webapppg.dart';
 
 class VedaHomePage extends StatefulWidget {
   const VedaHomePage({super.key});
@@ -217,10 +215,10 @@ class _VedaHomePageState extends State<VedaHomePage>
           children: [
             // Mobile
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_web',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 0),
                 child: _buildServiceItem(
                   context,
@@ -232,10 +230,10 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
             const SizedBox(height: 20),
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_software',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
@@ -247,10 +245,10 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
             const SizedBox(height: 20),
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_hardware',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
@@ -279,10 +277,10 @@ class _VedaHomePageState extends State<VedaHomePage>
           children: [
             // Desktop (same ids)
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_web',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 0),
                 child: _buildServiceItem(
                   context,
@@ -294,10 +292,10 @@ class _VedaHomePageState extends State<VedaHomePage>
               ),
             ),
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_software',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
@@ -309,10 +307,10 @@ class _VedaHomePageState extends State<VedaHomePage>
               ),
             ),
             RepaintBoundary(
-              child: FadeInUpOnScroll(
+              child: PopupOnScroll(
                 onceId: 'grid_hardware',
                 triggerFraction: 0.4,
-                offsetY: 30,
+
                 delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
@@ -575,34 +573,27 @@ class _VedaHomePageState extends State<VedaHomePage>
                       runSpacing: 20,
                       children: [
                         RepaintBoundary(
-                          child: FadeInUpOnScroll(
+                          child: PopupOnScroll(
                             onceId: 'web',
                             triggerFraction: 0.45,
-                            offsetY: 30,
                             delay: const Duration(
                               milliseconds: 0,
-                            ), // first appears immediately
+                            ), // shows immediately
                             child: _buildServiceCard(
                               'assets/3.webp',
                               'Web\nApplication',
                               'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
                               context,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Webapppg(),
-                                  ),
-                                );
+                                context.push('/webpage');
                               },
                             ),
                           ),
                         ),
                         RepaintBoundary(
-                          child: FadeInUpOnScroll(
+                          child: PopupOnScroll(
                             onceId: 'sftwr',
                             triggerFraction: 0.45,
-                            offsetY: 30,
                             delay: const Duration(
                               milliseconds: 50,
                             ), // second comes later
@@ -613,21 +604,16 @@ class _VedaHomePageState extends State<VedaHomePage>
                               'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
                               context,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Softwarepg(),
-                                  ),
-                                );
+                                context.push('/softwarepage');
                               },
                             ),
                           ),
                         ),
                         RepaintBoundary(
-                          child: FadeInUpOnScroll(
+                          child: PopupOnScroll(
                             onceId: 'hrdwr',
                             triggerFraction: 0.45,
-                            offsetY: 30,
+
                             delay: const Duration(
                               milliseconds: 100,
                             ), // third comes last
@@ -638,13 +624,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                               'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
                               context,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        Hardwareandnetworkingpg(),
-                                  ),
-                                );
+                                context.push('/hardwarepage');
                               },
                             ),
                           ),
@@ -811,10 +791,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     RepaintBoundary(
-                      child: FadeInUpOnScroll(
+                      child: PopupOnScroll(
                         onceId: '100%',
                         triggerFraction: 0.6,
-                        offsetY: 30,
+
                         delay: const Duration(milliseconds: 0),
                         child: _buildReasonItem(
                           '100%\nCustom Solutions',
@@ -829,10 +809,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     RepaintBoundary(
-                      child: FadeInUpOnScroll(
+                      child: PopupOnScroll(
                         onceId: 'lclsprt',
                         triggerFraction: 0.6,
-                        offsetY: 30,
+
                         delay: const Duration(milliseconds: 50),
 
                         child: _buildReasonItem(
@@ -848,10 +828,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     RepaintBoundary(
-                      child: FadeInUpOnScroll(
+                      child: PopupOnScroll(
                         onceId: 'fst',
                         triggerFraction: 0.6,
-                        offsetY: 30,
+
                         delay: const Duration(milliseconds: 100),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',
@@ -870,10 +850,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RepaintBoundary(
-                        child: FadeInUpOnScroll(
+                        child: PopupOnScroll(
                           onceId: '100%',
                           triggerFraction: 0.6,
-                          offsetY: 30,
+
                           delay: const Duration(milliseconds: 0),
                           child: _buildReasonItem(
                             '100%\nCustom Solutions',
@@ -891,10 +871,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: FadeInUpOnScroll(
+                        child: PopupOnScroll(
                           onceId: 'lclsprt',
                           triggerFraction: 0.6,
-                          offsetY: 30,
+
                           delay: const Duration(milliseconds: 50),
                           child: _buildReasonItem(
                             'Local Support,\nGlobal Standards',
@@ -912,10 +892,10 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: FadeInUpOnScroll(
+                        child: PopupOnScroll(
                           onceId: 'fst',
                           triggerFraction: 0.6,
-                          offsetY: 30,
+
                           delay: const Duration(milliseconds: 100),
                           child: _buildReasonItem(
                             'Fast\nTurnaround',

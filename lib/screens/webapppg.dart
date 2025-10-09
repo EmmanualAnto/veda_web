@@ -526,7 +526,12 @@ class _WebapppgState extends State<Webapppg>
             ),
           ),
           const SizedBox(height: 50),
-          AutoScrollClients(clients: clients, isMobile: isMobile),
+          AutoScrollClients(
+            clients: clients,
+            isMobile: isMobile,
+            topRowSpeedFactor: 1.0,
+            bottomRowSpeedFactor: 1.0,
+          ),
         ],
       ),
     );

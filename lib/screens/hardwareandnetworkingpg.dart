@@ -533,7 +533,12 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
             ),
           ),
           const SizedBox(height: 50),
-          AutoScrollClients(clients: clients, isMobile: isMobile),
+          AutoScrollClients(
+            clients: clients,
+            isMobile: isMobile,
+            topRowSpeedFactor: 1.0,
+            bottomRowSpeedFactor: 1.0,
+          ),
         ],
       ),
     );
