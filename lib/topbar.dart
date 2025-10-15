@@ -4,13 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 class TopBar extends StatelessWidget {
   final List<String> menuItems;
   final Function(String)? onMenuItemPressed;
+  final VoidCallback? onMenuPressed; // ✅ added
   final String logoPath;
+  final bool isMenuOpen;
 
   const TopBar({
     super.key,
     this.menuItems = const ['Home', 'About', 'Services', 'Contact'],
     this.logoPath = 'assets/logo.webp',
     this.onMenuItemPressed,
+    this.onMenuPressed, // ✅ added
+    this.isMenuOpen = false, // ✅ added
   });
 
   @override
@@ -19,14 +23,14 @@ class TopBar extends StatelessWidget {
     final isDesktop = screenWidth > 800;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Logo
           Image.asset(logoPath, height: 40, width: 120, fit: BoxFit.contain),
 
-          // Menu Items
+          // Desktop menu
           if (isDesktop)
             Row(
               children: menuItems
@@ -34,28 +38,23 @@ class TopBar extends StatelessWidget {
                   .toList(),
             )
           else
-            PopupMenuButton<String>(
-              color: Colors.white,
-              icon: const Icon(Icons.menu, color: Color(0xFF017697)),
-              onSelected: (value) {
-                if (onMenuItemPressed != null) onMenuItemPressed!(value);
-              },
-              itemBuilder: (context) {
-                return menuItems
-                    .map(
-                      (item) => PopupMenuItem<String>(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList();
-              },
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, anim) => RotationTransition(
+                turns: anim,
+                child: FadeTransition(opacity: anim, child: child),
+              ),
+              child: IconButton(
+                key: ValueKey<bool>(
+                  isMenuOpen,
+                ), // ensure different widget per state
+                icon: Icon(
+                  isMenuOpen ? Icons.close : Icons.menu,
+                  color: const Color(0xFF017697),
+                  size: 28,
+                ),
+                onPressed: onMenuPressed,
+              ),
             ),
         ],
       ),
@@ -95,7 +94,6 @@ class _NavButtonState extends State<_NavButton> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Text
             Text(
               widget.title,
               style: GoogleFonts.instrumentSans(
@@ -104,7 +102,6 @@ class _NavButtonState extends State<_NavButton> {
               ),
             ),
             const SizedBox(height: 4),
-            // Underline animation
             AnimatedAlign(
               duration: const Duration(milliseconds: 300),
               alignment: _isHovered
@@ -115,7 +112,7 @@ class _NavButtonState extends State<_NavButton> {
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 height: 2,
-                width: _isHovered ? 40 : 0, // underline width
+                width: _isHovered ? 40 : 0,
                 color: const Color(0xFF017697),
               ),
             ),

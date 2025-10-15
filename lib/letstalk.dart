@@ -14,7 +14,7 @@ class LetsTalkSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: desktop ? 715 : null, // fixed height for desktop, auto for mobile
+      height: 750,
       constraints: const BoxConstraints(minHeight: 500),
       child: Stack(
         children: [
@@ -341,6 +341,7 @@ class _FormFieldsState extends State<_FormFields> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.all(16),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -401,6 +402,8 @@ class _FormFieldsState extends State<_FormFields> {
                   height: 90,
                   child: TextFormField(
                     controller: _messageController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.multiline,
                     maxLines: null,
                     minLines: 5,
                     style: GoogleFonts.poppins(color: Colors.white),

@@ -86,7 +86,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       vsync: this,
       duration: const Duration(seconds: 8),
     );
-    _imageScaleAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+    _imageScaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _imageScaleController, curve: Curves.easeOut),
     );
     _imageScaleController.forward();

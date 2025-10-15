@@ -21,6 +21,7 @@ class _VedaHomePageState extends State<VedaHomePage>
   final ScrollController _scrollController = ScrollController();
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  bool _isMenuOpen = false;
 
   @override
   void initState() {
@@ -91,20 +92,22 @@ class _VedaHomePageState extends State<VedaHomePage>
               // TopBar
               SliverToBoxAdapter(
                 child: TopBar(
+                  isMenuOpen: _isMenuOpen, // ← IMPORTANT: pass the state here
+                  onMenuPressed: () =>
+                      setState(() => _isMenuOpen = !_isMenuOpen),
                   onMenuItemPressed: (title) {
+                    setState(() => _isMenuOpen = false);
                     switch (title) {
                       case 'Home':
                         _scrollToTop();
                         break;
                       case 'About':
-                        if (aboutKey.currentContext != null) {
+                        if (aboutKey.currentContext != null)
                           scrollToSection(aboutKey);
-                        }
                         break;
                       case 'Services':
-                        if (servicesKey.currentContext != null) {
+                        if (servicesKey.currentContext != null)
                           scrollToSection(servicesKey);
-                        }
                         break;
                       case 'Contact':
                         scrollToSection(contactKey);
@@ -169,7 +172,54 @@ class _VedaHomePageState extends State<VedaHomePage>
 
               SliverToBoxAdapter(child: Footer()),
             ],
+          ), // Sliding top menu
+          AnimatedSlide(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOutCubic,
+            offset: _isMenuOpen ? Offset(0, 0) : const Offset(0, -1),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+              opacity: _isMenuOpen ? 1.0 : 0.0,
+              child: Container(
+                margin: const EdgeInsets.only(top: kToolbarHeight),
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.25,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _menuButton('Home', () {
+                      setState(() => _isMenuOpen = false);
+                      _scrollToTop();
+                    }),
+                    _menuButton('About', () {
+                      setState(() => _isMenuOpen = false);
+                      scrollToSection(aboutKey);
+                    }),
+                    _menuButton('Services', () {
+                      setState(() => _isMenuOpen = false);
+                      scrollToSection(servicesKey);
+                    }),
+                    _menuButton('Contact', () {
+                      setState(() => _isMenuOpen = false);
+                      scrollToSection(contactKey);
+                    }),
+                  ],
+                ),
+              ),
+            ),
           ),
+
           Positioned(
             bottom: 30,
             right: 30,
@@ -200,6 +250,16 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _menuButton(String title, VoidCallback onPressed) {
+    return TextButton(
+      onPressed: onPressed,
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 18, color: Colors.black),
       ),
     );
   }
