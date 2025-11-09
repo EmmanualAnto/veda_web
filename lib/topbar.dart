@@ -16,47 +16,45 @@ class TopBar extends StatelessWidget {
     this.onMenuPressed, // ✅ added
     this.isMenuOpen = false, // ✅ added
   });
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo
-          Image.asset(logoPath, height: 40, width: 120, fit: BoxFit.contain),
+    return SizedBox(
+      height: kToolbarHeight, // <-- exact fixed height = 56
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+        ), // no vertical padding
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center, // keep items centered
+          children: [
+            Image.asset(logoPath, height: 36, fit: BoxFit.contain),
 
-          // Desktop menu
-          if (isDesktop)
-            Row(
-              children: menuItems
-                  .map((item) => _navButton(item, context))
-                  .toList(),
-            )
-          else
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, anim) => RotationTransition(
-                turns: anim,
-                child: FadeTransition(opacity: anim, child: child),
-              ),
-              child: IconButton(
-                key: ValueKey<bool>(
-                  isMenuOpen,
-                ), // ensure different widget per state
-                icon: Icon(
-                  isMenuOpen ? Icons.close : Icons.menu,
-                  color: const Color(0xFF017697),
-                  size: 28,
+            if (isDesktop)
+              Row(
+                children: menuItems
+                    .map((item) => _navButton(item, context))
+                    .toList(),
+              )
+            else
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: IconButton(
+                  key: ValueKey<bool>(isMenuOpen),
+                  icon: Icon(
+                    isMenuOpen ? Icons.close : Icons.menu,
+                    color: const Color(0xFF017697),
+                    size: 26,
+                  ),
+                  onPressed: onMenuPressed,
                 ),
-                onPressed: onMenuPressed,
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

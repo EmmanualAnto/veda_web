@@ -402,8 +402,9 @@ class _FormFieldsState extends State<_FormFields> {
               minLines: 5,
               style: GoogleFonts.poppins(color: Colors.white),
               validator: (value) {
-                if (value == null || value.trim().isEmpty)
+                if (value == null || value.trim().isEmpty) {
                   return 'Message cannot be empty';
+                }
                 return null;
               },
               decoration: InputDecoration(

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,6 +20,7 @@ class _VedaHomePageState extends State<VedaHomePage>
     with SingleTickerProviderStateMixin {
   // ✅ add this mixin
   final ScrollController _scrollController = ScrollController();
+
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   bool _isMenuOpen = false;
@@ -61,14 +63,22 @@ class _VedaHomePageState extends State<VedaHomePage>
   }
 
   void scrollToSection(GlobalKey key) {
-    final context = key.currentContext;
-    if (context != null) {
-      Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 700),
-        curve: Curves.easeInOut,
-      );
-    }
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+
+    final box = ctx.findRenderObject() as RenderBox;
+    final pos = box.localToGlobal(
+      Offset.zero,
+      ancestor: context.findRenderObject(),
+    );
+
+    final offset = _scrollController.offset + pos.dy - kToolbarHeight;
+
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -76,150 +86,180 @@ class _VedaHomePageState extends State<VedaHomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1150;
 
-    // GlobalKeys for smooth scrolling
     final GlobalKey aboutKey = GlobalKey();
     final GlobalKey servicesKey = GlobalKey();
     final GlobalKey contactKey = GlobalKey();
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // 👈 important
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // TopBar
-              SliverToBoxAdapter(
-                child: TopBar(
-                  isMenuOpen: _isMenuOpen, // ← IMPORTANT: pass the state here
-                  onMenuPressed: () =>
-                      setState(() => _isMenuOpen = !_isMenuOpen),
-                  onMenuItemPressed: (title) {
-                    setState(() => _isMenuOpen = false);
-                    switch (title) {
-                      case 'Home':
-                        _scrollToTop();
-                        break;
-                      case 'About':
-                        if (aboutKey.currentContext != null)
-                          scrollToSection(aboutKey);
-                        break;
-                      case 'Services':
-                        if (servicesKey.currentContext != null)
-                          scrollToSection(servicesKey);
-                        break;
-                      case 'Contact':
-                        scrollToSection(contactKey);
-                        break;
-                    }
-                  },
-                ),
-              ),
+          // Background scrollable content
+          ScrollConfiguration(
+            // remove overscroll glow and keep platform-appropriate behaviour
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
+            child: Listener(
+              // Intercept mouse/trackpad wheel events and animate the scroll controller
+              onPointerSignal: (pointerSignal) {
+                if (pointerSignal is PointerScrollEvent) {
+                  if (!_scrollController.hasClients) return;
+                  // tune this multiplier for sensitivity (0.6..1.0)
+                  final double wheelMultiplier = 0.8;
+                  final double delta =
+                      pointerSignal.scrollDelta.dy * wheelMultiplier;
+                  final double current = _scrollController.offset;
+                  final double max = _scrollController.position.maxScrollExtent;
+                  final double target = (current + delta).clamp(0.0, max);
 
-              // Header + Services Grid
-              SliverToBoxAdapter(
-                child: isDesktop
-                    ? Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          const HeaderCarousel(),
-                          Positioned(
-                            bottom: -75,
-                            left: 0,
-                            right: 0,
-                            child: _buildServicesGridSection(context),
+                  // cancel any existing animateTo by calling animateTo again
+                  _scrollController.animateTo(
+                    target,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                  );
+                }
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                // keep default physics so touch scrolling still feels natural
+                slivers: [
+                  SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight)),
+                  SliverToBoxAdapter(
+                    child: isDesktop
+                        ? Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const HeaderCarousel(),
+                              Positioned(
+                                bottom: -75,
+                                left: 0,
+                                right: 0,
+                                child: _buildServicesGridSection(context),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const HeaderCarousel(),
+                              const SizedBox(height: 40),
+                              _buildServicesGridSection(context),
+                            ],
                           ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          const HeaderCarousel(),
-                          const SizedBox(height: 40),
-                          _buildServicesGridSection(context),
-                        ],
-                      ),
-              ),
-
-              // Spacer
-              SliverToBoxAdapter(child: SizedBox(height: isDesktop ? 100 : 40)),
-
-              // Sections with keys
-              SliverToBoxAdapter(
-                child: Container(
-                  key: aboutKey,
-                  child: _buildAboutUsSection(context),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  key: servicesKey,
-                  child: _buildOurServicesSection(context),
-                ),
-              ),
-              SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
-              SliverToBoxAdapter(
-                child: Container(
-                  key: contactKey,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: const LetsTalkSection(),
                   ),
-                ),
-              ),
-
-              SliverToBoxAdapter(child: Footer()),
-            ],
-          ), // Sliding top menu
-          AnimatedSlide(
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOutCubic,
-            offset: _isMenuOpen ? Offset(0, 0) : const Offset(0, -1),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-              opacity: _isMenuOpen ? 1.0 : 0.0,
-              child: Container(
-                margin: const EdgeInsets.only(top: kToolbarHeight),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.25,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: isDesktop ? 100 : 40),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: aboutKey,
+                      child: _buildAboutUsSection(context),
                     ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _menuButton('Home', () {
-                      setState(() => _isMenuOpen = false);
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: servicesKey,
+                      child: _buildOurServicesSection(context),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      key: contactKey,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: const LetsTalkSection(),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: Footer()),
+                ],
+              ),
+            ),
+          ),
+
+          // Fixed TopBar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: PreferredSize(
+              preferredSize: const Size.fromHeight(
+                kToolbarHeight,
+              ), // ← exact height
+              child: TopBar(
+                isMenuOpen: _isMenuOpen,
+                onMenuPressed: () => setState(() => _isMenuOpen = !_isMenuOpen),
+                onMenuItemPressed: (title) {
+                  setState(() => _isMenuOpen = false);
+                  switch (title) {
+                    case 'Home':
                       _scrollToTop();
-                    }),
-                    _menuButton('About', () {
-                      setState(() => _isMenuOpen = false);
+                      break;
+                    case 'About':
                       scrollToSection(aboutKey);
-                    }),
-                    _menuButton('Services', () {
-                      setState(() => _isMenuOpen = false);
+                      break;
+                    case 'Services':
                       scrollToSection(servicesKey);
-                    }),
-                    _menuButton('Contact', () {
-                      setState(() => _isMenuOpen = false);
+                      break;
+                    case 'Contact':
                       scrollToSection(contactKey);
-                    }),
-                  ],
+                      break;
+                  }
+                },
+              ),
+            ),
+          ),
+
+          // Dropdown menu
+          Positioned(
+            top: kToolbarHeight,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              ignoring: !_isMenuOpen,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOutCubic,
+                offset: _isMenuOpen ? Offset.zero : const Offset(0, -1),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  opacity: _isMenuOpen ? 1.0 : 0.0,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    color: Colors.white,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _menuButton('Home', () {
+                          setState(() => _isMenuOpen = false);
+                          _scrollToTop();
+                        }),
+                        _menuButton('About', () {
+                          setState(() => _isMenuOpen = false);
+                          scrollToSection(aboutKey);
+                        }),
+                        _menuButton('Services', () {
+                          setState(() => _isMenuOpen = false);
+                          scrollToSection(servicesKey);
+                        }),
+                        _menuButton('Contact', () {
+                          setState(() => _isMenuOpen = false);
+                          scrollToSection(contactKey);
+                        }),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
 
+          // Floating scroll-to-top button
           Positioned(
             bottom: 30,
             right: 30,
@@ -454,99 +494,95 @@ class _VedaHomePageState extends State<VedaHomePage>
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(30, 20, 30, 80),
-          child: Center(
-            // ✅ Center content horizontally
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 1300, // ✅ keeps content from being too wide
-              ),
-              child: Wrap(
-                spacing: 30, // space between image and text horizontally
-                runSpacing: 20, // space vertically when wrapped
-                alignment:
-                    WrapAlignment.center, // ✅ centers children inside wrap
-                children: [
-                  SizedBox(
-                    width: 600,
-                    height: desktop ? 400 : 300,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(
-                        gaplessPlayback: true,
-                        'assets/2.webp',
-                        fit: BoxFit.cover,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 1300, // ✅ keeps content from being too wide
+            ),
+            child: Wrap(
+              spacing: 30, // space between image and text horizontally
+              runSpacing: 20, // space vertically when wrapped
+              alignment: WrapAlignment.center,
+              children: [
+                SizedBox(
+                  width: 600,
+                  height: desktop ? 400 : 300,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      gaplessPlayback: true,
+                      'assets/2.webp',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 650,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: desktop ? 60 : 10),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '// ',
+                              style: AppTextStyles.slash(isMobile: isMobile),
+                            ),
+                            TextSpan(
+                              text: 'About Us',
+                              style: AppTextStyles.slashTitle(
+                                isMobile: isMobile,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Where Experience Meets',
+                              style: GoogleFonts.instrumentSans(
+                                fontSize: desktop ? 46 : 26,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '\nInnovation',
+                              style: GoogleFonts.instrumentSans(
+                                color: const Color(0xFF0035FF),
+                                fontSize: desktop ? 46 : 26,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra tortor venenatis pulvinar proin.',
+                        style: GoogleFonts.poppins(
+                          fontSize: desktop ? 16 : 14,
+                          height: 1.6,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        textAlign: TextAlign.justify,
+                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra',
+                        style: GoogleFonts.poppins(
+                          fontSize: desktop ? 16 : 14,
+                          height: 1.6,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 650,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: desktop ? 60 : 10),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '// ',
-                                style: AppTextStyles.slash(isMobile: isMobile),
-                              ),
-                              TextSpan(
-                                text: 'About Us',
-                                style: AppTextStyles.slashTitle(
-                                  isMobile: isMobile,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Where Experience Meets',
-                                style: GoogleFonts.instrumentSans(
-                                  fontSize: desktop ? 46 : 26,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '\nInnovation',
-                                style: GoogleFonts.instrumentSans(
-                                  color: const Color(0xFF0035FF),
-                                  fontSize: desktop ? 46 : 26,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra tortor venenatis pulvinar proin.',
-                          style: GoogleFonts.poppins(
-                            fontSize: desktop ? 16 : 14,
-                            height: 1.6,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.justify,
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          textAlign: TextAlign.justify,
-                          'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra',
-                          style: GoogleFonts.poppins(
-                            fontSize: desktop ? 16 : 14,
-                            height: 1.6,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -568,132 +604,126 @@ class _VedaHomePageState extends State<VedaHomePage>
           width: double.infinity,
           color: Colors.grey.shade100,
           padding: EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: desktop ? 25 : 20,
+            vertical: 30,
+            horizontal: desktop ? 130 : 30,
           ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 30,
-              horizontal: desktop ? 120 : 10,
-            ),
-            child: SizedBox(
-              width: contentWidth,
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start, // ✅ keep left aligned
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '// ',
-                          style: GoogleFonts.instrumentSans(
-                            color: const Color(0xFF0035FF),
-                            fontSize: desktop ? 25 : 18,
-                            fontWeight: FontWeight.w900,
-                          ),
+          child: SizedBox(
+            width: contentWidth,
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // ✅ keep left aligned
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '// ',
+                        style: GoogleFonts.instrumentSans(
+                          color: const Color(0xFF0035FF),
+                          fontSize: desktop ? 25 : 18,
+                          fontWeight: FontWeight.w900,
                         ),
-                        TextSpan(
-                          text: 'Our Services',
-                          style: GoogleFonts.instrumentSans(
-                            fontSize: desktop ? 22 : 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      ),
+                      TextSpan(
+                        text: 'Our Services',
+                        style: GoogleFonts.instrumentSans(
+                          fontSize: desktop ? 22 : 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Smart Tech Services\n',
-                          style: GoogleFonts.instrumentSans(
-                            fontSize: desktop ? 46 : 26,
-                            fontWeight: FontWeight.w700,
-                          ),
+                ),
+                const SizedBox(height: 10),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Smart Tech Services\n',
+                        style: GoogleFonts.instrumentSans(
+                          fontSize: desktop ? 46 : 26,
+                          fontWeight: FontWeight.w700,
                         ),
-                        TextSpan(
-                          text: 'That Drive Results',
-                          style: GoogleFonts.instrumentSans(
-                            color: const Color(0xFF0035FF),
-                            fontSize: desktop ? 46 : 26,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      ),
+                      TextSpan(
+                        text: 'That Drive Results',
+                        style: GoogleFonts.instrumentSans(
+                          color: const Color(0xFF0035FF),
+                          fontSize: desktop ? 46 : 26,
+                          fontWeight: FontWeight.w700,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 30),
+                ),
+                const SizedBox(height: 30),
 
-                  Center(
-                    child: Wrap(
-                      spacing: 20,
-                      runSpacing: 20,
-                      children: [
-                        RepaintBoundary(
-                          child: PopupOnScroll(
-                            onceId: 'web',
-                            triggerFraction: 0.45,
-                            delay: const Duration(
-                              milliseconds: 0,
-                            ), // shows immediately
-                            child: _buildServiceCard(
-                              'assets/3.webp',
-                              'Web\nApplication',
-                              'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
-                              context,
-                              onPressed: () {
-                                context.push('/webpage');
-                              },
-                            ),
+                Center(
+                  child: Wrap(
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: [
+                      RepaintBoundary(
+                        child: PopupOnScroll(
+                          onceId: 'web',
+                          triggerFraction: 0.45,
+                          delay: const Duration(
+                            milliseconds: 0,
+                          ), // shows immediately
+                          child: _buildServiceCard(
+                            'assets/3.webp',
+                            'Web\nApplication',
+                            'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
+                            context,
+                            onPressed: () {
+                              context.push('/webpage');
+                            },
                           ),
                         ),
-                        RepaintBoundary(
-                          child: PopupOnScroll(
-                            onceId: 'sftwr',
-                            triggerFraction: 0.45,
-                            delay: const Duration(
-                              milliseconds: 50,
-                            ), // second comes later
+                      ),
+                      RepaintBoundary(
+                        child: PopupOnScroll(
+                          onceId: 'sftwr',
+                          triggerFraction: 0.45,
+                          delay: const Duration(
+                            milliseconds: 50,
+                          ), // second comes later
 
-                            child: _buildServiceCard(
-                              'assets/4.webp',
-                              'Software\nApplications',
-                              'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
-                              context,
-                              onPressed: () {
-                                context.push('/softwarepage');
-                              },
-                            ),
+                          child: _buildServiceCard(
+                            'assets/4.webp',
+                            'Software\nApplications',
+                            'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
+                            context,
+                            onPressed: () {
+                              context.push('/softwarepage');
+                            },
                           ),
                         ),
-                        RepaintBoundary(
-                          child: PopupOnScroll(
-                            onceId: 'hrdwr',
-                            triggerFraction: 0.45,
+                      ),
+                      RepaintBoundary(
+                        child: PopupOnScroll(
+                          onceId: 'hrdwr',
+                          triggerFraction: 0.45,
 
-                            delay: const Duration(
-                              milliseconds: 100,
-                            ), // third comes last
+                          delay: const Duration(
+                            milliseconds: 100,
+                          ), // third comes last
 
-                            child: _buildServiceCard(
-                              'assets/5.webp',
-                              'Hardware &\nNetworking',
-                              'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
-                              context,
-                              onPressed: () {
-                                context.push('/hardwarepage');
-                              },
-                            ),
+                          child: _buildServiceCard(
+                            'assets/5.webp',
+                            'Hardware &\nNetworking',
+                            'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
+                            context,
+                            onPressed: () {
+                              context.push('/hardwarepage');
+                            },
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );

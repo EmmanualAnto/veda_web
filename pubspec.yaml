@@ -41,6 +41,7 @@ dependencies:
   visibility_detector: ^0.4.0+2
   http: ^1.1.0
   go_router: ^16.2.0
+  smooth_scroll_multiplatform: ^1.0.8
 
 dev_dependencies:
   flutter_test:

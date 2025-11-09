@@ -67,7 +67,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
   void initState() {
     super.initState();
 
-    // Precache all images
+    // Precache images
     WidgetsBinding.instance.addPostFrameCallback((_) {
       for (var banner in _banners) {
         precacheImage(AssetImage(banner['imageMobile']!), context);
@@ -75,10 +75,10 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       }
     });
 
-    // Text animation
+    // Text animation controller for staggered lines
     _textController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(seconds: 1), // total duration for all lines
     );
 
     // Image scale animation (slow pop)
@@ -91,7 +91,6 @@ class _HeaderCarouselState extends State<HeaderCarousel>
     );
     _imageScaleController.forward();
 
-    // Start animation after short delay
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _textController.forward();
     });
@@ -186,114 +185,122 @@ class _HeaderCarouselState extends State<HeaderCarousel>
               child: AnimatedBuilder(
                 animation: _textController,
                 builder: (_, child) {
-                  // Calm easing
-                  final t = Curves.easeInOut.transform(_textController.value);
-                  return Opacity(
-                    opacity: t.clamp(0.0, 1.0),
-                    child: Transform.translate(
-                      offset: Offset(0, 30 * (1 - t)), // gently move up
-                      child: child,
-                    ),
-                  );
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: isMobile
-                      ? CrossAxisAlignment.center
-                      : CrossAxisAlignment.start,
-                  children: [
-                    // Slash + title
-                    RichText(
-                      textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '// ',
-                            style: GoogleFonts.instrumentSans(
-                              fontSize: isMobile ? 25 : 25,
-                              color: const Color(0xFF0035FF),
-                              fontWeight: FontWeight.w700,
-                            ),
+                  final t = _textController.value;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                    children: [
+                      _buildAnimatedLine(
+                        t: t,
+                        start: 0.0,
+                        end: 0.6,
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '// ',
+                                style: GoogleFonts.instrumentSans(
+                                  fontSize: isMobile ? 25 : 25,
+                                  color: const Color(0xFF0035FF),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              TextSpan(
+                                text: _banners[_currentIndex]['slash'],
+                                style: GoogleFonts.instrumentSans(
+                                  fontSize: isMobile ? 16 : 22,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                          TextSpan(
-                            text: _banners[_currentIndex]['slash'],
-                            style: GoogleFonts.instrumentSans(
-                              fontSize: isMobile ? 16 : 22,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 20 : 15),
-                    // Heading
-                    Text(
-                      _banners[_currentIndex]['title']!,
-                      textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                      style: GoogleFonts.instrumentSans(
-                        color: Colors.white,
-                        fontSize: isMobile ? 26 : 55,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 40 : 25),
-                    // Subtitle
-                    SizedBox(
-                      width: 1000,
-                      child: Text(
-                        _banners[_currentIndex]['subtitle']!,
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: isMobile ? 14 : 25,
-                          height: 1.5,
                         ),
                       ),
-                    ),
-                    SizedBox(height: isMobile ? 45 : 35),
-                    isMobile
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildPrimaryButton(
-                                onPressed: () =>
-                                    _banners[_currentIndex]['onPrimary'](
-                                      context,
-                                    ),
-                              ),
-                              const SizedBox(height: 15),
-                              _buildSecondaryButton(
-                                onPressed: () =>
-                                    _banners[_currentIndex]['onSecondary'](
-                                      context,
-                                    ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              _buildPrimaryButton(
-                                onPressed: () =>
-                                    _banners[_currentIndex]['onPrimary'](
-                                      context,
-                                    ),
-                              ),
-                              const SizedBox(width: 15),
-                              _buildSecondaryButton(
-                                onPressed: () =>
-                                    _banners[_currentIndex]['onSecondary'](
-                                      context,
-                                    ),
-                              ),
-                            ],
+                      SizedBox(height: isMobile ? 20 : 15),
+                      _buildAnimatedLine(
+                        t: t,
+                        start: 0.1,
+                        end: 0.7,
+                        child: Text(
+                          _banners[_currentIndex]['title']!,
+                          style: GoogleFonts.instrumentSans(
+                            color: Colors.white,
+                            fontSize: isMobile ? 26 : 55,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
                           ),
-                  ],
-                ),
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 40 : 25),
+                      _buildAnimatedLine(
+                        t: t,
+                        start: 0.2,
+                        end: 0.8,
+                        child: SizedBox(
+                          width: isMobile ? 400 : 1000,
+                          child: Center(
+                            child: Text(
+                              textAlign: isMobile
+                                  ? TextAlign.center
+                                  : TextAlign.start,
+                              _banners[_currentIndex]['subtitle']!,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                                fontSize: isMobile ? 14 : 25,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 45 : 35),
+                      _buildAnimatedLine(
+                        t: t,
+                        start: 0.3,
+                        end: 1.0,
+                        child: isMobile
+                            ? Column(
+                                children: [
+                                  _buildPrimaryButton(
+                                    onPressed: () =>
+                                        _banners[_currentIndex]['onPrimary'](
+                                          context,
+                                        ),
+                                  ),
+                                  SizedBox(height: 15),
+                                  _buildSecondaryButton(
+                                    onPressed: () =>
+                                        _banners[_currentIndex]['onSecondary'](
+                                          context,
+                                        ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  _buildPrimaryButton(
+                                    onPressed: () =>
+                                        _banners[_currentIndex]['onPrimary'](
+                                          context,
+                                        ),
+                                  ),
+                                  SizedBox(width: 15),
+                                  _buildSecondaryButton(
+                                    onPressed: () =>
+                                        _banners[_currentIndex]['onSecondary'](
+                                          context,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -302,35 +309,52 @@ class _HeaderCarouselState extends State<HeaderCarousel>
     );
   }
 
+  Widget _buildAnimatedLine({
+    required double t,
+    required double start,
+    required double end,
+    required Widget child,
+  }) {
+    final progress = ((t - start) / (end - start)).clamp(0.0, 1.0);
+    final curved = Curves.easeInOutCubic.transform(progress); // smoother
+    return Opacity(
+      opacity: curved,
+      child: Transform.translate(
+        offset: Offset(0, 10 * (1 - curved)), // smaller slide distance
+        child: child,
+      ),
+    );
+  }
+
   Widget _buildPrimaryButton({required VoidCallback onPressed}) =>
       ElevatedButton(
         onPressed: onPressed,
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            return states.contains(MaterialState.hovered)
+          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            return states.contains(WidgetState.hovered)
                 ? Colors.white
                 : const Color(0xFF0035FF);
           }),
-          foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            return states.contains(MaterialState.hovered)
+          foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            return states.contains(WidgetState.hovered)
                 ? Colors.black
                 : Colors.white;
           }),
-          side: MaterialStateProperty.resolveWith<BorderSide>((states) {
+          side: WidgetStateProperty.resolveWith<BorderSide>((states) {
             return BorderSide(
-              color: states.contains(MaterialState.hovered)
+              color: states.contains(WidgetState.hovered)
                   ? Colors.black
                   : Colors.transparent,
             );
           }),
-          padding: MaterialStateProperty.all(
+          padding: WidgetStateProperty.all(
             const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
           ),
-          shape: MaterialStateProperty.all(
+          shape: WidgetStateProperty.all(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          elevation: MaterialStateProperty.all(0),
-          minimumSize: MaterialStateProperty.all(const Size(205, 54)),
+          elevation: WidgetStateProperty.all(0),
+          minimumSize: WidgetStateProperty.all(const Size(205, 54)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -352,30 +376,30 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       OutlinedButton(
         onPressed: onPressed,
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith<Color?>((states) {
-            return states.contains(MaterialState.hovered)
+          backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            return states.contains(WidgetState.hovered)
                 ? Colors.white
                 : Colors.transparent;
           }),
-          foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            return states.contains(MaterialState.hovered)
+          foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            return states.contains(WidgetState.hovered)
                 ? Colors.black
                 : Colors.white;
           }),
-          side: MaterialStateProperty.resolveWith<BorderSide>((states) {
+          side: WidgetStateProperty.resolveWith<BorderSide>((states) {
             return BorderSide(
-              color: states.contains(MaterialState.hovered)
+              color: states.contains(WidgetState.hovered)
                   ? Colors.black
                   : Colors.white,
             );
           }),
-          padding: MaterialStateProperty.all(
+          padding: WidgetStateProperty.all(
             const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
           ),
-          shape: MaterialStateProperty.all(
+          shape: WidgetStateProperty.all(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
-          minimumSize: MaterialStateProperty.all(const Size(205, 54)),
+          minimumSize: WidgetStateProperty.all(const Size(205, 54)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

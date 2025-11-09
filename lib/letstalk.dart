@@ -5,16 +5,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class LetsTalkSection extends StatelessWidget {
-  const LetsTalkSection({super.key});
+  final double? height;
+  const LetsTalkSection({super.key, this.height});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
+    final containerHeight = height ?? (desktop ? 700 : 800);
 
     return Container(
       width: double.infinity,
-      height: 750,
+      height: containerHeight,
       constraints: const BoxConstraints(minHeight: 500),
       child: Stack(
         children: [
@@ -340,142 +342,114 @@ class _FormFieldsState extends State<_FormFields> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.all(16),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height - 32,
-        ),
-        child: IntrinsicHeight(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _CustomTextField(
-                  controller: _nameController,
-                  label: 'Name',
-                  icon: Icons.person_4_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                _CustomTextField(
-                  controller: _emailController,
-                  label: 'Email',
-                  icon: Icons.email_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
-                    }
-                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                    if (!emailRegex.hasMatch(value))
-                      return 'Enter a valid email';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                _CustomTextField(
-                  controller: _phoneController,
-                  label: 'Phone',
-                  icon: Icons.phone_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Phone number is required';
-                    }
-                    if (!RegExp(r'^\+?\d{7,15}$').hasMatch(value)) {
-                      return 'Enter a valid phone number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 90,
-                  child: TextFormField(
-                    controller: _messageController,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    minLines: 5,
-                    style: GoogleFonts.poppins(color: Colors.white),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty)
-                        return 'Message cannot be empty';
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Message',
-                      labelStyle: GoogleFonts.poppins(color: Colors.white70),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      alignLabelWithHint: true,
-                    ),
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // shrink to content
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CustomTextField(
+            controller: _nameController,
+            label: 'Name',
+            icon: Icons.person_4_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Name is required';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          _CustomTextField(
+            controller: _emailController,
+            label: 'Email',
+            icon: Icons.email_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Email is required';
+              }
+              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+              if (!emailRegex.hasMatch(value)) {
+                return 'Enter a valid email';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          _CustomTextField(
+            controller: _phoneController,
+            label: 'Phone',
+            icon: Icons.phone_outlined,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Phone number is required';
+              }
+              if (!RegExp(r'^\+?\d{7,15}$').hasMatch(value)) {
+                return 'Enter a valid phone number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          _CustomTextField(
+            controller: _messageController,
+            label: 'Message',
+
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Message cannot be empty';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 157,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isSubmitting ? null : _submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 157,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Submit',
+                          style: GoogleFonts.instrumentSans(fontSize: 16),
+                        ),
+                        const SizedBox(width: 8),
+                        if (!_isSubmitting)
+                          const Icon(Icons.arrow_forward_rounded, size: 20),
+                      ],
+                    ),
+                    if (_isSubmitting)
+                      const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
                         ),
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Submit',
-                                style: GoogleFonts.instrumentSans(fontSize: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              if (!_isSubmitting)
-                                const Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 20,
-                                ),
-                            ],
-                          ),
-                          if (_isSubmitting)
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

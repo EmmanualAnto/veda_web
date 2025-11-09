@@ -138,7 +138,7 @@ class _SoftwarepgState extends State<Softwarepg>
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/1.webp'),
+                    image: AssetImage('assets/carousel/sftwr2.webp'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -186,7 +186,7 @@ class _SoftwarepgState extends State<Softwarepg>
                               ),
                             ),
                             TextSpan(
-                              text: 'We Offer',
+                              text: 'Software Applications Services',
                               style: GoogleFonts.instrumentSans(
                                 color: Colors.white,
                                 fontSize: isMobile ? 16 : 22,
@@ -210,35 +210,28 @@ class _SoftwarepgState extends State<Softwarepg>
                         ),
                       ),
                       SizedBox(height: isMobile ? 40 : 25),
-                      Text(
-                        'At the heart of our services is a commitment to efficiency and customization. From wholesale inventory to personal accounting, we create intelligent software that reduces manual work, streamlines operations, and allows you to focus on what truly matters growing your business',
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: isMobile ? 14 : 20,
-                          height: 1.5,
+                      SizedBox(
+                        width: 1000,
+                        child: Text(
+                          'At the heart of our services is a commitment to efficiency and customization. From wholesale inventory to personal accounting, we create intelligent software that reduces manual work, streamlines operations, and allows you to focus on what truly matters growing your business',
+                          textAlign: isMobile
+                              ? TextAlign.center
+                              : TextAlign.start,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                            fontSize: isMobile ? 14 : 20,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                       SizedBox(height: isMobile ? 45 : 35),
                       isMobile
                           ? Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildPrimaryButton(),
-                                const SizedBox(height: 15),
-                                _buildSecondaryButton(),
-                              ],
+                              children: [_buildPrimaryButton()],
                             )
-                          : Row(
-                              children: [
-                                _buildPrimaryButton(),
-                                const SizedBox(width: 15),
-                                _buildSecondaryButton(),
-                              ],
-                            ),
+                          : Row(children: [_buildPrimaryButton()]),
                     ],
                   ),
                 ),
@@ -291,50 +284,6 @@ class _SoftwarepgState extends State<Softwarepg>
         ),
         const SizedBox(width: 8),
         const Icon(Icons.arrow_forward, size: 24),
-      ],
-    ),
-  );
-
-  Widget _buildSecondaryButton() => OutlinedButton(
-    onPressed: () {},
-    style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.white
-            : Colors.transparent;
-      }),
-      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        return states.contains(WidgetState.hovered)
-            ? Colors.black
-            : Colors.white;
-      }),
-      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-        return BorderSide(
-          color: states.contains(WidgetState.hovered)
-              ? Colors.black
-              : Colors.white,
-        );
-      }),
-      padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-      ),
-      shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      minimumSize: WidgetStateProperty.all(const Size(205, 54)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Explore more',
-          style: GoogleFonts.instrumentSans(
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Icon(Icons.arrow_forward, size: 24), // inherits foregroundColor
       ],
     ),
   );
