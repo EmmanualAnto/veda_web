@@ -12,7 +12,7 @@ class PopupOnScroll extends StatefulWidget {
   const PopupOnScroll({
     super.key,
     required this.child,
-    this.triggerFraction = 0.3,
+    this.triggerFraction = 0.1, // trigger early
     this.duration = const Duration(milliseconds: 600),
     this.delay = Duration.zero,
     this.onceId,
@@ -25,14 +25,14 @@ class PopupOnScroll extends StatefulWidget {
 
 class _PopupOnScrollState extends State<PopupOnScroll>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  static final Set<String> _playedIds = {}; // keeps track globally
+  static final Set<String> _playedIds = {}; // global played tracker
 
   late final AnimationController _controller;
   late final Animation<double> _animation;
   bool _hasAppeared = false;
 
   @override
-  bool get wantKeepAlive => true; // ✅ keep alive on navigation
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _PopupOnScrollState extends State<PopupOnScroll>
       curve: Curves.easeOutCubic,
     );
 
-    // ✅ restore previous completed animation if onceId was already played
+    // restore previous completed animation if needed
     if (widget.onceId != null && _playedIds.contains(widget.onceId)) {
       _hasAppeared = true;
       _controller.value = 1;
@@ -60,6 +60,7 @@ class _PopupOnScrollState extends State<PopupOnScroll>
 
   void _onVisibilityChanged(VisibilityInfo info) {
     if (_hasAppeared) return;
+
     if (info.visibleFraction >= widget.triggerFraction) {
       _hasAppeared = true;
       Future.delayed(widget.delay, () {
@@ -79,11 +80,14 @@ class _PopupOnScrollState extends State<PopupOnScroll>
       key: widget.key ?? UniqueKey(),
       onVisibilityChanged: _onVisibilityChanged,
       child: TickerMode(
-        enabled: mounted, // ✅ prevents rogue animations offscreen
+        enabled: mounted,
         child: FadeTransition(
           opacity: _animation,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(_animation),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.2), // start slightly below
+              end: Offset.zero,
+            ).animate(_animation),
             child: widget.child,
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,6 +44,11 @@ class _VedaHomePageState extends State<VedaHomePage>
         _fadeController.forward();
       } else {
         _fadeController.reverse();
+      }
+
+      // ✅ close menu on mobile scroll
+      if (_isMenuOpen) {
+        setState(() => _isMenuOpen = false);
       }
     });
   }
@@ -102,9 +108,21 @@ class _VedaHomePageState extends State<VedaHomePage>
             child: Listener(
               // Intercept mouse/trackpad wheel events and animate the scroll controller
               onPointerSignal: (pointerSignal) {
+                // ✅ Only apply scrolling logic on Web & Desktop
+                if (!kIsWeb &&
+                    (Theme.of(context).platform == TargetPlatform.android ||
+                        Theme.of(context).platform == TargetPlatform.iOS)) {
+                  return;
+                }
+
                 if (pointerSignal is PointerScrollEvent) {
+                  // ✅ close menu on scroll
+                  if (_isMenuOpen) {
+                    setState(() => _isMenuOpen = false);
+                  }
+
                   if (!_scrollController.hasClients) return;
-                  // tune this multiplier for sensitivity (0.6..1.0)
+
                   final double wheelMultiplier = 0.8;
                   final double delta =
                       pointerSignal.scrollDelta.dy * wheelMultiplier;
@@ -112,7 +130,6 @@ class _VedaHomePageState extends State<VedaHomePage>
                   final double max = _scrollController.position.maxScrollExtent;
                   final double target = (current + delta).clamp(0.0, max);
 
-                  // cancel any existing animateTo by calling animateTo again
                   _scrollController.animateTo(
                     target,
                     duration: const Duration(milliseconds: 300),
@@ -120,6 +137,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                   );
                 }
               },
+
               child: CustomScrollView(
                 controller: _scrollController,
                 // keep default physics so touch scrolling still feels natural
@@ -214,50 +232,62 @@ class _VedaHomePageState extends State<VedaHomePage>
           ),
 
           // Dropdown menu
-          Positioned(
-            top: kToolbarHeight,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              ignoring: !_isMenuOpen,
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOutCubic,
-                offset: _isMenuOpen ? Offset.zero : const Offset(0, -1),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                  opacity: _isMenuOpen ? 1.0 : 0.0,
-                  child: Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _menuButton('Home', () {
-                          setState(() => _isMenuOpen = false);
-                          _scrollToTop();
-                        }),
-                        _menuButton('About', () {
-                          setState(() => _isMenuOpen = false);
-                          scrollToSection(aboutKey);
-                        }),
-                        _menuButton('Services', () {
-                          setState(() => _isMenuOpen = false);
-                          scrollToSection(servicesKey);
-                        }),
-                        _menuButton('Contact', () {
-                          setState(() => _isMenuOpen = false);
-                          scrollToSection(contactKey);
-                        }),
-                      ],
+          // Dropdown menu
+          if (_isMenuOpen)
+            Positioned.fill(
+              // full screen tap layer
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () =>
+                    setState(() => _isMenuOpen = false), // ✅ tap outside closes
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: kToolbarHeight,
+                      left: 0,
+                      right: 0,
+                      child: AnimatedSlide(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOutCubic,
+                        offset: _isMenuOpen
+                            ? Offset.zero
+                            : const Offset(0, -0.15),
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 400),
+                          opacity: _isMenuOpen ? 1.0 : 0.0,
+                          child: Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.25,
+                            color: Colors.white,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _menuButton('Home', () {
+                                  setState(() => _isMenuOpen = false);
+                                  _scrollToTop();
+                                }),
+                                _menuButton('About', () {
+                                  setState(() => _isMenuOpen = false);
+                                  scrollToSection(aboutKey);
+                                }),
+                                _menuButton('Services', () {
+                                  setState(() => _isMenuOpen = false);
+                                  scrollToSection(servicesKey);
+                                }),
+                                _menuButton('Contact', () {
+                                  setState(() => _isMenuOpen = false);
+                                  scrollToSection(contactKey);
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-          ),
 
           // Floating scroll-to-top button
           Positioned(

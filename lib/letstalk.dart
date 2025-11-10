@@ -12,11 +12,9 @@ class LetsTalkSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
-    final containerHeight = height ?? (desktop ? 700 : 800);
 
     return Container(
       width: double.infinity,
-      height: containerHeight,
       constraints: const BoxConstraints(minHeight: 500),
       child: Stack(
         children: [
@@ -197,6 +195,16 @@ class _FormFieldsState extends State<_FormFields> {
   final _messageController = TextEditingController();
 
   bool _isSubmitting = false; // 👈 track submit state
+  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onTextChanged);
+    _emailController.addListener(_onTextChanged);
+    _phoneController.addListener(_onTextChanged);
+    _messageController.addListener(_onTextChanged);
+  }
 
   @override
   void dispose() {
@@ -232,12 +240,17 @@ class _FormFieldsState extends State<_FormFields> {
       if (!mounted) return;
 
       if (response.statusCode == 200) {
-        // Reset form state first
+        // Reset form state and clear warnings
         _formKey.currentState!.reset();
         _nameController.clear();
         _emailController.clear();
         _phoneController.clear();
         _messageController.clear();
+
+        setState(() {
+          _autoValidateMode =
+              AutovalidateMode.disabled; // 👈 disable all warnings
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -340,6 +353,12 @@ class _FormFieldsState extends State<_FormFields> {
     }
   }
 
+  void _onTextChanged() {
+    if (_autoValidateMode != AutovalidateMode.onUserInteraction) {
+      setState(() => _autoValidateMode = AutovalidateMode.onUserInteraction);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -359,6 +378,7 @@ class _FormFieldsState extends State<_FormFields> {
               }
               return null;
             },
+            autovalidateMode: _autoValidateMode,
           ),
           const SizedBox(height: 12),
           _CustomTextField(
@@ -376,6 +396,7 @@ class _FormFieldsState extends State<_FormFields> {
               }
               return null;
             },
+            autovalidateMode: _autoValidateMode,
           ),
           const SizedBox(height: 12),
           _CustomTextField(
@@ -392,19 +413,23 @@ class _FormFieldsState extends State<_FormFields> {
               }
               return null;
             },
+            autovalidateMode: _autoValidateMode,
           ),
           const SizedBox(height: 12),
           _CustomTextField(
             controller: _messageController,
             label: 'Message',
-
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Message cannot be empty';
               }
               return null;
             },
+            autovalidateMode: _autoValidateMode,
+            maxLines: 6, // 👈 allows 6 lines
+            minLines: 3, // 👈 minimum height
           ),
+
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerLeft,
@@ -461,6 +486,9 @@ class _CustomTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputAction textInputAction;
+  final int? minLines;
+  final int? maxLines;
+  final AutovalidateMode? autovalidateMode;
 
   const _CustomTextField({
     required this.label,
@@ -468,6 +496,9 @@ class _CustomTextField extends StatefulWidget {
     this.controller,
     this.validator,
     this.textInputAction = TextInputAction.next,
+    this.minLines,
+    this.maxLines,
+    this.autovalidateMode,
   });
 
   @override
@@ -478,17 +509,10 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   @override
   void initState() {
     super.initState();
-    widget.controller?.addListener(_onTextChanged);
-  }
-
-  void _onTextChanged() {
-    // Rebuild field to remove validation error when user types
-    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    widget.controller?.removeListener(_onTextChanged);
     super.dispose();
   }
 
@@ -497,14 +521,17 @@ class _CustomTextFieldState extends State<_CustomTextField> {
     return TextFormField(
       controller: widget.controller,
       validator: widget.validator,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
+
       keyboardType: widget.label == "Phone"
           ? TextInputType.phone
           : (widget.label == "Email"
                 ? TextInputType.emailAddress
-                : TextInputType.text),
+                : TextInputType.multiline), // 👈 multiline for text
       textInputAction: widget.textInputAction,
       style: const TextStyle(color: Colors.white),
+      maxLines: widget.maxLines ?? 1, // 👈 default 1 for normal fields
+      minLines: widget.minLines ?? 1,
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: GoogleFonts.poppins(color: Colors.white70),
@@ -512,7 +539,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
         fillColor: Colors.white.withOpacity(0.16),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 12,
+          vertical: 16, // 👈 increase vertical padding
         ),
         prefixIcon: widget.icon != null
             ? Icon(widget.icon, color: Colors.white70)

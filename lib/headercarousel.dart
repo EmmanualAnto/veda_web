@@ -138,17 +138,39 @@ class _HeaderCarouselState extends State<HeaderCarousel>
           // Background image
           ClipRect(
             child: AnimatedSwitcher(
-              duration: const Duration(seconds: 1),
-              switchInCurve: Curves.easeInOut,
-              switchOutCurve: Curves.easeInOut,
-              child: ScaleTransition(
-                scale: _imageScaleAnimation,
-                child: Image.asset(
-                  imagePath,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
+              duration: const Duration(milliseconds: 900),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeOutCubic,
+              layoutBuilder: (current, previous) {
+                return Stack(
+                  children: [
+                    ...previous, // ✅ Fix here
+                    if (current != null) current,
+                  ],
+                );
+              },
+              child: FadeTransition(
+                opacity:
+                    Tween<double>(begin: 0.6, end: 1.0) // start lighter
+                        .animate(
+                          _imageScaleController.drive(
+                            CurveTween(
+                              curve: const Interval(
+                                0.0,
+                                0.7,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
+                          ),
+                        ),
+                child: ScaleTransition(
+                  scale: _imageScaleAnimation,
+                  child: Image.asset(
+                    imagePath,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -232,6 +254,9 @@ class _HeaderCarouselState extends State<HeaderCarousel>
                             fontWeight: FontWeight.w700,
                             height: 1.2,
                           ),
+                          textAlign: isMobile
+                              ? TextAlign.center
+                              : TextAlign.start,
                         ),
                       ),
                       SizedBox(height: isMobile ? 40 : 25),
