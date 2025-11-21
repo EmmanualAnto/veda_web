@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
+import 'package:veda_main/constants.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
 import 'package:veda_main/popupanime.dart';
@@ -130,16 +131,13 @@ class _WebapppgState extends State<Webapppg>
                   height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF0035FF),
-                      width: 2,
-                    ),
+                    border: Border.all(color: AppColors.primary, width: 2),
                     color: Colors.transparent,
                   ),
                   child: const Center(
                     child: Icon(
                       Icons.arrow_upward,
-                      color: Color(0xFF0035FF),
+                      color: AppColors.primary,
                       size: 24,
                     ),
                   ),
@@ -247,7 +245,7 @@ class _WebapppgState extends State<Webapppg>
                             const TextSpan(
                               text: '// ',
                               style: TextStyle(
-                                color: Color(0xFF0035FF),
+                                color: AppColors.primary,
                                 fontSize: 30,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -316,7 +314,7 @@ class _WebapppgState extends State<Webapppg>
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         return states.contains(WidgetState.hovered)
             ? Colors.white
-            : const Color(0xFF0035FF);
+            : AppColors.primary;
       }),
       foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         return states.contains(WidgetState.hovered)
@@ -391,7 +389,7 @@ class _WebapppgState extends State<Webapppg>
                     TextSpan(
                       text: '// ',
                       style: GoogleFonts.instrumentSans(
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                         fontSize: isMobile ? 18 : 25,
                         fontWeight: FontWeight.w900,
                       ),
@@ -420,7 +418,7 @@ class _WebapppgState extends State<Webapppg>
                     TextSpan(
                       text: 'In Our Solutions',
                       style: GoogleFonts.instrumentSans(
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                         fontSize: isMobile ? 26 : 46,
                         fontWeight: FontWeight.w700,
                       ),

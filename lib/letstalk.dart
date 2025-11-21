@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:veda_main/constants.dart';
 
 class LetsTalkSection extends StatelessWidget {
   final double? height;
@@ -63,7 +64,7 @@ class LetsTalkSection extends StatelessWidget {
                       TextSpan(
                         text: '// ',
                         style: GoogleFonts.instrumentSans(
-                          color: const Color(0xFF0035FF),
+                          color: AppColors.primary,
                           fontSize: desktop ? 25 : 18,
                           fontWeight: FontWeight.w900,
                         ),
@@ -95,7 +96,7 @@ class LetsTalkSection extends StatelessWidget {
                       TextSpan(
                         text: "Working on",
                         style: GoogleFonts.instrumentSans(
-                          color: const Color(0xFF0035FF),
+                          color: AppColors.primary,
                           fontSize: desktop ? 46 : 26,
                           fontWeight: FontWeight.w700,
                         ),
@@ -255,7 +256,7 @@ class _FormFieldsState extends State<_FormFields> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF0035FF),
+            backgroundColor: AppColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -439,7 +440,7 @@ class _FormFieldsState extends State<_FormFields> {
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(0, 53, 255, 1),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

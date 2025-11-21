@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 
 class StyledCardSection extends StatefulWidget {
   final String imagePath;
@@ -45,7 +46,7 @@ class _StyledCardSectionState extends State<StyledCardSection> {
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: const Color(0xFF0035FF).withOpacity(0.4),
+                    color: AppColors.primary.withOpacity(0.4),
                     offset: const Offset(0, 4),
                     blurRadius: 20,
                     spreadRadius: 2,
@@ -59,7 +60,7 @@ class _StyledCardSectionState extends State<StyledCardSection> {
                   ),
                 ],
           border: const Border(
-            bottom: BorderSide(color: Color.fromRGBO(0, 53, 255, 1), width: 8),
+            bottom: BorderSide(color: AppColors.primary, width: 8),
           ),
         ),
         child: Column(

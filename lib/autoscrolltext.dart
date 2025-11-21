@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 
 class ClientReel extends StatefulWidget {
   final List<String> clients;
@@ -104,7 +105,7 @@ class _ClientReelState extends State<ClientReel> with TickerProviderStateMixin {
                   height: 10,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(0, 53, 255, 1),
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 import 'package:veda_main/popupanime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:veda_main/veda_page_layout.dart';
@@ -28,7 +29,7 @@ class ServicesPage extends StatelessWidget {
                     TextSpan(
                       text: '// ',
                       style: GoogleFonts.instrumentSans(
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                         fontSize: isDesktop ? 25 : 18,
                         fontWeight: FontWeight.w900,
                       ),
@@ -57,7 +58,7 @@ class ServicesPage extends StatelessWidget {
                     TextSpan(
                       text: 'That Drive Results',
                       style: GoogleFonts.instrumentSans(
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                         fontSize: isDesktop ? 46 : 26,
                         fontWeight: FontWeight.w700,
                       ),
@@ -136,7 +137,7 @@ class ServicesPage extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: const Border(
-          bottom: BorderSide(color: Color(0xFF0035FF), width: 8),
+          bottom: BorderSide(color: AppColors.primary, width: 8),
         ),
         boxShadow: [
           BoxShadow(
@@ -181,9 +182,7 @@ class ServicesPage extends StatelessWidget {
             const SizedBox(height: 16),
             TextButton(
               onPressed: () => context.push(route),
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF0035FF),
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

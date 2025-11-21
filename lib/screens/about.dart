@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 import 'package:veda_main/veda_page_layout.dart';
 
 class AboutUsPage extends StatelessWidget {
@@ -25,7 +26,7 @@ class AboutUsPage extends StatelessWidget {
               style: GoogleFonts.instrumentSans(
                 fontSize: isDesktop ? 48 : 34,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0035FF),
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 16),
@@ -168,7 +169,7 @@ class AboutUsPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, size: 48, color: const Color(0xFF0035FF)),
+          Icon(icon, size: 48, color: AppColors.primary),
           const SizedBox(height: 16),
           Text(
             title,

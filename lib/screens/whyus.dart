@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 import 'package:veda_main/popupanime.dart';
 import 'package:veda_main/veda_page_layout.dart';
 
@@ -24,7 +25,7 @@ class WhyUsPage extends StatelessWidget {
                     TextSpan(
                       text: '// ',
                       style: GoogleFonts.instrumentSans(
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                         fontSize: isDesktop ? 25 : 18,
                         fontWeight: FontWeight.w900,
                       ),
@@ -56,7 +57,7 @@ class WhyUsPage extends StatelessWidget {
                       style: GoogleFonts.instrumentSans(
                         fontSize: isDesktop ? 46 : 26,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0035FF),
+                        color: AppColors.primary,
                       ),
                     ),
                   ],

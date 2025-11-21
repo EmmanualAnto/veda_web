@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 // -------------------- COLORS --------------------
 class AppColors {
-  static const primary = Color(0xFF0035FF);
-  static const primaryLight = Color(0xFF0050FF); // if you need hover variations
+  static const primary = Color(0xFF017697);
+  static const primaryLight = Color(0xFF0035FF); // if you need hover variations
   static const overlayGradientStart = Color.fromRGBO(3, 9, 35, 0.879);
   static const overlayGradient25 = Color.fromRGBO(3, 9, 35, 0.867);
   static const overlayGradient50 = Color.fromRGBO(3, 9, 35, 0.85);

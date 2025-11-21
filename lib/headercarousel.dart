@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:veda_main/constants.dart';
 
 class HeaderCarousel extends StatefulWidget {
   const HeaderCarousel({super.key});
@@ -225,7 +226,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
                                 text: '// ',
                                 style: GoogleFonts.instrumentSans(
                                   fontSize: isMobile ? 25 : 25,
-                                  color: const Color(0xFF0035FF),
+                                  color: AppColors.primary,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -358,7 +359,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
           backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
             return states.contains(WidgetState.hovered)
                 ? Colors.white
-                : const Color(0xFF0035FF);
+                : AppColors.primary;
           }),
           foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
             return states.contains(WidgetState.hovered)

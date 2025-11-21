@@ -211,16 +211,13 @@ class _VedaHomePageState extends State<VedaHomePage>
                   height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF0035FF),
-                      width: 2,
-                    ),
+                    border: Border.all(color: AppColors.primary, width: 2),
                     color: Colors.transparent,
                   ),
                   child: const Center(
                     child: Icon(
                       Icons.arrow_upward,
-                      color: Color(0xFF0035FF),
+                      color: AppColors.primary,
                       size: 24,
                     ),
                   ),
@@ -348,51 +345,90 @@ class _VedaHomePageState extends State<VedaHomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     bool isMobile = screenWidth < 800;
 
-    return Container(
-      width: width,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(
-          top: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
-          right: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
-          bottom: BorderSide(color: const Color(0xFF0035FF), width: 8),
-          left: BorderSide(color: const Color(0xFF0035FF), width: 0.6),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
+    bool _isHovered = false; // tracked inside StatefulBuilder
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          cursor: SystemMouseCursors.click,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            width: width,
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border(
+                top: BorderSide(color: AppColors.primary, width: 0.6),
+                right: BorderSide(color: AppColors.primary, width: 0.6),
+                bottom: BorderSide(color: AppColors.primary, width: 8),
+                left: BorderSide(color: AppColors.primary, width: 0.6),
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.35), // darker shadow
+                        offset: const Offset(0, 6),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                  : [],
             ),
-            child: Icon(icon, color: Colors.blue.shade800, size: 30),
-          ),
-          SizedBox(width: screenWidth > 600 ? 8 : 12),
-          Expanded(
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: AppTextStyles.serviceTitle(isMobile: isMobile),
+                AnimatedContainer(
+                  duration: const Duration(
+                    milliseconds: 300,
+                  ), // smooth background
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _isHovered
+                        ? AppColors.primary
+                        : Colors.blue.shade50, // smooth color transition
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      icon,
+                      key: UniqueKey(), // <-- ensures no duplicate keys
+                      color: _isHovered ? Colors.white : AppColors.primary,
+                      size: 30,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  textAlign: TextAlign.justify,
-                  description,
-                  style: AppTextStyles.servicedescription(isMobile: isMobile),
+                SizedBox(width: screenWidth > 600 ? 8 : 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTextStyles.serviceTitle(isMobile: isMobile),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        textAlign: TextAlign.justify,
+                        description,
+                        style: AppTextStyles.servicedescription(
+                          isMobile: isMobile,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -462,7 +498,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                             TextSpan(
                               text: '\nInnovation',
                               style: GoogleFonts.instrumentSans(
-                                color: const Color(0xFF0035FF),
+                                color: AppColors.primary,
                                 fontSize: desktop ? 46 : 26,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -530,7 +566,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       TextSpan(
                         text: '// ',
                         style: GoogleFonts.instrumentSans(
-                          color: const Color(0xFF0035FF),
+                          color: AppColors.primary,
                           fontSize: desktop ? 25 : 18,
                           fontWeight: FontWeight.w900,
                         ),
@@ -559,7 +595,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       TextSpan(
                         text: 'That Drive Results',
                         style: GoogleFonts.instrumentSans(
-                          color: const Color(0xFF0035FF),
+                          color: AppColors.primary,
                           fontSize: desktop ? 46 : 26,
                           fontWeight: FontWeight.w700,
                         ),
@@ -645,82 +681,106 @@ class _VedaHomePageState extends State<VedaHomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
 
-    return Container(
-      width: desktop ? 400 : 350, // keep width fixed
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: const Border(
-          bottom: BorderSide(color: Color(0xFF0035FF), width: 8),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                gaplessPlayback: true,
-                imagePath,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Title
-            Text(
-              title,
-              style: GoogleFonts.instrumentSans(
-                fontSize: desktop ? 22 : 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Description
-            Text(
-              textAlign: TextAlign.justify,
-              description,
-              style: GoogleFonts.poppins(
-                fontSize: desktop ? 15 : 13,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 16), // instead of Spacer
-            // Button
-            TextButton(
-              onPressed: onPressed,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF0035FF),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Learn More',
-                    style: GoogleFonts.instrumentSans(
-                      fontSize: desktop ? 18 : 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+    bool isHovered = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: onPressed, // entire card click triggers same callback
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              width: desktop ? 400 : 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border(
+                  bottom: BorderSide(color: AppColors.primary, width: 8),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isHovered
+                        ? AppColors.primary.withOpacity(0.35)
+                        : AppColors.primary.withOpacity(0.1),
+                    offset: const Offset(0, 6),
+                    blurRadius: isHovered ? 15 : 6,
+                    spreadRadius: isHovered ? 2 : 0,
                   ),
-                  const SizedBox(width: 6),
-                  Icon(Icons.arrow_forward, size: desktop ? 24 : 20),
                 ],
               ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top image with pop effect
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: AnimatedScale(
+                        scale: isHovered ? 1.05 : 1.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: Image.asset(
+                          gaplessPlayback: true,
+                          imagePath,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Title
+                    Text(
+                      title,
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: desktop ? 22 : 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Description
+                    Text(
+                      textAlign: TextAlign.justify,
+                      description,
+                      style: GoogleFonts.poppins(
+                        fontSize: desktop ? 15 : 13,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Button (still works separately)
+                    TextButton(
+                      onPressed: onPressed,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Learn More',
+                            style: GoogleFonts.instrumentSans(
+                              fontSize: desktop ? 18 : 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(Icons.arrow_forward, size: desktop ? 24 : 20),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -739,7 +799,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 TextSpan(
                   text: '// ',
                   style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
+                    color: AppColors.primary,
                     fontSize: desktop ? 25 : 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -771,7 +831,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                   style: GoogleFonts.instrumentSans(
                     fontSize: desktop ? 46 : 26,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0035FF),
+                    color: AppColors.primary,
                   ),
                 ),
               ],

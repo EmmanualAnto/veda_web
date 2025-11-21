@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:veda_main/constants.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -130,7 +131,7 @@ class Footer extends StatelessWidget {
               TextSpan(
                 text: '// ',
                 style: GoogleFonts.instrumentSans(
-                  color: const Color(0xFF0035FF),
+                  color: AppColors.primary,
                   fontSize: desktop ? 25 : 18,
                   fontWeight: FontWeight.w900,
                 ),
@@ -175,7 +176,7 @@ class Footer extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: const Color(0xFF0035FF),
+          color: AppColors.primary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: Colors.white, size: 18),
