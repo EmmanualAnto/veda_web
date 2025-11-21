@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
+import 'package:veda_main/popupanime.dart';
 import 'package:veda_main/stylecard.dart';
 import 'package:veda_main/topbar.dart';
 
@@ -25,7 +26,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
     super.initState();
 
     _fadeController = AnimationController(
-      vsync: this, // ✅ works now
+      vsync: this,
       duration: const Duration(milliseconds: 400),
     );
     _fadeAnimation = CurvedAnimation(
@@ -60,38 +61,63 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(title: const Text('Home'), onTap: () {}),
-            ListTile(title: const Text('About'), onTap: () {}),
-            ListTile(title: const Text('Services'), onTap: () {}),
-            ListTile(title: const Text('Contact'), onTap: () {}),
-          ],
-        ),
-      ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
           CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverToBoxAdapter(child: Center(child: TopBar())),
+              // Header
               SliverToBoxAdapter(
-                child: Center(child: _buildHeaderSection(context)),
+                child: RepaintBoundary(
+                  child: FadeInOnScroll(
+                    delay: const Duration(milliseconds: 0),
+                    child: _buildHeaderSection(context),
+                  ),
+                ),
               ),
+
+              // Cards
               SliverToBoxAdapter(
-                child: Center(child: _buildFiveCardsSection(context)),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: List.generate(8, (index) {
+                    return FadeInOnScroll(
+                      delay: Duration(milliseconds: index * 120), // stagger
+                      child: _buildCardByIndex(index),
+                    );
+                  }),
+                ),
               ),
-              SliverToBoxAdapter(
-                child: Center(child: _buildClientsSection(context)),
-              ),
-              const SliverToBoxAdapter(child: Center(child: LetsTalkSection())),
-              SliverToBoxAdapter(child: Center(child: Footer())),
+
+              // Clients
+              SliverToBoxAdapter(child: _buildClientsSection(context)),
+              // LetsTalk
+              const SliverToBoxAdapter(child: LetsTalkSection()),
+              // Footer
+              const SliverToBoxAdapter(child: Footer()),
             ],
           ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ReusableMenu(
+                menuRoutes: {
+                  'Home': '/',
+                  'About': '/aboutus',
+                  'Services': '/ourservices',
+                  'Contact': '/contactus',
+                },
+              ),
+            ),
+          ),
 
+          // Scroll-to-top button
           Positioned(
             bottom: 30,
             right: 30,
@@ -123,6 +149,47 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCardByIndex(int index) {
+    List<String> images = [
+      "assets/software/1.webp",
+      "assets/software/2.webp",
+      "assets/software/3.webp",
+      "assets/software/4.webp",
+      "assets/software/5.webp",
+      "assets/software/5.webp",
+      "assets/software/5.webp",
+      "assets/software/5.webp",
+    ];
+    List<String> titles = [
+      "Network Setup & Configuration",
+      "Firewall & Network Security",
+      "Computer & Server Installation",
+      "Hardware Maintenance & AMC",
+      "Remote Access & VPN Solutions",
+      "Data Backup & Storage Solutions",
+      "Cloud & Hybrid Network Integration",
+      "IT Infrastructure Consulting",
+    ];
+    List<String> desc = [
+      "Complete wired & wireless LAN/WAN setup for offices, including routers, switches, and structured cabling.",
+      "Installation of firewalls, antivirus, and other cybersecurity solutions to protect client data and networks.",
+      "Supply and setup of desktops, laptops, and servers tailored to business needs.",
+      "Regular servicing, troubleshooting, and repair of IT hardware with flexible support plans.",
+      "Secure remote connectivity for employees and branch offices via VPN setups.",
+      "Setup of local and cloud-based backup systems, NAS devices, and secure storage management.",
+      "Helping businesses connect and manage cloud platforms (like AWS, Azure) with their on-premise network.",
+      "Tailored consultation for setting up or upgrading IT infrastructure based on client needs and budget.",
+    ];
+
+    return StyledCardSection(
+      pageKey: 'hrdwr_page',
+      cardIndex: index, // FIXED
+      imagePath: images[index],
+      title: titles[index],
+      description: desc[index],
     );
   }
 
@@ -289,135 +356,6 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
     ),
   );
 
-  Widget _buildFiveCardsSection(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 800;
-
-        return Padding(
-          padding: EdgeInsets.all(isMobile ? 10 : 20),
-          child: isMobile
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Column(
-                    children: const [
-                      StyledCardSection(
-                        imagePath: "assets/software/1.webp",
-                        title: "Network Setup & Configuration",
-                        description:
-                            "Complete wired & wireless LAN/WAN setup for offices, including routers, switches, and structured cabling.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/2.webp",
-                        title: "Firewall & Network Security",
-                        description:
-                            "Installation of firewalls, antivirus, and other cybersecurity solutions to protect client data and networks.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/3.webp",
-                        title: "Computer & Server Installation",
-                        description:
-                            "Supply and setup of desktops, laptops, and servers tailored to business needs.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/4.webp",
-                        title: "Hardware Maintenance & AMC",
-                        description:
-                            "Regular servicing, troubleshooting, and repair of IT hardware with flexible support plans.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/5.webp",
-                        title: "Remote Access & VPN Solutions",
-                        description:
-                            "Secure remote connectivity for employees and branch offices via VPN setups.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/5.webp",
-                        title: "Data Backup & Storage Solutions",
-                        description:
-                            "Setup of local and cloud-based backup systems, NAS devices, and secure storage management.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/5.webp",
-                        title: "Cloud & Hybrid Network Integration",
-                        description:
-                            "Helping businesses connect and manage cloud platforms (like AWS, Azure) with their on-premise network.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/5.webp",
-                        title: "IT Infrastructure Consulting",
-                        description:
-                            "Tailored consultation for setting up or upgrading IT infrastructure based on client needs and budget.",
-                      ),
-                    ],
-                  ),
-                )
-              : Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: const [
-                    StyledCardSection(
-                      imagePath: "assets/software/1.webp",
-                      title: "Network Setup & Configuration",
-                      description:
-                          "Complete wired & wireless LAN/WAN setup for offices, including routers, switches, and structured cabling.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/2.webp",
-                      title: "Firewall & Network Security",
-                      description:
-                          "Installation of firewalls, antivirus, and other cybersecurity solutions to protect client data and networks.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/3.webp",
-                      title: "Computer & Server Installation",
-                      description:
-                          "Supply and setup of desktops, laptops, and servers tailored to business needs.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/4.webp",
-                      title: "Hardware Maintenance & AMC",
-                      description:
-                          "Regular servicing, troubleshooting, and repair of IT hardware with flexible support plans.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.webp",
-                      title: "Remote Access & VPN Solutions",
-                      description:
-                          "Secure remote connectivity for employees and branch offices via VPN setups.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.webp",
-                      title: "Data Backup & Storage Solutions",
-                      description:
-                          "Setup of local and cloud-based backup systems, NAS devices, and secure storage management.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.webp",
-                      title: "Cloud & Hybrid Network Integration",
-                      description:
-                          "Helping businesses connect and manage cloud platforms (like AWS, Azure) with their on-premise network.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.webp",
-                      title: "IT Infrastructure Consulting",
-                      description:
-                          "Tailored consultation for setting up or upgrading IT infrastructure based on client needs and budget.",
-                    ),
-                  ],
-                ),
-        );
-      },
-    );
-  }
-
   Widget _buildClientsSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 800;
@@ -428,68 +366,80 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
       "Markwell International WLL",
       "Musthafa Muhammed Trading",
       "Madan Electrical Contracting",
+      "Soccerscene",
+      "Life line Document Clearance",
+      "Palace Opticals",
+      "Awali Stationaries",
+      "Sadaret Food Stuff Center",
+      "Atlas Stationaries",
+      "K S Fashions",
+      "Al Thawaouda Tailoring",
+      "Art of Living Bahrain",
+      "Ashraf Bicycle Store",
+      "Ali Ajmal Building Materials",
     ];
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 100,
-        vertical: 40,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '// ',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 18 : 25,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Our Clients',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 16 : 22,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 100,
+            vertical: 40,
           ),
-          const SizedBox(height: 8),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Partners Who Believe\n',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '// ',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 18 : 25,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Our Clients',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 16 : 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                TextSpan(
-                  text: 'In Our Solutions',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Partners Who Believe\n',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'In Our Solutions',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 50),
-          AutoScrollClients(
-            clients: clients,
-            isMobile: isMobile,
-            topRowSpeedFactor: 1.0,
-            bottomRowSpeedFactor: 1.0,
-          ),
-        ],
-      ),
+        ),
+        ClientReel(clients: clients),
+        const SizedBox(height: 50),
+      ],
     );
   }
 }

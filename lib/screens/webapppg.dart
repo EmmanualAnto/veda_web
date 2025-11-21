@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
+import 'package:veda_main/popupanime.dart';
 import 'package:veda_main/stylecard.dart';
 import 'package:veda_main/topbar.dart';
 
@@ -24,7 +25,7 @@ class _WebapppgState extends State<Webapppg>
     super.initState();
 
     _fadeController = AnimationController(
-      vsync: this, // ✅ works now
+      vsync: this,
       duration: const Duration(milliseconds: 400),
     );
     _fadeAnimation = CurvedAnimation(
@@ -59,36 +60,63 @@ class _WebapppgState extends State<Webapppg>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(title: const Text('Home'), onTap: () {}),
-            ListTile(title: const Text('About'), onTap: () {}),
-            ListTile(title: const Text('Services'), onTap: () {}),
-            ListTile(title: const Text('Contact'), onTap: () {}),
-          ],
-        ),
-      ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
           CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverToBoxAdapter(child: Center(child: TopBar())),
               SliverToBoxAdapter(
-                child: Center(child: _buildHeaderSection(context)),
+                child: RepaintBoundary(
+                  child: FadeInOnScroll(
+                    delay: const Duration(milliseconds: 0),
+                    child: _buildHeaderSection(context),
+                  ),
+                ),
               ),
+
               SliverToBoxAdapter(
-                child: Center(child: _buildFiveCardsSection(context)),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: List.generate(7, (index) {
+                    return FadeInOnScroll(
+                      delay: Duration(milliseconds: index * 120), // stagger
+                      child: _buildCardByIndex(index),
+                    );
+                  }),
+                ),
               ),
+
               SliverToBoxAdapter(
-                child: Center(child: _buildClientsSection(context)),
+                child: RepaintBoundary(
+                  child: FadeInOnScroll(
+                    delay: const Duration(milliseconds: 0),
+                    child: _buildClientsSection(context),
+                  ),
+                ),
               ),
-              const SliverToBoxAdapter(child: Center(child: LetsTalkSection())),
-              SliverToBoxAdapter(child: Center(child: Footer())),
+
+              const SliverToBoxAdapter(child: LetsTalkSection()),
+              const SliverToBoxAdapter(child: Footer()),
             ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ReusableMenu(
+                menuRoutes: {
+                  'Home': '/',
+                  'About': '/aboutus',
+                  'Services': '/ourservices',
+                  'Contact': '/contactus',
+                },
+              ),
+            ),
           ),
           Positioned(
             bottom: 30,
@@ -123,6 +151,46 @@ class _WebapppgState extends State<Webapppg>
       ),
     );
   }
+
+  Widget _buildCardByIndex(int index) {
+    List<String> images = [
+      "assets/web/1.webp",
+      "assets/web/2.webp",
+      "assets/web/4.webp",
+      "assets/web/3.webp",
+      "assets/web/6.webp",
+      "assets/web/5.webp",
+      "assets/web/7.webp",
+    ];
+    List<String> titles = [
+      "Design & Development",
+      "Marketing & Analysis",
+      "Domain & Hosting Management",
+      "E-Commerce Development",
+      "Website Upgrades & Renovations",
+      "Application Development",
+      "Database Construction",
+    ];
+    List<String> desc = [
+      "Insight-driven strategies to grow traffic, engagement, and conversions.",
+      "Fast, secure, and reliable POS solutions for retail and restaurants.",
+      "Seamless domain registration, hosting, and long-term maintenance.",
+      "Custom online stores with secure transactions and smooth user experience.",
+      "Redesign and revamp outdated websites with modern UI/UX.",
+      "Interactive solutions like chatrooms, polls, message boards, and more.",
+      "Powerful, scalable databases designed to handle business growth.",
+    ];
+
+    return StyledCardSection(
+      pageKey: 'web_page',
+      cardIndex: index, // FIXED
+      imagePath: images[index],
+      title: titles[index],
+      description: desc[index],
+    );
+  }
+
+  // Keep your existing _buildHeaderSection, _buildFiveCardsSection, _buildClientsSection, and _buildPrimaryButton methods
 
   Widget _buildHeaderSection(BuildContext context) {
     return LayoutBuilder(
@@ -287,124 +355,6 @@ class _WebapppgState extends State<Webapppg>
     ),
   );
 
-  Widget _buildFiveCardsSection(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 800;
-
-        return Padding(
-          padding: EdgeInsets.all(isMobile ? 10 : 20),
-          child: isMobile
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Column(
-                    children: const [
-                      StyledCardSection(
-                        imagePath: "assets/web/1.webp",
-                        title: "Design & Development",
-                        description:
-                            "Insight-driven strategies to grow traffic, engagement, and conversions.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/2.webp",
-                        title: "Marketing & Analysis",
-                        description:
-                            "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/4.webp",
-                        title: "Domain & Hosting Management",
-                        description:
-                            "Seamless domain registration, hosting, and long-term maintenance.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/3.webp",
-                        title: "E-Commerce Development",
-                        description:
-                            "Custom online stores with secure transactions and smooth user experience.",
-                      ),
-
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/6.webp",
-                        title: "Website Upgrades & Renovations",
-                        description:
-                            "Redesign and revamp outdated websites with modern UI/UX.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/5.webp",
-                        title: "Application Development",
-                        description:
-                            "Interactive solutions like chatrooms, polls, message boards, and more.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/web/7.webp",
-                        title: "Database Construction",
-                        description:
-                            "Powerful, scalable databases designed to handle business growth.",
-                      ),
-                    ],
-                  ),
-                )
-              : Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: const [
-                    StyledCardSection(
-                      imagePath: "assets/web/1.webp",
-                      title: "Design & Development",
-                      description:
-                          "Insight-driven strategies to grow traffic, engagement, and conversions.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/web/2.webp",
-                      title: "Marketing & Analysis",
-                      description:
-                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/web/4.webp",
-                      title: "Domain & Hosting Management",
-                      description:
-                          "Seamless domain registration, hosting, and long-term maintenance.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/web/3.webp",
-                      title: "E-Commerce Development",
-                      description:
-                          "Custom online stores with secure transactions and smooth user experience.",
-                    ),
-
-                    StyledCardSection(
-                      imagePath: "assets/web/5.webp",
-                      title: "Website Upgrades & Renovations",
-                      description:
-                          "Redesign and revamp outdated websites with modern UI/UX.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/web/6.webp",
-                      title: "Application Development",
-                      description:
-                          "Interactive solutions like chatrooms, polls, message boards, and more.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/web/7.webp",
-                      title: "Database Construction",
-                      description:
-                          "Powerful, scalable databases designed to handle business growth.",
-                    ),
-                  ],
-                ),
-        );
-      },
-    );
-  }
-
   Widget _buildClientsSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 800;
@@ -423,66 +373,67 @@ class _WebapppgState extends State<Webapppg>
       "Devine Food Co.",
     ];
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 100,
-        vertical: 40,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '// ',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 18 : 25,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Our Clients',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 16 : 22,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 100,
+            vertical: 40,
           ),
-          const SizedBox(height: 8),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Partners Who Believe\n',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '// ',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 18 : 25,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Our Clients',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 16 : 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                TextSpan(
-                  text: 'In Our Solutions',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Partners Who Believe\n',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'In Our Solutions',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 50),
-          AutoScrollClients(
-            clients: clients,
-            isMobile: isMobile,
-            topRowSpeedFactor: 1.0,
-            bottomRowSpeedFactor: 1.0,
-          ),
-        ],
-      ),
+        ),
+        ClientReel(clients: clients),
+        const SizedBox(height: 50),
+      ],
     );
   }
 }

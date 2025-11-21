@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
+import 'package:veda_main/popupanime.dart';
 import 'package:veda_main/stylecard.dart';
 import 'package:veda_main/topbar.dart';
 
@@ -22,9 +23,8 @@ class _SoftwarepgState extends State<Softwarepg>
   @override
   void initState() {
     super.initState();
-
     _fadeController = AnimationController(
-      vsync: this, // ✅ works now
+      vsync: this,
       duration: const Duration(milliseconds: 400),
     );
     _fadeAnimation = CurvedAnimation(
@@ -59,38 +59,70 @@ class _SoftwarepgState extends State<Softwarepg>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(title: const Text('Home'), onTap: () {}),
-            ListTile(title: const Text('About'), onTap: () {}),
-            ListTile(title: const Text('Services'), onTap: () {}),
-            ListTile(title: const Text('Contact'), onTap: () {}),
-          ],
-        ),
-      ),
       backgroundColor: Colors.white,
       body: Stack(
         children: [
           CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverToBoxAdapter(child: Center(child: TopBar())),
+              // Header with popup animation
               SliverToBoxAdapter(
-                child: Center(child: _buildHeaderSection(context)),
+                child: RepaintBoundary(
+                  child: FadeInOnScroll(
+                    delay: const Duration(milliseconds: 0),
+                    child: _buildHeaderSection(context),
+                  ),
+                ),
               ),
+
+              // Five Cards with staggered popup
               SliverToBoxAdapter(
-                child: Center(child: _buildFiveCardsSection(context)),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: List.generate(5, (index) {
+                    return FadeInOnScroll(
+                      delay: Duration(milliseconds: index * 100), // stagger
+                      child: _buildCardByIndex(index),
+                    );
+                  }),
+                ),
               ),
+
+              // Clients section
               SliverToBoxAdapter(
-                child: Center(child: _buildClientsSection(context)),
+                child: RepaintBoundary(
+                  child: FadeInOnScroll(
+                    delay: const Duration(milliseconds: 0),
+                    child: _buildClientsSection(context),
+                  ),
+                ),
               ),
+
               const SliverToBoxAdapter(child: Center(child: LetsTalkSection())),
+
+              // Footer with navigation
               SliverToBoxAdapter(child: Center(child: Footer())),
             ],
           ),
-
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ReusableMenu(
+                menuRoutes: {
+                  'Home': '/',
+                  'About': '/aboutus',
+                  'Services': '/ourservices',
+                  'Contact': '/contactus',
+                },
+              ),
+            ),
+          ),
+          // Scroll to top button
           Positioned(
             bottom: 30,
             right: 30,
@@ -122,6 +154,38 @@ class _SoftwarepgState extends State<Softwarepg>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCardByIndex(int index) {
+    List<String> images = [
+      "assets/software/1.webp",
+      "assets/software/2.webp",
+      "assets/software/3.webp",
+      "assets/software/4.webp",
+      "assets/software/5.webp",
+    ];
+    List<String> titles = [
+      "Customized Accounting Packages",
+      "POS (Point of Sale) Systems",
+      "Wholesale & Retail Inventory Software",
+      "Customized Software for Organizations",
+      "Softwares for Personal Accounting",
+    ];
+    List<String> desc = [
+      "Streamline finances with tailored accounting software built for your business model.",
+      "Fast, secure, and reliable POS solutions for retail and restaurants.",
+      "Track, manage, and optimize your inventory with ease.",
+      "Custom-built software designed to fit unique organizational needs.",
+      "Simplify your personal finances with user-friendly accounting software.",
+    ];
+
+    return StyledCardSection(
+      pageKey: 'sftwr_page',
+      cardIndex: index, // FIXED
+      imagePath: images[index],
+      title: titles[index],
+      description: desc[index],
     );
   }
 
@@ -288,96 +352,6 @@ class _SoftwarepgState extends State<Softwarepg>
     ),
   );
 
-  Widget _buildFiveCardsSection(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 800;
-
-        return Padding(
-          padding: EdgeInsets.all(isMobile ? 10 : 20),
-          child: isMobile
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Column(
-                    children: const [
-                      StyledCardSection(
-                        imagePath: "assets/software/1.webp",
-                        title: "Customized Accounting Packages",
-                        description:
-                            "Streamline finances with tailored accounting software built for your business model.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/2.webp",
-                        title: "POS (Point of Sale) Systems",
-                        description:
-                            "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/3.webp",
-                        title: "Wholesale & Retail Inventory Software",
-                        description:
-                            "Track, manage, and optimize your inventory with ease.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/4.webp",
-                        title: "Customized Software for Organizations",
-                        description:
-                            "Custom-built software designed to fit unique organizational needs.",
-                      ),
-                      SizedBox(height: 20),
-                      StyledCardSection(
-                        imagePath: "assets/software/5.webp",
-                        title: "Softwares for Personal Accounting",
-                        description:
-                            "Simplify your personal finances with user-friendly accounting software.",
-                      ),
-                    ],
-                  ),
-                )
-              : Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: const [
-                    StyledCardSection(
-                      imagePath: "assets/software/1.webp",
-                      title: "Customized\nAccounting Packages",
-                      description:
-                          "Streamline finances with tailored accounting software built for your business model.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/2.webp",
-                      title: "POS (Point of Sale) Systems",
-                      description:
-                          "Fast, secure, and reliable POS solutions for retail and restaurants.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/3.webp",
-                      title: "Wholesale & Retail Inventory Software",
-                      description:
-                          "Track, manage, and optimize your inventory with ease.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/4.webp",
-                      title: "Customized Software for Organizations",
-                      description:
-                          "Custom-built software designed to fit unique organizational needs.",
-                    ),
-                    StyledCardSection(
-                      imagePath: "assets/software/5.webp",
-                      title: "Softwares for Personal Accounting",
-                      description:
-                          "Simplify your personal finances with user-friendly accounting software.",
-                    ),
-                  ],
-                ),
-        );
-      },
-    );
-  }
-
   Widget _buildClientsSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 800;
@@ -409,66 +383,70 @@ class _SoftwarepgState extends State<Softwarepg>
       "Ali Ajmal Building Materials",
     ];
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 100,
-        vertical: 40,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '// ',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 18 : 25,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Our Clients',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 16 : 22,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 100,
+            vertical: 40,
           ),
-          const SizedBox(height: 8),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Partners Who Believe\n',
-                  style: GoogleFonts.instrumentSans(
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
+            children: [
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '// ',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 18 : 25,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Our Clients',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 16 : 22,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                TextSpan(
-                  text: 'In Our Solutions',
-                  style: GoogleFonts.instrumentSans(
-                    color: const Color(0xFF0035FF),
-                    fontSize: isMobile ? 26 : 46,
-                    fontWeight: FontWeight.w700,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Partners Who Believe\n',
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'In Our Solutions',
+                      style: GoogleFonts.instrumentSans(
+                        color: const Color(0xFF0035FF),
+                        fontSize: isMobile ? 26 : 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 50),
-          AutoScrollClients(
-            clients: clients,
-            isMobile: isMobile,
-            topRowSpeedFactor: 1.0,
-            bottomRowSpeedFactor: 1.0,
-          ),
-        ],
-      ),
+        ),
+        ClientReel(clients: clients),
+        const SizedBox(height: 50),
+      ],
     );
   }
+
+  // Keep your existing _buildHeaderSection and _buildClientsSection methods here
 }

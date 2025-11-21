@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -14,7 +15,7 @@ class Footer extends StatelessWidget {
         builder: (context, constraints) {
           bool isMobile = constraints.maxWidth < 800;
           double contentWidth = constraints.maxWidth > 1200
-              ? 1200 // max width for large desktops
+              ? 1200
               : constraints.maxWidth;
 
           return Center(
@@ -23,7 +24,6 @@ class Footer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top section
                   isMobile
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,12 +47,9 @@ class Footer extends StatelessWidget {
                             ),
                           ],
                         ),
-
                   const SizedBox(height: 40),
                   const Divider(color: Colors.white24, thickness: 1),
                   const SizedBox(height: 20),
-
-                  // Copyright
                   Center(
                     child: Text(
                       '© 2025 Veda Systems Solutions – Bahrain.\nAll rights reserved.',
@@ -120,6 +117,7 @@ class Footer extends StatelessWidget {
   Widget _buildRightSection(bool isMobile, BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
+
     return Column(
       crossAxisAlignment: isMobile
           ? CrossAxisAlignment.center
@@ -142,17 +140,29 @@ class Footer extends StatelessWidget {
                 style: GoogleFonts.instrumentSans(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
-                  color: Color.fromRGBO(238, 238, 238, 1),
+                  color: const Color.fromRGBO(238, 238, 238, 1),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 20),
-        const FooterLink(text: 'About Us'),
-        const FooterLink(text: 'Our Services'),
-        const FooterLink(text: 'Why Us?'),
-        const FooterLink(text: 'Contact Us'),
+        FooterLink(
+          text: 'About Us',
+          onTap: () => context.push('/aboutus'),
+        ), // updated
+        FooterLink(
+          text: 'Our Services',
+          onTap: () => context.push('/ourservices'),
+        ), // updated
+        FooterLink(
+          text: 'Why Us?',
+          onTap: () => context.push('/whyus'),
+        ), // updated
+        FooterLink(
+          text: 'Contact Us',
+          onTap: () => context.push('/contactus'),
+        ), // updated
       ],
     );
   }
@@ -176,15 +186,16 @@ class Footer extends StatelessWidget {
 
 class FooterLink extends StatelessWidget {
   final String text;
+  final VoidCallback onTap;
 
-  const FooterLink({super.key, required this.text});
+  const FooterLink({super.key, required this.text, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         child: Text(
           text,
           style: GoogleFonts.poppins(

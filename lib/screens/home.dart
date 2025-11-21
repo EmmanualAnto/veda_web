@@ -92,10 +92,6 @@ class _VedaHomePageState extends State<VedaHomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1150;
 
-    final GlobalKey aboutKey = GlobalKey();
-    final GlobalKey servicesKey = GlobalKey();
-    final GlobalKey contactKey = GlobalKey();
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
@@ -168,28 +164,15 @@ class _VedaHomePageState extends State<VedaHomePage>
                   SliverToBoxAdapter(
                     child: SizedBox(height: isDesktop ? 100 : 40),
                   ),
-                  SliverToBoxAdapter(
-                    child: Container(
-                      key: aboutKey,
-                      child: _buildAboutUsSection(context),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Container(
-                      key: servicesKey,
-                      child: _buildOurServicesSection(context),
-                    ),
-                  ),
+                  SliverToBoxAdapter(child: _buildAboutUsSection(context)),
+                  SliverToBoxAdapter(child: _buildOurServicesSection(context)),
                   SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
                   SliverToBoxAdapter(
-                    child: Container(
-                      key: contactKey,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom,
-                        ),
-                        child: const LetsTalkSection(),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
                       ),
+                      child: const LetsTalkSection(),
                     ),
                   ),
                   SliverToBoxAdapter(child: Footer()),
@@ -198,96 +181,22 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
           ),
 
-          // Fixed TopBar
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: PreferredSize(
-              preferredSize: const Size.fromHeight(
-                kToolbarHeight,
-              ), // ← exact height
-              child: TopBar(
-                isMenuOpen: _isMenuOpen,
-                onMenuPressed: () => setState(() => _isMenuOpen = !_isMenuOpen),
-                onMenuItemPressed: (title) {
-                  setState(() => _isMenuOpen = false);
-                  switch (title) {
-                    case 'Home':
-                      _scrollToTop();
-                      break;
-                    case 'About':
-                      scrollToSection(aboutKey);
-                      break;
-                    case 'Services':
-                      scrollToSection(servicesKey);
-                      break;
-                    case 'Contact':
-                      scrollToSection(contactKey);
-                      break;
-                  }
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ReusableMenu(
+                menuRoutes: {
+                  'Home': '/',
+                  'About': '/aboutus',
+                  'Services': '/ourservices',
+                  'Contact': '/contactus',
                 },
               ),
             ),
           ),
-
-          // Dropdown menu
-          // Dropdown menu
-          if (_isMenuOpen)
-            Positioned.fill(
-              // full screen tap layer
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () =>
-                    setState(() => _isMenuOpen = false), // ✅ tap outside closes
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: kToolbarHeight,
-                      left: 0,
-                      right: 0,
-                      child: AnimatedSlide(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOutCubic,
-                        offset: _isMenuOpen
-                            ? Offset.zero
-                            : const Offset(0, -0.15),
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 400),
-                          opacity: _isMenuOpen ? 1.0 : 0.0,
-                          child: Container(
-                            width: double.infinity,
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            color: Colors.white,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _menuButton('Home', () {
-                                  setState(() => _isMenuOpen = false);
-                                  _scrollToTop();
-                                }),
-                                _menuButton('About', () {
-                                  setState(() => _isMenuOpen = false);
-                                  scrollToSection(aboutKey);
-                                }),
-                                _menuButton('Services', () {
-                                  setState(() => _isMenuOpen = false);
-                                  scrollToSection(servicesKey);
-                                }),
-                                _menuButton('Contact', () {
-                                  setState(() => _isMenuOpen = false);
-                                  scrollToSection(contactKey);
-                                }),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
           // Floating scroll-to-top button
           Positioned(
@@ -324,16 +233,6 @@ class _VedaHomePageState extends State<VedaHomePage>
     );
   }
 
-  Widget _menuButton(String title, VoidCallback onPressed) {
-    return TextButton(
-      onPressed: onPressed,
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 18, color: Colors.black),
-      ),
-    );
-  }
-
   Widget _buildServicesGridSection(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -345,10 +244,7 @@ class _VedaHomePageState extends State<VedaHomePage>
           children: [
             // Mobile
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_web',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 0),
                 child: _buildServiceItem(
                   context,
@@ -360,10 +256,7 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
             const SizedBox(height: 20),
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_software',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
@@ -375,10 +268,7 @@ class _VedaHomePageState extends State<VedaHomePage>
             ),
             const SizedBox(height: 20),
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_hardware',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
@@ -407,10 +297,7 @@ class _VedaHomePageState extends State<VedaHomePage>
           children: [
             // Desktop (same ids)
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_web',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 0),
                 child: _buildServiceItem(
                   context,
@@ -422,10 +309,7 @@ class _VedaHomePageState extends State<VedaHomePage>
               ),
             ),
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_software',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 50),
                 child: _buildServiceItem(
                   context,
@@ -437,10 +321,7 @@ class _VedaHomePageState extends State<VedaHomePage>
               ),
             ),
             RepaintBoundary(
-              child: PopupOnScroll(
-                onceId: 'grid_hardware',
-                triggerFraction: 0.4,
-
+              child: FadeInOnScroll(
                 delay: const Duration(milliseconds: 100),
                 child: _buildServiceItem(
                   context,
@@ -694,9 +575,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                     runSpacing: 20,
                     children: [
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: 'web',
-                          triggerFraction: 0.45,
+                        child: FadeInOnScroll(
                           delay: const Duration(
                             milliseconds: 0,
                           ), // shows immediately
@@ -712,9 +591,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: 'sftwr',
-                          triggerFraction: 0.45,
+                        child: FadeInOnScroll(
                           delay: const Duration(
                             milliseconds: 50,
                           ), // second comes later
@@ -731,10 +608,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: 'hrdwr',
-                          triggerFraction: 0.45,
-
+                        child: FadeInOnScroll(
                           delay: const Duration(
                             milliseconds: 100,
                           ), // third comes last
@@ -911,10 +785,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     RepaintBoundary(
-                      child: PopupOnScroll(
-                        onceId: '100%',
-                        triggerFraction: 0.6,
-
+                      child: FadeInOnScroll(
                         delay: const Duration(milliseconds: 0),
                         child: _buildReasonItem(
                           '100%\nCustom Solutions',
@@ -929,10 +800,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     RepaintBoundary(
-                      child: PopupOnScroll(
-                        onceId: 'lclsprt',
-                        triggerFraction: 0.6,
-
+                      child: FadeInOnScroll(
                         delay: const Duration(milliseconds: 50),
 
                         child: _buildReasonItem(
@@ -948,10 +816,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       child: CustomPaint(size: const Size(1, 60)),
                     ),
                     RepaintBoundary(
-                      child: PopupOnScroll(
-                        onceId: 'fst',
-                        triggerFraction: 0.6,
-
+                      child: FadeInOnScroll(
                         delay: const Duration(milliseconds: 100),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',
@@ -970,10 +835,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: '100%',
-                          triggerFraction: 0.6,
-
+                        child: FadeInOnScroll(
                           delay: const Duration(milliseconds: 0),
                           child: _buildReasonItem(
                             '100%\nCustom Solutions',
@@ -991,10 +853,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: 'lclsprt',
-                          triggerFraction: 0.6,
-
+                        child: FadeInOnScroll(
                           delay: const Duration(milliseconds: 50),
                           child: _buildReasonItem(
                             'Local Support,\nGlobal Standards',
@@ -1012,10 +871,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                         ),
                       ),
                       RepaintBoundary(
-                        child: PopupOnScroll(
-                          onceId: 'fst',
-                          triggerFraction: 0.6,
-
+                        child: FadeInOnScroll(
                           delay: const Duration(milliseconds: 100),
                           child: _buildReasonItem(
                             'Fast\nTurnaround',

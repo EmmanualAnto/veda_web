@@ -1,44 +1,136 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AutoScrollClients extends StatefulWidget {
+class ClientReel extends StatefulWidget {
   final List<String> clients;
-  final bool isMobile;
-  final double topRowSpeedFactor;
-  final double bottomRowSpeedFactor;
+  final double speed; // pixels per second
 
-  const AutoScrollClients({
-    super.key,
-    required this.clients,
-    required this.isMobile,
-    this.topRowSpeedFactor = 1.0,
-    this.bottomRowSpeedFactor = 1.0,
-  });
+  const ClientReel({super.key, required this.clients, this.speed = 50});
 
   @override
-  State<AutoScrollClients> createState() => _AutoScrollClientsState();
+  State<ClientReel> createState() => _ClientReelState();
 }
 
-class _AutoScrollClientsState extends State<AutoScrollClients>
-    with TickerProviderStateMixin {
-  late AnimationController _topController;
-  late AnimationController _bottomController;
-
-  // Constant scroll velocity in pixels per second
-  static const double _pixelsPerSecond = 90;
+class _ClientReelState extends State<ClientReel> with TickerProviderStateMixin {
+  late final ScrollController _topController;
+  late final ScrollController _bottomController;
 
   @override
   void initState() {
     super.initState();
+    _topController = ScrollController();
+    _bottomController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isMobile = screenWidth < 800;
 
-    // Constant loop duration (arbitrary, we use elapsed time not value)
-    const loopDuration = Duration(seconds: 1000);
+      if (isMobile) {
+        final mid = (widget.clients.length / 2).ceil();
+        _startScrolling(_topController, widget.clients.sublist(0, mid));
+        _startScrolling(_bottomController, widget.clients.sublist(mid));
+      } else {
+        _startScrolling(_topController, widget.clients);
+      }
+    });
+  }
 
-    _topController = AnimationController(duration: loopDuration, vsync: this)
-      ..repeat();
+  void _startScrolling(
+    ScrollController controller,
+    List<String> clients,
+  ) async {
+    final extendedClients = [...clients, ...clients];
+    while (mounted) {
+      double listWidth = 0;
+      for (var client in extendedClients) {
+        final tp = TextPainter(
+          text: TextSpan(
+            text: client,
+            style: GoogleFonts.poppins(
+              fontSize: 26,
+              fontWeight: FontWeight.w500,
+              color: const Color.fromRGBO(13, 20, 45, 1),
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        listWidth += tp.width + 8 * 2 + 10; // text + padding + dot
+      }
 
-    _bottomController = AnimationController(duration: loopDuration, vsync: this)
-      ..repeat();
+      await controller.animateTo(
+        listWidth,
+        duration: Duration(seconds: (listWidth / widget.speed).round()),
+        curve: Curves.linear,
+      );
+      if (!mounted) return;
+      controller.jumpTo(0);
+    }
+  }
+
+  Widget _buildScrollingRow(
+    ScrollController controller,
+    List<String> clients,
+    bool isMobile,
+  ) {
+    final extendedClients = [...clients, ...clients];
+
+    return SizedBox(
+      height: 40,
+      child: ShaderMask(
+        shaderCallback: (rect) {
+          return LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Colors.transparent,
+              Colors.black,
+              Colors.black,
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.08, 0.92, 1.0], // adjust width of fade
+          ).createShader(Rect.fromLTWH(0, 0, rect.width, rect.height));
+        },
+        blendMode: BlendMode.dstIn,
+        child: ListView.builder(
+          controller: controller,
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: extendedClients.length * 2 - 1,
+          itemBuilder: (context, index) {
+            if (index.isOdd) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: SizedBox(
+                  width: 10,
+                  height: 10,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(0, 53, 255, 1),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              final clientIndex = index ~/ 2;
+              final client = extendedClients[clientIndex];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Center(
+                  child: Text(
+                    client,
+                    style: GoogleFonts.poppins(
+                      fontSize: isMobile ? 20 : 26,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromRGBO(13, 20, 45, 1),
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -48,132 +140,24 @@ class _AutoScrollClientsState extends State<AutoScrollClients>
     super.dispose();
   }
 
-  Widget _buildScrollingRow({
-    required List<String> clients,
-    required AnimationController controller,
-    required double speedFactor,
-  }) {
-    if (clients.isEmpty) return const SizedBox.shrink();
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final textStyle = GoogleFonts.poppins(
-          fontSize: widget.isMobile ? 22 : 26,
-          fontWeight: FontWeight.w500,
-          color: const Color.fromRGBO(13, 20, 45, 1),
-        );
-
-        const double itemSpacing = 50.0;
-        const double dotWidthAndSpacing = 10.0 + 20.0;
-
-        double totalContentWidth = 0;
-        for (final client in clients) {
-          final textPainter = TextPainter(
-            text: TextSpan(text: client, style: textStyle),
-            textDirection: TextDirection.ltr,
-          )..layout();
-          totalContentWidth +=
-              textPainter.width + dotWidthAndSpacing + itemSpacing;
-        }
-
-        return SizedBox(
-          height: 40,
-          child: AnimatedBuilder(
-            animation: controller,
-            builder: (context, child) {
-              final elapsedMs =
-                  controller.lastElapsedDuration?.inMilliseconds ?? 0;
-              final pxPerSec = _pixelsPerSecond * speedFactor;
-              final offset =
-                  (elapsedMs / 1000.0 * pxPerSec) % totalContentWidth;
-
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  _buildRowContent(clients, -offset),
-                  _buildRowContent(clients, totalContentWidth - offset),
-                ],
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDotAndSpacing() {
-    const double halfSpacing = 12.5; // half of desired spacing (25px)
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: halfSpacing),
-      child: SizedBox(
-        width: 10,
-        height: 10,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(0, 53, 255, 1),
-            shape: BoxShape.circle,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRowContent(List<String> clients, double offset) {
-    return Positioned(
-      left: offset,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (int i = 0; i < clients.length; i++) ...[
-            Text(
-              clients[i],
-              style: GoogleFonts.poppins(
-                fontSize: widget.isMobile ? 20 : 26,
-                fontWeight: FontWeight.w500,
-                color: const Color.fromRGBO(13, 20, 45, 1),
-              ),
-            ),
-            // Add dot + spacing only if not the last client in the list
-            _buildDotAndSpacing(),
-          ],
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.clients.isEmpty) return const SizedBox.shrink();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 800;
 
-    if (!widget.isMobile) {
-      return _buildScrollingRow(
-        clients: widget.clients,
-        controller: _topController,
-        speedFactor: widget.topRowSpeedFactor,
-      );
+    if (!isMobile) {
+      return _buildScrollingRow(_topController, widget.clients, isMobile);
     }
 
     final mid = (widget.clients.length / 2).ceil();
     final firstRowClients = widget.clients.sublist(0, mid);
     final secondRowClients = widget.clients.sublist(mid);
 
-    if (firstRowClients.isEmpty && secondRowClients.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       children: [
-        _buildScrollingRow(
-          clients: firstRowClients,
-          controller: _topController,
-          speedFactor: widget.topRowSpeedFactor,
-        ),
+        _buildScrollingRow(_topController, firstRowClients, isMobile),
         const SizedBox(height: 10),
-        _buildScrollingRow(
-          clients: secondRowClients,
-          controller: _bottomController,
-          speedFactor: widget.bottomRowSpeedFactor,
-        ),
+        _buildScrollingRow(_bottomController, secondRowClients, isMobile),
       ],
     );
   }
