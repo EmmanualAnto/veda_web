@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
 import 'package:veda_main/constants.dart';
@@ -78,16 +79,19 @@ class _SoftwarepgState extends State<Softwarepg>
 
               // Five Cards with staggered popup
               SliverToBoxAdapter(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: List.generate(5, (index) {
-                    return FadeInOnScroll(
-                      delay: Duration(milliseconds: index * 100), // stagger
-                      child: _buildCardByIndex(index),
-                    );
-                  }),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: List.generate(5, (index) {
+                      return FadeInOnScroll(
+                        delay: Duration(milliseconds: index * 100), // stagger
+                        child: _buildCardByIndex(index),
+                      );
+                    }),
+                  ),
                 ),
               ),
 
@@ -306,7 +310,7 @@ class _SoftwarepgState extends State<Softwarepg>
   }
 
   Widget _buildPrimaryButton() => ElevatedButton(
-    onPressed: () {},
+    onPressed: () => context.go('/contactus'),
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         return states.contains(WidgetState.hovered)

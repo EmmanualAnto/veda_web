@@ -10,6 +10,7 @@ class VedaMobileApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
     return MaterialApp.router(
       title: 'Veda System Solutions',
       theme: ThemeData(

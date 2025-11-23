@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 
 import 'package:veda_main/constants.dart';
+import 'package:veda_main/whatsapp.dart';
 
 class ReusableMenu extends StatefulWidget {
   final Map<String, String> menuRoutes;
@@ -36,7 +37,7 @@ class _ReusableMenuState extends State<ReusableMenu>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOutCubic,
-      height: widget.topBarHeight + (_isMenuOpen && !isDesktop ? 200 : 0),
+      height: widget.topBarHeight + (_isMenuOpen && !isDesktop ? 400 : 0),
       child: Stack(
         children: [
           // Top bar here (unchanged)
@@ -101,12 +102,18 @@ class _ReusableMenuState extends State<ReusableMenu>
                       // Inside your Positioned -> ClipRect -> AnimatedSize -> Container
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: widget.menuRoutes.entries.map((entry) {
-                          return _DrawerMenuItem(
-                            title: entry.key,
-                            onTap: () => _navigate(entry.value),
-                          );
-                        }).toList(),
+                        children: [
+                          ...widget.menuRoutes.entries.map((entry) {
+                            return _DrawerMenuItem(
+                              title: entry.key,
+                              onTap: () => _navigate(entry.value),
+                            );
+                          }).toList(),
+
+                          const SizedBox(height: 16),
+
+                          WhatsAppButton(phoneNumber: "919961320030"),
+                        ],
                       ),
                     ),
                   ),
@@ -134,21 +141,31 @@ class _DrawerMenuItemState extends State<_DrawerMenuItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: MouseRegion(
-          onEnter: (_) => setState(() => _isHovered = true),
-          onExit: (_) => setState(() => _isHovered = false),
-          cursor: SystemMouseCursors.click,
-          child: AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 300),
-            style: TextStyle(
-              fontSize: 18,
-              color: _isHovered ? AppColors.primary : Colors.black,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: _isHovered ? Colors.grey.shade100 : null,
+            borderRadius: BorderRadius.circular(10),
+            border: BoxBorder.all(
+              color: _isHovered ? AppColors.primary : AppColors.black,
             ),
-            child: Text(widget.title),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            widget.title,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
           ),
         ),
       ),

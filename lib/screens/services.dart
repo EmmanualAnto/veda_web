@@ -181,7 +181,7 @@ class ServicesPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: () => context.push(route),
+              onPressed: () => context.go(route),
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

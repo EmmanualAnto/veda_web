@@ -19,12 +19,18 @@ class VedaHomePage extends StatefulWidget {
 
 class _VedaHomePageState extends State<VedaHomePage>
     with SingleTickerProviderStateMixin {
+  late Animation<double> _fadeAnimation;
+  late AnimationController _fadeController;
+  bool _isMenuOpen = false;
   // ✅ add this mixin
   final ScrollController _scrollController = ScrollController();
 
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-  bool _isMenuOpen = false;
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -53,21 +59,6 @@ class _VedaHomePageState extends State<VedaHomePage>
     });
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToTop() {
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-    );
-  }
-
   void scrollToSection(GlobalKey key) {
     final ctx = key.currentContext;
     if (ctx == null) return;
@@ -87,146 +78,11 @@ class _VedaHomePageState extends State<VedaHomePage>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth >= 1150;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // Background scrollable content
-          ScrollConfiguration(
-            // remove overscroll glow and keep platform-appropriate behaviour
-            behavior: const ScrollBehavior().copyWith(overscroll: false),
-            child: Listener(
-              // Intercept mouse/trackpad wheel events and animate the scroll controller
-              onPointerSignal: (pointerSignal) {
-                // ✅ Only apply scrolling logic on Web & Desktop
-                if (!kIsWeb &&
-                    (Theme.of(context).platform == TargetPlatform.android ||
-                        Theme.of(context).platform == TargetPlatform.iOS)) {
-                  return;
-                }
-
-                if (pointerSignal is PointerScrollEvent) {
-                  // ✅ close menu on scroll
-                  if (_isMenuOpen) {
-                    setState(() => _isMenuOpen = false);
-                  }
-
-                  if (!_scrollController.hasClients) return;
-
-                  final double wheelMultiplier = 0.8;
-                  final double delta =
-                      pointerSignal.scrollDelta.dy * wheelMultiplier;
-                  final double current = _scrollController.offset;
-                  final double max = _scrollController.position.maxScrollExtent;
-                  final double target = (current + delta).clamp(0.0, max);
-
-                  _scrollController.animateTo(
-                    target,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                  );
-                }
-              },
-
-              child: CustomScrollView(
-                controller: _scrollController,
-                // keep default physics so touch scrolling still feels natural
-                slivers: [
-                  SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight)),
-                  SliverToBoxAdapter(
-                    child: isDesktop
-                        ? Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              const HeaderCarousel(),
-                              Positioned(
-                                bottom: -75,
-                                left: 0,
-                                right: 0,
-                                child: _buildServicesGridSection(context),
-                              ),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              const HeaderCarousel(),
-                              const SizedBox(height: 40),
-                              _buildServicesGridSection(context),
-                            ],
-                          ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: SizedBox(height: isDesktop ? 100 : 40),
-                  ),
-                  SliverToBoxAdapter(child: _buildAboutUsSection(context)),
-                  SliverToBoxAdapter(child: _buildOurServicesSection(context)),
-                  SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: const LetsTalkSection(),
-                    ),
-                  ),
-                  SliverToBoxAdapter(child: Footer()),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: PreferredSize(
-              preferredSize: const Size.fromHeight(kToolbarHeight),
-              child: ReusableMenu(
-                menuRoutes: {
-                  'Home': '/',
-                  'About': '/aboutus',
-                  'Services': '/ourservices',
-                  'Contact': '/contactus',
-                },
-              ),
-            ),
-          ),
-
-          // Floating scroll-to-top button
-          Positioned(
-            bottom: 30,
-            right: 30,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: GestureDetector(
-                onTap: _scrollToTop,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 2),
-                    color: Colors.transparent,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.arrow_upward,
-                      color: AppColors.primary,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
     );
   }
 
@@ -343,9 +199,9 @@ class _VedaHomePageState extends State<VedaHomePage>
     double width = 370,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < 800;
+    final bool isMobile = screenWidth < 800;
 
-    bool _isHovered = false; // tracked inside StatefulBuilder
+    bool _isHovered = false; // the ONLY hover variable
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -353,78 +209,80 @@ class _VedaHomePageState extends State<VedaHomePage>
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
           cursor: SystemMouseCursors.click,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
+
+          child: SizedBox(
+            // Full hit-test area
             width: width,
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border(
-                top: BorderSide(color: AppColors.primary, width: 0.6),
-                right: BorderSide(color: AppColors.primary, width: 0.6),
-                bottom: BorderSide(color: AppColors.primary, width: 8),
-                left: BorderSide(color: AppColors.primary, width: 0.6),
+
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 12),
+
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border(
+                  top: BorderSide(color: AppColors.primary, width: 0.6),
+                  right: BorderSide(color: AppColors.primary, width: 0.6),
+                  bottom: BorderSide(color: AppColors.primary, width: 8),
+                  left: BorderSide(color: AppColors.primary, width: 0.6),
+                ),
+                boxShadow: _isHovered
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.30),
+                          offset: const Offset(0, 6),
+                          blurRadius: 14,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : [],
               ),
-              boxShadow: _isHovered
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.35), // darker shadow
-                        offset: const Offset(0, 6),
-                        blurRadius: 15,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(
-                    milliseconds: 300,
-                  ), // smooth background
-                  curve: Curves.easeInOut,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _isHovered
-                        ? AppColors.primary
-                        : Colors.blue.shade50, // smooth color transition
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: AnimatedSwitcher(
+
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _isHovered
+                          ? AppColors.primary
+                          : Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Icon(
                       icon,
-                      key: UniqueKey(), // <-- ensures no duplicate keys
                       color: _isHovered ? Colors.white : AppColors.primary,
                       size: 30,
                     ),
                   ),
-                ),
-                SizedBox(width: screenWidth > 600 ? 8 : 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: AppTextStyles.serviceTitle(isMobile: isMobile),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        textAlign: TextAlign.justify,
-                        description,
-                        style: AppTextStyles.servicedescription(
-                          isMobile: isMobile,
+
+                  SizedBox(width: screenWidth > 600 ? 8 : 12),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTextStyles.serviceTitle(isMobile: isMobile),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          description,
+                          textAlign: TextAlign.justify,
+                          style: AppTextStyles.servicedescription(
+                            isMobile: isMobile,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -508,7 +366,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra tortor venenatis pulvinar proin.',
+                        'We are a technology-driven team passionate about transforming ideas into impactful solutions. Our expertise spans software development, web applications, and IT infrastructure management, helping clients stay ahead in a fast-evolving digital world.',
                         style: GoogleFonts.poppins(
                           fontSize: desktop ? 16 : 14,
                           height: 1.6,
@@ -519,7 +377,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                       const SizedBox(height: 15),
                       Text(
                         textAlign: TextAlign.justify,
-                        'Lorem ipsum dolor sit amet consectetur. Fringilla leo dolor turpis cursus. Tempor sit et ultricies consectetur amet. Donec nisi fusce nam velit enim. Morbi molestie aliquam odio aliquam pharetra',
+                        'With years of experience and a commitment to innovation, we focus on delivering scalable, user-friendly, and future-ready solutions that empower businesses to grow confidently.',
                         style: GoogleFonts.poppins(
                           fontSize: desktop ? 16 : 14,
                           height: 1.6,
@@ -621,7 +479,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                             'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
                             context,
                             onPressed: () {
-                              context.push('/webpage');
+                              context.go('/webpage');
                             },
                           ),
                         ),
@@ -638,7 +496,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                             'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
                             context,
                             onPressed: () {
-                              context.push('/softwarepage');
+                              context.go('/softwarepage');
                             },
                           ),
                         ),
@@ -655,7 +513,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                             'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
                             context,
                             onPressed: () {
-                              context.push('/hardwarepage');
+                              context.go('/hardwarepage');
                             },
                           ),
                         ),
@@ -992,6 +850,149 @@ class _VedaHomePageState extends State<VedaHomePage>
               color: Colors.black.withOpacity(0.8),
               height: 1.5,
               fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1150;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Background scrollable content
+          ScrollConfiguration(
+            // remove overscroll glow and keep platform-appropriate behaviour
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
+            child: Listener(
+              // Intercept mouse/trackpad wheel events and animate the scroll controller
+              onPointerSignal: (pointerSignal) {
+                // ✅ Only apply scrolling logic on Web & Desktop
+                if (!kIsWeb &&
+                    (Theme.of(context).platform == TargetPlatform.android ||
+                        Theme.of(context).platform == TargetPlatform.iOS)) {
+                  return;
+                }
+
+                if (pointerSignal is PointerScrollEvent) {
+                  // ✅ close menu on scroll
+                  if (_isMenuOpen) {
+                    setState(() => _isMenuOpen = false);
+                  }
+
+                  if (!_scrollController.hasClients) return;
+
+                  final double wheelMultiplier = 0.8;
+                  final double delta =
+                      pointerSignal.scrollDelta.dy * wheelMultiplier;
+                  final double current = _scrollController.offset;
+                  final double max = _scrollController.position.maxScrollExtent;
+                  final double target = (current + delta).clamp(0.0, max);
+
+                  _scrollController.animateTo(
+                    target,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                  );
+                }
+              },
+
+              child: CustomScrollView(
+                controller: _scrollController,
+                // keep default physics so touch scrolling still feels natural
+                slivers: [
+                  SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight)),
+                  SliverToBoxAdapter(
+                    child: isDesktop
+                        ? Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const HeaderCarousel(),
+                              Positioned(
+                                bottom: -75,
+                                left: 0,
+                                right: 0,
+                                child: _buildServicesGridSection(context),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const HeaderCarousel(),
+                              const SizedBox(height: 40),
+                              _buildServicesGridSection(context),
+                            ],
+                          ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: isDesktop ? 100 : 40),
+                  ),
+                  SliverToBoxAdapter(child: _buildAboutUsSection(context)),
+                  SliverToBoxAdapter(child: _buildOurServicesSection(context)),
+                  SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: const LetsTalkSection(),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: Footer()),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: ReusableMenu(
+                menuRoutes: {
+                  'Home': '/',
+                  'About': '/aboutus',
+                  'Services': '/ourservices',
+                  if (screenWidth > 800) 'Contact': '/contactus',
+                },
+              ),
+            ),
+          ),
+
+          // Floating scroll-to-top button
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: GestureDetector(
+                onTap: _scrollToTop,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primary, width: 2),
+                    color: Colors.transparent,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_upward,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
