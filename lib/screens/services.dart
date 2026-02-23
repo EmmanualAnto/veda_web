@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/constants.dart';
-import 'package:veda_main/popupanime.dart';
 import 'package:go_router/go_router.dart';
+import 'package:veda_main/popupanime.dart';
+import 'package:veda_main/stylecard.dart';
 import 'package:veda_main/veda_page_layout.dart';
 
 class ServicesPage extends StatelessWidget {
@@ -73,132 +74,65 @@ class ServicesPage extends StatelessWidget {
                   spacing: 20,
                   runSpacing: 20,
                   children: [
-                    _serviceCardWrapper(
-                      context,
-                      'assets/3.webp',
-                      'Web\nApplication',
-                      'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
-                      '/webpage',
-                      delayMs: 0,
+                    RepaintBoundary(
+                      child: FadeInOnScroll(
+                        delay: const Duration(
+                          milliseconds: 0,
+                        ), // second comes later
+
+                        child: StyledCardSection(
+                          pageKey: 'web_page',
+                          cardIndex: 0,
+                          imagePath: 'assets/3.webp',
+                          title: 'Web Application',
+                          description:
+                              'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
+                          onTap: () => context.go('/webapp'),
+                          showLearnMore: true,
+                        ),
+                      ),
                     ),
-                    _serviceCardWrapper(
-                      context,
-                      'assets/4.webp',
-                      'Software\nApplications',
-                      'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
-                      '/softwarepage',
-                      delayMs: 50,
+                    RepaintBoundary(
+                      child: FadeInOnScroll(
+                        delay: const Duration(
+                          milliseconds: 50,
+                        ), // second comes later
+
+                        child: StyledCardSection(
+                          pageKey: 'sftwr_page',
+                          cardIndex: 1,
+                          imagePath: 'assets/4.webp',
+                          title: 'Software Applications',
+                          description:
+                              'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
+                          onTap: () => context.go('/software'),
+                          showLearnMore: true,
+                        ),
+                      ),
                     ),
-                    _serviceCardWrapper(
-                      context,
-                      'assets/5.webp',
-                      'Hardware &\nNetworking',
-                      'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
-                      '/hardwarepage',
-                      delayMs: 100,
+                    RepaintBoundary(
+                      child: FadeInOnScroll(
+                        delay: const Duration(
+                          milliseconds: 100,
+                        ), // second comes later
+
+                        child: StyledCardSection(
+                          pageKey: 'hrdwr_page',
+                          cardIndex: 2,
+                          imagePath: 'assets/5.webp',
+                          title: 'Hardware & Networking',
+                          description:
+                              'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
+                          onTap: () => context.go('/hardware'),
+                          showLearnMore: true,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _serviceCardWrapper(
-    BuildContext context,
-    String image,
-    String title,
-    String desc,
-    String route, {
-    required int delayMs,
-  }) {
-    return FadeInOnScroll(
-      delay: Duration(milliseconds: delayMs),
-      child: _buildServiceCard(context, image, title, desc, route),
-    );
-  }
-
-  Widget _buildServiceCard(
-    BuildContext context,
-    String image,
-    String title,
-    String desc,
-    String route,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 800;
-
-    return Container(
-      width: isDesktop ? 400 : 350,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: const Border(
-          bottom: BorderSide(color: AppColors.primary, width: 8),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                gaplessPlayback: true,
-                image,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: GoogleFonts.instrumentSans(
-                fontSize: isDesktop ? 22 : 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              desc,
-              textAlign: TextAlign.justify,
-              style: GoogleFonts.poppins(
-                fontSize: isDesktop ? 15 : 13,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => context.go(route),
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Learn More',
-                    style: GoogleFonts.instrumentSans(
-                      fontSize: isDesktop ? 18 : 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Icon(Icons.arrow_forward, size: isDesktop ? 24 : 20),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );

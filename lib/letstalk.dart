@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veda_main/constants.dart';
 
 class LetsTalkSection extends StatelessWidget {
@@ -157,24 +158,107 @@ class _ContactInfo extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        const ContactInfoItem(
+
+        ContactInfoItem(
           icon: Icons.email_outlined,
           text: 'info@vedabahrain.com',
           textColor: Colors.white,
+          onTap: () => _launchEmail('info@vedabahrain.com'),
         ),
-        SizedBox(height: 20),
-        const ContactInfoItem(
+
+        const SizedBox(height: 20),
+
+        ContactInfoItem(
           icon: Icons.location_on_outlined,
           text: 'Manama, Kingdom of Bahrain',
           textColor: Colors.white,
+          onTap: _launchMap,
         ),
-        SizedBox(height: 20),
-        const ContactInfoItem(
+
+        const SizedBox(height: 20),
+
+        ContactInfoItem(
           icon: Icons.local_phone_outlined,
           text: '+973 17 374742',
           textColor: Colors.white,
+          onTap: () => _launchPhone('+97317374742'),
         ),
       ],
+    );
+  }
+}
+
+Future<void> _launchEmail(String email) async {
+  final uri = Uri(scheme: 'mailto', path: email);
+  await launchUrl(uri);
+}
+
+Future<void> _launchPhone(String number) async {
+  final uri = Uri(scheme: 'tel', path: number);
+  await launchUrl(uri);
+}
+
+Future<void> _launchMap() async {
+  final uri = Uri.parse("https://maps.app.goo.gl/c8Cvqdb1xNkZwYQHA");
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+// ---------------------- Contact Info Item ----------------------
+class ContactInfoItem extends StatefulWidget {
+  final IconData icon;
+  final String text;
+  final Color textColor;
+  final VoidCallback? onTap;
+
+  const ContactInfoItem({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.textColor = Colors.white,
+    this.onTap,
+  });
+
+  @override
+  State<ContactInfoItem> createState() => _ContactInfoItemState();
+}
+
+class _ContactInfoItemState extends State<ContactInfoItem> {
+  bool hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => hovering = true),
+      onExit: (_) => setState(() => hovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 150),
+          style: GoogleFonts.instrumentSans(
+            color: hovering ? AppColors.primary : widget.textColor,
+            fontSize: desktop ? 18 : 16,
+            fontWeight: FontWeight.w500,
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 5),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                child: Icon(
+                  widget.icon,
+                  color: hovering ? AppColors.primary : Colors.white,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(widget.text),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -281,7 +365,7 @@ class _FormFieldsState extends State<_FormFields> {
         );
       } else {
         // Show server error message if available
-        String errorMsg = "Failed to send message. Please try again.";
+        String errorMsg = "Failed to send message. Please try again later.";
         try {
           final data = jsonDecode(response.body);
           if (data['message'] != null) {
@@ -550,42 +634,6 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           borderSide: BorderSide.none,
         ),
       ),
-    );
-  }
-}
-
-// ---------------------- Contact Info Item ----------------------
-class ContactInfoItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color textColor;
-
-  const ContactInfoItem({
-    super.key,
-    required this.icon,
-    required this.text,
-    this.textColor = Colors.black,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final desktop = screenWidth > 800;
-
-    return Row(
-      children: [
-        const SizedBox(width: 5),
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 10),
-        Text(
-          text,
-          style: GoogleFonts.instrumentSans(
-            color: textColor,
-            fontSize: desktop ? 18 : 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }

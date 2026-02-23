@@ -25,9 +25,9 @@ class _ContactUsPageState extends State<ContactUsPage> {
           ReusableMenu(
             menuRoutes: {
               'Home': '/',
-              'About': '/aboutus',
-              'Services': '/ourservices',
-              'Contact': '/contactus',
+              'About': '/about',
+              'Services': '/services',
+              'Contact': '/contact-us',
             },
           ),
         ],

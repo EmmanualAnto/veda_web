@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:veda_main/pagenotfound.dart';
 import 'package:veda_main/screens/about.dart';
 import 'package:veda_main/screens/contactus.dart';
 import 'package:veda_main/screens/hardwareandnetworkingpg.dart';
@@ -19,42 +19,41 @@ class AppRoutes {
         builder: (context, state) => const VedaHomePage(),
       ),
       GoRoute(
-        path: '/aboutus',
-        name: 'aboutus',
+        path: '/about',
+        name: 'about',
         builder: (context, state) => const AboutUsPage(),
       ),
       GoRoute(
-        path: '/ourservices',
-        name: 'ourservices',
+        path: '/services',
+        name: 'services',
         builder: (context, state) => const ServicesPage(),
       ),
       GoRoute(
-        path: '/whyus',
-        name: 'whyus',
+        path: '/why-us',
+        name: 'why-us',
         builder: (context, state) => const WhyUsPage(),
       ),
       GoRoute(
-        path: '/webpage',
-        name: 'webpage',
+        path: '/webapp',
+        name: 'webapp',
         builder: (context, state) => const Webapppg(),
       ),
       GoRoute(
-        path: '/softwarepage',
-        name: 'softwarepage',
+        path: '/software',
+        name: 'software',
         builder: (context, state) => const Softwarepg(),
       ),
       GoRoute(
-        path: '/hardwarepage',
-        name: 'hardwarepage',
+        path: '/hardware',
+        name: 'hardware',
         builder: (context, state) => const Hardwareandnetworkingpg(),
       ),
       GoRoute(
-        path: '/contactus',
-        name: 'contactus',
+        path: '/contact-us',
+        name: 'contact-us',
         builder: (context, state) => const ContactUsPage(),
       ),
     ],
-    errorBuilder: (context, state) =>
-        const Scaffold(body: Center(child: Text('Page not found'))),
+    errorBuilder: (context, state) => const NotFoundPage(),
   );
 }

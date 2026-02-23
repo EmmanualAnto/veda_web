@@ -10,11 +10,11 @@ class HeaderCarousel extends StatefulWidget {
   @override
   State<HeaderCarousel> createState() => _HeaderCarouselState();
 }
-// … keep your imports and HeaderCarousel class
 
 class _HeaderCarouselState extends State<HeaderCarousel>
     with TickerProviderStateMixin {
   int _currentIndex = 0;
+  int _previousIndex = 0;
   Timer? _autoSlideTimer;
 
   late final AnimationController _textController;
@@ -23,44 +23,44 @@ class _HeaderCarouselState extends State<HeaderCarousel>
 
   final List<Map<String, dynamic>> _banners = [
     {
-      'imageMobile': 'assets/carousel/main1.webp', // 2:3 ratio
-      'imageDesktop': 'assets/carousel/main2.webp', // 3:2 ratio
+      'imageMobile': 'assets/carousel/main1.webp',
+      'imageDesktop': 'assets/carousel/main2.webp',
       'slash': 'Tech That Powers Growth',
       'title': 'Your Complete Digital Partner',
       'subtitle':
           'From web development to custom software and advanced networking, we provide end-to-end technology solutions tailored to scale your business with confidence.',
-      'onPrimary': (BuildContext context) => context.go('/contactus'),
-      'onSecondary': (BuildContext context) => context.go('/webpage'),
+      'onPrimary': (BuildContext context) => context.go('/contact-us'),
+      'onSecondary': (BuildContext context) => context.go('/webapp'),
     },
     {
-      'imageMobile': 'assets/carousel/web1.webp', // 2:3 ratio
-      'imageDesktop': 'assets/carousel/web2.webp', // 3:2 ratio
+      'imageMobile': 'assets/carousel/web1.webp',
+      'imageDesktop': 'assets/carousel/web2.webp',
       'slash': 'Websites That Wow',
       'title': 'Transform Clicks Into Customers',
       'subtitle':
           'We craft engaging and visually stunning web experiences that not only captivate your audience but also turn every click into measurable business growth.',
-      'onPrimary': (BuildContext context) => context.go('/contactus'),
-      'onSecondary': (BuildContext context) => context.go('/webpage'),
+      'onPrimary': (BuildContext context) => context.go('/contact-us'),
+      'onSecondary': (BuildContext context) => context.go('/webapp'),
     },
     {
-      'imageMobile': 'assets/carousel/sftwr1.webp', // 2:3 ratio
-      'imageDesktop': 'assets/carousel/sftwr2.webp', // 3:2 ratio
+      'imageMobile': 'assets/carousel/sftwr1.webp',
+      'imageDesktop': 'assets/carousel/sftwr2.webp',
       'slash': 'Software That Works Smarter',
       'title': 'Automate. Optimize. Excel.',
       'subtitle':
           'Our custom software solutions are designed to simplify complex processes, automate repetitive tasks, and boost overall efficiency across your business operations.',
-      'onPrimary': (BuildContext context) => context.go('/contactus'),
-      'onSecondary': (BuildContext context) => context.go('/softwarepage'),
+      'onPrimary': (BuildContext context) => context.go('/contact-us'),
+      'onSecondary': (BuildContext context) => context.go('/software'),
     },
     {
-      'imageMobile': 'assets/carousel/hrdwr1.webp', // 2:3 ratio
-      'imageDesktop': 'assets/carousel/hrdwr2.webp', // 3:2 ratio
+      'imageMobile': 'assets/carousel/hrdwr1.webp',
+      'imageDesktop': 'assets/carousel/hrdwr2.webp',
       'slash': 'Networks That Never Quit',
       'title': 'Fast. Secure. Reliable.',
       'subtitle':
           'We build top-notch IT infrastructure and networking systems that guarantee speed, security, and reliability—keeping your team and clients seamlessly connected 24/7.',
-      'onPrimary': (BuildContext context) => context.go('/contactus'),
-      'onSecondary': (BuildContext context) => context.go('/hardwarepage'),
+      'onPrimary': (BuildContext context) => context.go('/contact-us'),
+      'onSecondary': (BuildContext context) => context.go('/hardware'),
     },
   ];
 
@@ -68,7 +68,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
   void initState() {
     super.initState();
 
-    // Precache images
+    // Precache all images
     WidgetsBinding.instance.addPostFrameCallback((_) {
       for (var banner in _banners) {
         precacheImage(AssetImage(banner['imageMobile']!), context);
@@ -76,13 +76,13 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       }
     });
 
-    // Text animation controller for staggered lines
+    // Text animation controller
     _textController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1), // total duration for all lines
-    );
+      duration: const Duration(seconds: 1),
+    )..forward();
 
-    // Image scale animation (slow pop)
+    // Image scale animation
     _imageScaleController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -92,11 +92,22 @@ class _HeaderCarouselState extends State<HeaderCarousel>
     );
     _imageScaleController.forward();
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) _textController.forward();
-    });
-
     _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _previousIndex = _currentIndex;
+      _currentIndex = (_currentIndex + 1) % _banners.length;
+
+      _textController.reset();
+      _textController.forward();
+
+      _imageScaleController.reset();
+      _imageScaleController.forward();
+
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -107,339 +118,298 @@ class _HeaderCarouselState extends State<HeaderCarousel>
     super.dispose();
   }
 
-  void _startAutoSlide() {
-    _autoSlideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      setState(() {
-        _currentIndex = (_currentIndex + 1) % _banners.length;
-      });
-
-      _imageScaleController.reset();
-      _imageScaleController.forward();
-
-      _textController.reset();
-      Future.delayed(const Duration(milliseconds: 150), () {
-        if (mounted) _textController.forward();
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     final height = isMobile ? 510.0 : 810.0;
-    final String imagePath = isMobile
+
+    final currentImage = isMobile
         ? _banners[_currentIndex]['imageMobile']!
         : _banners[_currentIndex]['imageDesktop']!;
 
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: Stack(
-        children: [
-          // Background image
-          ClipRect(
-            child: AnimatedSwitcher(
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _banners[_previousIndex][isMobile
+                  ? 'imageMobile'
+                  : 'imageDesktop']!,
+              fit: BoxFit.cover,
+            ),
+            // Current image with scale animation
+            AnimatedOpacity(
+              opacity: 1.0,
               duration: const Duration(milliseconds: 900),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeOutCubic,
-              layoutBuilder: (current, previous) {
-                return Stack(
-                  children: [
-                    ...previous, // ✅ Fix here
-                    if (current != null) current,
+              curve: Curves.easeOutCubic,
+              child: ScaleTransition(
+                scale: _imageScaleAnimation,
+                child: Image.asset(currentImage, fit: BoxFit.cover),
+              ),
+            ),
+
+            // Gradient overlay
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(3, 9, 35, 0.879),
+                    Color.fromRGBO(3, 9, 35, 0.867),
+                    Color.fromRGBO(3, 9, 35, 0.85),
+                    Color.fromRGBO(3, 9, 35, 0.67),
+                    Color.fromRGBO(3, 9, 35, 0.6),
                   ],
-                );
-              },
-              child: FadeTransition(
-                opacity:
-                    Tween<double>(begin: 0.6, end: 1.0) // start lighter
-                        .animate(
-                          _imageScaleController.drive(
-                            CurveTween(
-                              curve: const Interval(
-                                0.0,
-                                0.7,
-                                curve: Curves.easeOut,
-                              ),
-                            ),
-                          ),
-                        ),
-                child: ScaleTransition(
-                  scale: _imageScaleAnimation,
-                  child: Image.asset(
-                    imagePath,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  stops: [0.0, 0.25, 0.5, 0.75, 1.0],
                 ),
               ),
             ),
-          ),
 
-          // Gradient overlay
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromRGBO(3, 9, 35, 0.879),
-                  Color.fromRGBO(3, 9, 35, 0.867),
-                  Color.fromRGBO(3, 9, 35, 0.85),
-                  Color.fromRGBO(3, 9, 35, 0.67),
-                  Color.fromRGBO(3, 9, 35, 0.6),
-                ],
-                stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+            // Text and buttons (animated as before)
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 5 : 120,
+                vertical: isMobile ? 0 : 170,
               ),
-            ),
-          ),
-
-          // Replace the SlideTransition + FadeTransition in your build method with this calm animation
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 5 : 120,
-              vertical: isMobile ? 0 : 170,
-            ),
-            child: Align(
-              alignment: isMobile ? Alignment.center : Alignment.topLeft,
-              child: AnimatedBuilder(
-                animation: _textController,
-                builder: (_, child) {
-                  final t = _textController.value;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      _buildAnimatedLine(
-                        t: t,
-                        start: 0.0,
-                        end: 0.6,
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '// ',
-                                style: GoogleFonts.instrumentSans(
-                                  fontSize: isMobile ? 25 : 25,
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w700,
+              child: Align(
+                alignment: isMobile ? Alignment.center : Alignment.topLeft,
+                child: AnimatedBuilder(
+                  animation: _textController,
+                  builder: (_, child) {
+                    final t = _textController.value;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: isMobile
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.start,
+                      children: [
+                        _buildAnimatedLine(
+                          t: t,
+                          start: 0.0,
+                          end: 0.6,
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '// ',
+                                  style: GoogleFonts.instrumentSans(
+                                    fontSize: isMobile ? 25 : 25,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: _banners[_currentIndex]['slash'],
-                                style: GoogleFonts.instrumentSans(
-                                  fontSize: isMobile ? 16 : 22,
+                                TextSpan(
+                                  text: _banners[_currentIndex]['slash'],
+                                  style: GoogleFonts.instrumentSans(
+                                    fontSize: isMobile ? 16 : 22,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: isMobile ? 20 : 15),
+                        _buildAnimatedLine(
+                          t: t,
+                          start: 0.1,
+                          end: 0.7,
+                          child: Text(
+                            _banners[_currentIndex]['title']!,
+                            style: GoogleFonts.instrumentSans(
+                              color: Colors.white,
+                              fontSize: isMobile ? 26 : 55,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                            ),
+                            textAlign: isMobile
+                                ? TextAlign.center
+                                : TextAlign.start,
+                          ),
+                        ),
+                        SizedBox(height: isMobile ? 40 : 25),
+                        _buildAnimatedLine(
+                          t: t,
+                          start: 0.2,
+                          end: 0.8,
+                          child: SizedBox(
+                            width: isMobile ? 400 : 1000,
+                            child: Center(
+                              child: Text(
+                                textAlign: isMobile
+                                    ? TextAlign.center
+                                    : TextAlign.start,
+                                _banners[_currentIndex]['subtitle']!,
+                                style: GoogleFonts.poppins(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: isMobile ? 14 : 25,
+                                  height: 1.5,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: isMobile ? 20 : 15),
-                      _buildAnimatedLine(
-                        t: t,
-                        start: 0.1,
-                        end: 0.7,
-                        child: Text(
-                          _banners[_currentIndex]['title']!,
-                          style: GoogleFonts.instrumentSans(
-                            color: Colors.white,
-                            fontSize: isMobile ? 26 : 55,
-                            fontWeight: FontWeight.w700,
-                            height: 1.2,
-                          ),
-                          textAlign: isMobile
-                              ? TextAlign.center
-                              : TextAlign.start,
-                        ),
-                      ),
-                      SizedBox(height: isMobile ? 40 : 25),
-                      _buildAnimatedLine(
-                        t: t,
-                        start: 0.2,
-                        end: 0.8,
-                        child: SizedBox(
-                          width: isMobile ? 400 : 1000,
-                          child: Center(
-                            child: Text(
-                              textAlign: isMobile
-                                  ? TextAlign.center
-                                  : TextAlign.start,
-                              _banners[_currentIndex]['subtitle']!,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400,
-                                fontSize: isMobile ? 14 : 25,
-                                height: 1.5,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: isMobile ? 45 : 35),
-                      _buildAnimatedLine(
-                        t: t,
-                        start: 0.3,
-                        end: 1.0,
-                        child: isMobile
-                            ? Column(
-                                children: [
-                                  _buildPrimaryButton(
-                                    onPressed: () =>
-                                        _banners[_currentIndex]['onPrimary'](
-                                          context,
-                                        ),
-                                  ),
-                                  SizedBox(height: 15),
-                                  _buildSecondaryButton(
-                                    onPressed: () =>
-                                        _banners[_currentIndex]['onSecondary'](
-                                          context,
-                                        ),
-                                  ),
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  _buildPrimaryButton(
-                                    onPressed: () =>
-                                        _banners[_currentIndex]['onPrimary'](
-                                          context,
-                                        ),
-                                  ),
-                                  SizedBox(width: 15),
-                                  _buildSecondaryButton(
-                                    onPressed: () =>
-                                        _banners[_currentIndex]['onSecondary'](
-                                          context,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ],
-                  );
-                },
+                        SizedBox(height: isMobile ? 45 : 35),
+                        _buildAnimatedLine(
+                          t: t,
+                          start: 0.3,
+                          end: 1.0,
+                          child: isMobile
+                              ? Column(
+                                  children: [
+                                    _buildPrimaryButton(
+                                      onPressed: () =>
+                                          _banners[_currentIndex]['onPrimary'](
+                                            context,
+                                          ),
+                                    ),
+                                    SizedBox(height: 15),
+                                    _buildSecondaryButton(
+                                      onPressed: () =>
+                                          _banners[_currentIndex]['onSecondary'](
+                                            context,
+                                          ),
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    _buildPrimaryButton(
+                                      onPressed: () =>
+                                          _banners[_currentIndex]['onPrimary'](
+                                            context,
+                                          ),
+                                    ),
+                                    SizedBox(width: 15),
+                                    _buildSecondaryButton(
+                                      onPressed: () =>
+                                          _banners[_currentIndex]['onSecondary'](
+                                            context,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Widget _buildAnimatedLine({
+  required double t,
+  required double start,
+  required double end,
+  required Widget child,
+}) {
+  final progress = ((t - start) / (end - start)).clamp(0.0, 1.0);
+  final curved = Curves.easeInOutCubic.transform(progress); // smoother
+  return Opacity(
+    opacity: curved,
+    child: Transform.translate(
+      offset: Offset(0, 10 * (1 - curved)), // smaller slide distance
+      child: child,
+    ),
+  );
+}
+
+Widget _buildPrimaryButton({required VoidCallback onPressed}) => ElevatedButton(
+  onPressed: onPressed,
+  style: ButtonStyle(
+    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+      return states.contains(WidgetState.hovered)
+          ? Colors.white
+          : AppColors.primary;
+    }),
+    foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+      return states.contains(WidgetState.hovered) ? Colors.black : Colors.white;
+    }),
+    side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+      return BorderSide(
+        color: states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.transparent,
+      );
+    }),
+    padding: WidgetStateProperty.all(
+      const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+    ),
+    shape: WidgetStateProperty.all(
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    ),
+    elevation: WidgetStateProperty.all(0),
+    minimumSize: WidgetStateProperty.all(const Size(205, 54)),
+  ),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        'Contact Now',
+        style: GoogleFonts.instrumentSans(
+          fontWeight: FontWeight.w400,
+          fontSize: 18,
+        ),
+      ),
+      const SizedBox(width: 8),
+      const Icon(Icons.arrow_forward, size: 24),
+    ],
+  ),
+);
+
+Widget _buildSecondaryButton({required VoidCallback onPressed}) =>
+    OutlinedButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+          return states.contains(WidgetState.hovered)
+              ? Colors.white
+              : Colors.transparent;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+          return states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.white;
+        }),
+        side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+          return BorderSide(
+            color: states.contains(WidgetState.hovered)
+                ? Colors.black
+                : Colors.white,
+          );
+        }),
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+        ),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        minimumSize: WidgetStateProperty.all(const Size(205, 54)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Explore More',
+            style: GoogleFonts.instrumentSans(
+              fontWeight: FontWeight.w400,
+              fontSize: 18,
+            ),
           ),
+          const SizedBox(width: 8),
+          const Icon(Icons.arrow_forward, size: 24),
         ],
       ),
     );
-  }
-
-  Widget _buildAnimatedLine({
-    required double t,
-    required double start,
-    required double end,
-    required Widget child,
-  }) {
-    final progress = ((t - start) / (end - start)).clamp(0.0, 1.0);
-    final curved = Curves.easeInOutCubic.transform(progress); // smoother
-    return Opacity(
-      opacity: curved,
-      child: Transform.translate(
-        offset: Offset(0, 10 * (1 - curved)), // smaller slide distance
-        child: child,
-      ),
-    );
-  }
-
-  Widget _buildPrimaryButton({required VoidCallback onPressed}) =>
-      ElevatedButton(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-            return states.contains(WidgetState.hovered)
-                ? Colors.white
-                : AppColors.primary;
-          }),
-          foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-            return states.contains(WidgetState.hovered)
-                ? Colors.black
-                : Colors.white;
-          }),
-          side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-            return BorderSide(
-              color: states.contains(WidgetState.hovered)
-                  ? Colors.black
-                  : Colors.transparent,
-            );
-          }),
-          padding: WidgetStateProperty.all(
-            const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-          ),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          elevation: WidgetStateProperty.all(0),
-          minimumSize: WidgetStateProperty.all(const Size(205, 54)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Contact Now',
-              style: GoogleFonts.instrumentSans(
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward, size: 24),
-          ],
-        ),
-      );
-
-  Widget _buildSecondaryButton({required VoidCallback onPressed}) =>
-      OutlinedButton(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
-            return states.contains(WidgetState.hovered)
-                ? Colors.white
-                : Colors.transparent;
-          }),
-          foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-            return states.contains(WidgetState.hovered)
-                ? Colors.black
-                : Colors.white;
-          }),
-          side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-            return BorderSide(
-              color: states.contains(WidgetState.hovered)
-                  ? Colors.black
-                  : Colors.white,
-            );
-          }),
-          padding: WidgetStateProperty.all(
-            const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-          ),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          minimumSize: WidgetStateProperty.all(const Size(205, 54)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Explore More',
-              style: GoogleFonts.instrumentSans(
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward, size: 24),
-          ],
-        ),
-      );
-}

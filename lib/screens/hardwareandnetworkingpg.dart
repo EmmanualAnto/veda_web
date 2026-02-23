@@ -114,9 +114,9 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
               child: ReusableMenu(
                 menuRoutes: {
                   'Home': '/',
-                  'About': '/aboutus',
-                  'Services': '/ourservices',
-                  'Contact': '/contactus',
+                  'About': '/about',
+                  'Services': '/services',
+                  'Contact': '/contact-us',
                 },
               ),
             ),
@@ -156,14 +156,14 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
 
   Widget _buildCardByIndex(int index) {
     List<String> images = [
-      "assets/software/1.webp",
-      "assets/software/2.webp",
-      "assets/software/3.webp",
-      "assets/software/4.webp",
-      "assets/software/5.webp",
-      "assets/software/5.webp",
-      "assets/software/5.webp",
-      "assets/software/5.webp",
+      "assets/networking/config.webp",
+      "assets/networking/firewall.webp",
+      "assets/networking/cmptr.webp",
+      "assets/networking/maintnce.webp",
+      "assets/networking/remote.webp",
+      "assets/networking/backup.webp",
+      "assets/networking/cloud.webp",
+      "assets/networking/it.webp",
     ];
     List<String> titles = [
       "Network Setup & Configuration",
@@ -195,126 +195,126 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
     );
   }
 
-  Widget _buildHeaderSection(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isMobile = constraints.maxWidth < 800;
+  final List<Map<String, dynamic>> _sections = [
+    {
+      'imageMobile': 'assets/carousel/hrdwr1.webp',
+      'imageDesktop': 'assets/carousel/hrdwr2.webp',
+      'title': 'Hardware & Networking Services',
+      'subtitle':
+          'We provide end-to-end digital services tailored to your business needs. From custom web applications to seamless system integrations, our solutions are built to optimize operations, enhance user experience, and drive measurable results.',
+    },
+    // Add more sections here...
+  ];
 
-        return SizedBox(
-          width: double.infinity,
-          height: 810,
-          child: Stack(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/carousel/hrdwr2.webp'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+  Widget _buildHeaderSection(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    final section = _sections[0]; // first section for now
+
+    final image = isMobile ? section['imageMobile']! : section['imageDesktop']!;
+    final title = section['title']!;
+    final subtitle = section['subtitle']!;
+
+    return SizedBox(
+      width: double.infinity,
+      height: isMobile ? 570 : 810,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(image, fit: BoxFit.cover),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromRGBO(3, 9, 35, 0.879),
+                  Color.fromRGBO(3, 9, 35, 0.867),
+                  Color.fromRGBO(3, 9, 35, 0.85),
+                  Color.fromRGBO(3, 9, 35, 0.67),
+                  Color.fromRGBO(3, 9, 35, 0.6),
+                ],
               ),
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(3, 9, 35, 0.879),
-                      Color.fromRGBO(3, 9, 35, 0.867),
-                      Color.fromRGBO(3, 9, 35, 0.85),
-                      Color.fromRGBO(3, 9, 35, 0.67),
-                      Color.fromRGBO(3, 9, 35, 0.6),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 5 : 120,
-                  vertical: isMobile ? 0 : 170,
-                ),
-                child: Align(
-                  alignment: isMobile ? Alignment.center : Alignment.topLeft,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: '// ',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Hardware & Networking Services',
-                              style: GoogleFonts.instrumentSans(
-                                color: Colors.white,
-                                fontSize: isMobile ? 16 : 22,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: isMobile ? 20 : 15),
-                      Text(
-                        'Smart Tech Solutions\nDesigned for Growth',
-                        textAlign: isMobile
-                            ? TextAlign.center
-                            : TextAlign.start,
-                        style: GoogleFonts.instrumentSans(
-                          color: Colors.white,
-                          fontSize: isMobile ? 26 : 46,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: isMobile ? 40 : 25),
-                      SizedBox(
-                        width: 1000,
-                        child: Text(
-                          'We provide end-to-end digital services tailored to your business needs. From custom web applications to seamless system integrations, our solutions are built to optimize operations, enhance user experience, and drive measurable results.',
-                          textAlign: isMobile
-                              ? TextAlign.center
-                              : TextAlign.start,
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
-                            fontSize: isMobile ? 14 : 20,
-                            height: 1.5,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 5 : 120,
+              vertical: isMobile ? 0 : 170,
+            ),
+            child: Align(
+              alignment: isMobile ? Alignment.center : Alignment.topLeft,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: isMobile
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: '// ',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                      ),
-                      SizedBox(height: isMobile ? 45 : 35),
-                      isMobile
-                          ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [_buildPrimaryButton()],
-                            )
-                          : Row(children: [_buildPrimaryButton()]),
-                    ],
+                        TextSpan(
+                          text: title,
+                          style: GoogleFonts.instrumentSans(
+                            color: Colors.white,
+                            fontSize: isMobile ? 16 : 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Smart Tech Solutions\nDesigned for Growth',
+                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
+                    style: GoogleFonts.instrumentSans(
+                      color: Colors.white,
+                      fontSize: isMobile ? 26 : 46,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  SizedBox(
+                    width: 1000,
+                    child: Text(
+                      subtitle,
+                      textAlign: isMobile ? TextAlign.center : TextAlign.start,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                        fontSize: isMobile ? 14 : 20,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 35),
+                  isMobile
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [_buildPrimaryButton()],
+                        )
+                      : Row(children: [_buildPrimaryButton()]),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
   Widget _buildPrimaryButton() => ElevatedButton(
-    onPressed: () => context.go('/contactus'),
+    onPressed: () => context.go('/contact-us'),
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         return states.contains(WidgetState.hovered)

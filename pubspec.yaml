@@ -34,7 +34,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.3.0
+  google_fonts: ^6.3.2
   font_awesome_flutter: ^10.7.0
   flutter_animate: ^2.0.0
   lottie: ^2.4.0
@@ -68,6 +68,7 @@ flutter:
     - assets/5.webp
     - assets/last.webp
     - assets/logo.webp
+    - assets/per.jpg
     - assets/software/1.webp
     - assets/software/2.webp
     - assets/software/3.webp
@@ -80,6 +81,7 @@ flutter:
     - assets/web/5.webp
     - assets/web/6.webp
     - assets/web/7.webp
+
     - assets/carousel/hrdwr1.webp
     - assets/carousel/hrdwr2.webp
     - assets/carousel/main1.webp
@@ -88,6 +90,16 @@ flutter:
     - assets/carousel/sftwr2.webp
     - assets/carousel/web1.webp
     - assets/carousel/web2.webp
+    - assets/carousel/hrdwr2.webp
+    - assets/networking/config.webp
+    - assets/networking/firewall.webp
+    - assets/networking/cmptr.webp
+    - assets/networking/maintnce.webp
+    - assets/networking/remote.webp
+    - assets/networking/backup.webp
+    - assets/networking/cloud.webp
+    - assets/networking/it.webp
+    
 
 
   # The following line ensures that the Material Icons font is

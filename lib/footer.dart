@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:veda_main/constants.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
+
+  Future<void> launchWeb(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,11 +112,17 @@ class Footer extends StatelessWidget {
               ? MainAxisAlignment.center
               : MainAxisAlignment.start,
           children: [
-            _buildSocialIcon(FontAwesomeIcons.instagram, () {}),
+            _buildSocialIcon(FontAwesomeIcons.instagram, () {
+              launchWeb("https://instagram.com/vedasystems");
+            }),
             const SizedBox(width: 15),
-            _buildSocialIcon(FontAwesomeIcons.linkedin, () {}),
+            _buildSocialIcon(FontAwesomeIcons.linkedin, () {
+              launchWeb("https://linkedin.com/company/vedasystems");
+            }),
             const SizedBox(width: 15),
-            _buildSocialIcon(FontAwesomeIcons.facebook, () {}),
+            _buildSocialIcon(FontAwesomeIcons.facebook, () {
+              launchWeb("https://facebook.com/vedasystems");
+            }),
           ],
         ),
       ],
@@ -150,61 +164,92 @@ class Footer extends StatelessWidget {
         const SizedBox(height: 20),
         FooterLink(
           text: 'About Us',
-          onTap: () => context.go('/aboutus'),
+          onTap: () => context.go('/about'),
         ), // updated
         FooterLink(
           text: 'Our Services',
-          onTap: () => context.go('/ourservices'),
+          onTap: () => context.go('/services'),
         ), // updated
         FooterLink(
           text: 'Why Us?',
-          onTap: () => context.go('/whyus'),
+          onTap: () => context.go('/why-us'),
         ), // updated
         FooterLink(
           text: 'Contact Us',
-          onTap: () => context.go('/contactus'),
+          onTap: () => context.go('/contact-us'),
         ), // updated
       ],
     );
   }
 
   Widget _buildSocialIcon(IconData icon, VoidCallback onPressed) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(8),
+    final hover = ValueNotifier(false);
+
+    return MouseRegion(
+      onEnter: (_) => hover.value = true,
+      onExit: (_) => hover.value = false,
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onPressed,
+        child: ValueListenableBuilder<bool>(
+          valueListenable: hover,
+          builder: (context, isHovering, _) {
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: isHovering
+                    ? AppColors.primary.withOpacity(0.75)
+                    : AppColors.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: Colors.white, size: 18),
+            );
+          },
         ),
-        child: Icon(icon, color: Colors.white, size: 18),
       ),
     );
   }
 }
 
-class FooterLink extends StatelessWidget {
+class FooterLink extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
 
   const FooterLink({super.key, required this.text, required this.onTap});
 
   @override
+  State<FooterLink> createState() => _FooterLinkState();
+}
+
+class _FooterLinkState extends State<FooterLink> {
+  bool hovering = false;
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        child: Text(
-          text,
-          style: GoogleFonts.poppins(
-            color: const Color.fromRGBO(238, 238, 238, 1),
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => hovering = true),
+        onExit: (_) => setState(() => hovering = false),
+        cursor: SystemMouseCursors.click,
+        child: InkWell(
+          onTap: widget.onTap,
+          splashColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          child: Text(
+            widget.text,
+            style: GoogleFonts.poppins(
+              color: hovering
+                  ? AppColors.primary
+                  : const Color.fromRGBO(238, 238, 238, 1),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );

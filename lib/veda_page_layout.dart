@@ -16,7 +16,6 @@ class VedaPageLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: Stack(
         children: [
           // page main content
@@ -49,9 +48,9 @@ class VedaPageLayout extends StatelessWidget {
               child: ReusableMenu(
                 menuRoutes: {
                   'Home': '/',
-                  'About': '/aboutus',
-                  'Services': '/ourservices',
-                  'Contact': '/contactus',
+                  'About': '/about',
+                  'Services': '/services',
+                  'Contact': '/contact-us',
                 },
               ),
             ),

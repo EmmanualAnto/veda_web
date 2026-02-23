@@ -6,9 +6,10 @@ class StyledCardSection extends StatefulWidget {
   final String imagePath;
   final String title;
   final String description;
-
   final String pageKey;
   final int cardIndex;
+  final VoidCallback? onTap;
+  final bool showLearnMore;
 
   const StyledCardSection({
     super.key,
@@ -17,6 +18,8 @@ class StyledCardSection extends StatefulWidget {
     required this.description,
     required this.pageKey,
     required this.cardIndex,
+    this.onTap,
+    this.showLearnMore = false,
   });
 
   @override
@@ -34,82 +37,109 @@ class _StyledCardSectionState extends State<StyledCardSection> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-        width: desktop ? 386.67 : 343,
-        height: 355,
-        padding: EdgeInsets.all(desktop ? 16 : 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.4),
-                    offset: const Offset(0, 4),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ]
-              : const [
-                  BoxShadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.15),
-                    offset: Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                ],
-          border: const Border(
-            bottom: BorderSide(color: AppColors.primary, width: 8),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image container stays fixed
-            SizedBox(
-              width: double.infinity,
-              height: 180,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: AnimatedScale(
-                        scale: _isHovered ? 1.05 : 1.0, // only image scales
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOut,
-                        child: Image.asset(
-                          gaplessPlayback: true,
-                          widget.imagePath,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+      cursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          width: desktop ? 386.67 : 343,
+          padding: EdgeInsets.all(desktop ? 16 : 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.4),
+                      offset: const Offset(0, 4),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : const [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.15),
+                      offset: Offset(0, 4),
+                      blurRadius: 8,
                     ),
                   ],
+            border: const Border(
+              bottom: BorderSide(color: AppColors.primary, width: 8),
+            ),
+          ),
+          child: SizedBox(
+            height: widget.showLearnMore && widget.onTap != null ? 450 : 355,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image
+                SizedBox(
+                  width: double.infinity,
+                  height: widget.showLearnMore && widget.onTap != null
+                      ? 200
+                      : 180,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AnimatedScale(
+                      scale: _isHovered ? 1.05 : 1.0,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOut,
+                      child: Image.asset(
+                        gaplessPlayback: true,
+                        widget.imagePath,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(
+                  widget.title,
+                  style: GoogleFonts.instrumentSans(
+                    fontSize: desktop ? 23 : 20,
+                    fontWeight: FontWeight.w600,
+                    color: const Color.fromRGBO(13, 20, 45, 1),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.description,
+                  textAlign: TextAlign.justify,
+                  style: GoogleFonts.poppins(
+                    fontSize: desktop ? 15 : 13,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                if (widget.showLearnMore && widget.onTap != null) ...[
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: widget.onTap,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Learn More',
+                          style: GoogleFonts.instrumentSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.arrow_forward, size: 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              widget.title,
-              style: GoogleFonts.instrumentSans(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromRGBO(13, 20, 45, 1),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.description,
-              textAlign: TextAlign.justify,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: const Color.fromRGBO(89, 89, 89, 1),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
