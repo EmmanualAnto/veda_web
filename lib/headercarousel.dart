@@ -14,7 +14,7 @@ class HeaderCarousel extends StatefulWidget {
 class _HeaderCarouselState extends State<HeaderCarousel>
     with TickerProviderStateMixin {
   int _currentIndex = 0;
-  int _previousIndex = 0;
+  final int _previousIndex = 0;
   Timer? _autoSlideTimer;
 
   late final AnimationController _textController;

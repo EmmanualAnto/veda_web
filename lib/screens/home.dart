@@ -315,10 +315,11 @@ class ProfessionalBackgroundPainter extends CustomPainter {
     final path = Path();
     for (double x = 0; x <= size.width; x++) {
       double y = size.height * 0.5 + math.sin(x / 40) * 25;
-      if (x == 0)
+      if (x == 0) {
         path.moveTo(x, y);
-      else
+      } else {
         path.lineTo(x, y);
+      }
     }
     canvas.drawPath(path, shapePaint);
 
@@ -330,10 +331,11 @@ class ProfessionalBackgroundPainter extends CustomPainter {
       for (double t = 0; t <= 2 * math.pi; t += 0.1) {
         double x = orbitCenter.dx + orbitRadius * math.cos(t + i);
         double y = orbitCenter.dy + orbitRadius * math.sin(t + i / 2);
-        if (t == 0)
+        if (t == 0) {
           orbitPath.moveTo(x, y);
-        else
+        } else {
           orbitPath.lineTo(x, y);
+        }
       }
       orbitPath.close();
       canvas.drawPath(orbitPath, shapePaint);
@@ -361,10 +363,11 @@ class ProfessionalBackgroundPainter extends CustomPainter {
       double angle = (math.pi / 3) * i;
       double x = hexCenter.dx + hexRadius * math.cos(angle);
       double y = hexCenter.dy + hexRadius * math.sin(angle);
-      if (i == 0)
+      if (i == 0) {
         hexPath.moveTo(x, y);
-      else
+      } else {
         hexPath.lineTo(x, y);
+      }
     }
     hexPath.close();
     canvas.drawPath(hexPath, polyPaint);
@@ -511,13 +514,13 @@ Widget _buildServiceItem(
   final screenWidth = MediaQuery.of(context).size.width;
   final bool isMobile = screenWidth < 800;
 
-  bool _isHovered = false; // the ONLY hover variable
+  bool isHovered = false; // the ONLY hover variable
 
   return StatefulBuilder(
     builder: (context, setState) {
       return MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
+        onEnter: (_) => setState(() => isHovered = true),
+        onExit: (_) => setState(() => isHovered = false),
 
         child: SizedBox(
           // Full hit-test area
@@ -538,7 +541,7 @@ Widget _buildServiceItem(
                 bottom: BorderSide(color: AppColors.primary, width: 8),
                 left: BorderSide(color: AppColors.primary, width: 0.6),
               ),
-              boxShadow: _isHovered
+              boxShadow: isHovered
                   ? [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.30),
@@ -557,12 +560,12 @@ Widget _buildServiceItem(
                   duration: const Duration(milliseconds: 300),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _isHovered ? AppColors.primary : Colors.blue.shade50,
+                    color: isHovered ? AppColors.primary : Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     icon,
-                    color: _isHovered ? Colors.white : AppColors.primary,
+                    color: isHovered ? Colors.white : AppColors.primary,
                     size: 30,
                   ),
                 ),

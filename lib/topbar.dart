@@ -29,7 +29,7 @@ class _ReusableMenuState extends State<ReusableMenu>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
 
-    void _navigate(String route) {
+    void navigate(String route) {
       context.go(route);
       if (_isMenuOpen) setState(() => _isMenuOpen = false);
     }
@@ -66,7 +66,7 @@ class _ReusableMenuState extends State<ReusableMenu>
                             (item) => _NavButton(
                               title: item,
                               onPressed: (_) =>
-                                  _navigate(widget.menuRoutes[item]!),
+                                  navigate(widget.menuRoutes[item]!),
                             ),
                           )
                           .toList(),
@@ -106,9 +106,9 @@ class _ReusableMenuState extends State<ReusableMenu>
                           ...widget.menuRoutes.entries.map((entry) {
                             return _DrawerMenuItem(
                               title: entry.key,
-                              onTap: () => _navigate(entry.value),
+                              onTap: () => navigate(entry.value),
                             );
-                          }).toList(),
+                          }),
 
                           const SizedBox(height: 16),
 
