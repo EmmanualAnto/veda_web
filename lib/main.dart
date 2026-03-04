@@ -8,7 +8,6 @@ void main() {
 
 class VedaMobileApp extends StatelessWidget {
   const VedaMobileApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -16,6 +15,7 @@ class VedaMobileApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
       routerConfig: AppRoutes.router,
       debugShowCheckedModeBanner: false,
-    );
+    ); 
   }
 }
+ 

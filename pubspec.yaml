@@ -66,6 +66,7 @@ flutter:
     - assets/3.webp
     - assets/4.webp
     - assets/5.webp
+    - assets/1.2.webp
     - assets/last.webp
     - assets/logo.webp
     - assets/per.jpg
@@ -81,7 +82,7 @@ flutter:
     - assets/web/5.webp
     - assets/web/6.webp
     - assets/web/7.webp
-
+    - assets/carousel/new1.jpg
     - assets/carousel/hrdwr1.webp
     - assets/carousel/hrdwr2.webp
     - assets/carousel/main1.webp

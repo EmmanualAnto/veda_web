@@ -87,7 +87,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       vsync: this,
       duration: const Duration(seconds: 8),
     );
-    _imageScaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _imageScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _imageScaleController, curve: Curves.easeOut),
     );
     _imageScaleController.forward();
@@ -97,7 +97,6 @@ class _HeaderCarouselState extends State<HeaderCarousel>
 
   void _startAutoSlide() {
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _previousIndex = _currentIndex;
       _currentIndex = (_currentIndex + 1) % _banners.length;
 
       _textController.reset();

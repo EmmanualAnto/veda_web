@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ class _VedaHomePageState extends State<VedaHomePage>
   bool _isMenuOpen = false;
   // ✅ add this mixin
   final ScrollController _scrollController = ScrollController();
+  bool _showScrollTop = false;
 
   @override
   void dispose() {
@@ -38,22 +41,30 @@ class _VedaHomePageState extends State<VedaHomePage>
     super.initState();
 
     _fadeController = AnimationController(
-      vsync: this, // ✅ works now
+      vsync: this,
       duration: const Duration(milliseconds: 400),
     );
+
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
       curve: Curves.easeInOut,
     );
 
     _scrollController.addListener(() {
-      if (_scrollController.offset > 300) {
-        _fadeController.forward();
-      } else {
-        _fadeController.reverse();
+      final shouldShow = _scrollController.offset > 300;
+
+      // Only trigger animation when state changes
+      if (shouldShow != _showScrollTop) {
+        _showScrollTop = shouldShow;
+
+        if (shouldShow) {
+          _fadeController.forward();
+        } else {
+          _fadeController.reverse();
+        }
       }
 
-      // ✅ close menu on mobile scroll
+      // Close menu only if actually open
       if (_isMenuOpen) {
         setState(() => _isMenuOpen = false);
       }
@@ -97,14 +108,19 @@ class _VedaHomePageState extends State<VedaHomePage>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background scrollable content
+          // 1. Fixed Professional Background Layer
+          // This stays static while the content moves over it
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: ProfessionalBackgroundPainter()),
+            ),
+          ),
+
+          // 2. Scrollable Content Layer
           ScrollConfiguration(
-            // remove overscroll glow and keep platform-appropriate behaviour
             behavior: const ScrollBehavior().copyWith(overscroll: false),
             child: Listener(
-              // Intercept mouse/trackpad wheel events and animate the scroll controller
               onPointerSignal: (pointerSignal) {
-                // ✅ Only apply scrolling logic on Web & Desktop
                 if (!kIsWeb &&
                     (Theme.of(context).platform == TargetPlatform.android ||
                         Theme.of(context).platform == TargetPlatform.iOS)) {
@@ -112,11 +128,7 @@ class _VedaHomePageState extends State<VedaHomePage>
                 }
 
                 if (pointerSignal is PointerScrollEvent) {
-                  // ✅ close menu on scroll
-                  if (_isMenuOpen) {
-                    setState(() => _isMenuOpen = false);
-                  }
-
+                  if (_isMenuOpen) setState(() => _isMenuOpen = false);
                   if (!_scrollController.hasClients) return;
 
                   final double wheelMultiplier = 0.8;
@@ -126,25 +138,22 @@ class _VedaHomePageState extends State<VedaHomePage>
                   final double max = _scrollController.position.maxScrollExtent;
                   final double target = (current + delta).clamp(0.0, max);
 
-                  _scrollController.animateTo(
-                    target,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                  );
+                  _scrollController.jumpTo(target);
                 }
               },
-
               child: CustomScrollView(
                 controller: _scrollController,
-                // keep default physics so touch scrolling still feels natural
                 slivers: [
-                  SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight)),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: kToolbarHeight),
+                  ),
+
+                  // Hero & Services Section
                   SliverToBoxAdapter(
                     child: isDesktop
                         ? Column(
                             children: [
                               const HeaderCarousel(),
-                              // move services up by 75px while keeping its hitbox at the new visual location
                               Transform.translate(
                                 offset: const Offset(0, -75),
                                 child: _buildServicesGridSection(context),
@@ -160,9 +169,12 @@ class _VedaHomePageState extends State<VedaHomePage>
                           ),
                   ),
 
+                  // Main Content Sections
                   SliverToBoxAdapter(child: _buildAboutUsSection(context)),
                   SliverToBoxAdapter(child: _buildOurServicesSection(context)),
                   SliverToBoxAdapter(child: _buildWhyVedaSection(context)),
+
+                  // Form Section with Bottom Inset Support
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.only(
@@ -171,29 +183,26 @@ class _VedaHomePageState extends State<VedaHomePage>
                       child: const LetsTalkSection(),
                     ),
                   ),
-                  SliverToBoxAdapter(child: Footer()),
+
+                  const SliverToBoxAdapter(child: Footer()),
                 ],
               ),
             ),
           ),
 
+          // 3. Navigation Layer (Always Top)
           Align(
             alignment: Alignment.topCenter,
-
-            child: PreferredSize(
-              preferredSize: const Size.fromHeight(kToolbarHeight),
-              child: ReusableMenu(
-                menuRoutes: {
-                  'Home': '/',
-                  'About': '/about',
-                  'Services': '/services',
-                  if (screenWidth > 800) 'Contact': '/contact-us',
-                },
-              ),
+            child: ReusableMenu(
+              menuRoutes: {
+                'Home': '/',
+                'About': '/about',
+                'Services': '/services',
+                if (screenWidth > 800) 'Contact': '/contact-us',
+              },
             ),
           ),
 
-          // Floating scroll-to-top button
           Positioned(
             bottom: 30,
             right: 30,
@@ -226,6 +235,155 @@ class _VedaHomePageState extends State<VedaHomePage>
   }
 }
 
+class ProfessionalBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 2. FLOATING TECH NODES (Subtle, low opacity)
+    _drawTechNodes(canvas, size);
+
+    // 3. GLOWING CIRCUIT LINES (Soft beams)
+    _drawBeams(canvas, size);
+
+    // 4. MATHEMATICAL & PAINTER SHAPES
+    _drawPainterShapes(canvas, size);
+  }
+
+  void _drawTechNodes(Canvas canvas, Size size) {
+    final nodePaint = Paint()..color = Colors.cyanAccent.withOpacity(0.3);
+    final linePaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.15)
+      ..strokeWidth = 0.8;
+
+    final centers = [
+      Offset(size.width * 0.2, size.height * 0.25),
+      Offset(size.width * 0.75, size.height * 0.15),
+      Offset(size.width * 0.5, size.height * 0.7),
+      Offset(size.width * 0.15, size.height * 0.6),
+      Offset(size.width * 0.85, size.height * 0.8),
+    ];
+
+    for (var center in centers) {
+      for (int i = 0; i < 5; i++) {
+        final offset =
+            center + Offset(math.sin(i * 1.7) * 25, math.cos(i * 1.7) * 25);
+        canvas.drawCircle(offset, 2.0, nodePaint);
+        if (i > 0) {
+          final prevOffset =
+              center +
+              Offset(
+                math.sin((i - 1) * 1.7) * 25,
+                math.cos((i - 1) * 1.7) * 25,
+              );
+          canvas.drawLine(prevOffset, offset, linePaint);
+        }
+      }
+    }
+  }
+
+  void _drawBeams(Canvas canvas, Size size) {
+    final beamPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          Colors.cyanAccent.withOpacity(0.0),
+          Colors.cyanAccent.withOpacity(0.2),
+          Colors.cyanAccent.withOpacity(0.35),
+          Colors.cyanAccent.withOpacity(0.0),
+        ],
+        stops: const [0.0, 0.2, 0.5, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, 2))
+      ..strokeWidth = 1.0;
+
+    canvas.drawLine(
+      Offset(-50, size.height * 0.1),
+      Offset(size.width * 0.7, size.height * 0.3),
+      beamPaint,
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.3, size.height * 0.6),
+      Offset(size.width + 50, size.height * 0.4),
+      beamPaint,
+    );
+  }
+
+  void _drawPainterShapes(Canvas canvas, Size size) {
+    final shapePaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.12)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    // 1. Sine Wave (Futuristic tech line)
+    final path = Path();
+    for (double x = 0; x <= size.width; x++) {
+      double y = size.height * 0.5 + math.sin(x / 40) * 25;
+      if (x == 0)
+        path.moveTo(x, y);
+      else
+        path.lineTo(x, y);
+    }
+    canvas.drawPath(path, shapePaint);
+
+    // 2. Parametric Circles (Orbits)
+    final orbitCenter = Offset(size.width * 0.65, size.height * 0.35);
+    final orbitRadius = 45.0;
+    for (int i = 0; i < 3; i++) {
+      final orbitPath = Path();
+      for (double t = 0; t <= 2 * math.pi; t += 0.1) {
+        double x = orbitCenter.dx + orbitRadius * math.cos(t + i);
+        double y = orbitCenter.dy + orbitRadius * math.sin(t + i / 2);
+        if (t == 0)
+          orbitPath.moveTo(x, y);
+        else
+          orbitPath.lineTo(x, y);
+      }
+      orbitPath.close();
+      canvas.drawPath(orbitPath, shapePaint);
+    }
+
+    // 3. Polygonal Tech Shapes (Triangles & hexagons)
+    final polyPaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    // Triangles
+    final triPath = Path();
+    triPath.moveTo(size.width * 0.1, size.height * 0.2);
+    triPath.lineTo(size.width * 0.18, size.height * 0.22);
+    triPath.lineTo(size.width * 0.12, size.height * 0.3);
+    triPath.close();
+    canvas.drawPath(triPath, polyPaint);
+
+    // Hexagon
+    final hexCenter = Offset(size.width * 0.8, size.height * 0.6);
+    final hexRadius = 30.0;
+    final hexPath = Path();
+    for (int i = 0; i < 6; i++) {
+      double angle = (math.pi / 3) * i;
+      double x = hexCenter.dx + hexRadius * math.cos(angle);
+      double y = hexCenter.dy + hexRadius * math.sin(angle);
+      if (i == 0)
+        hexPath.moveTo(x, y);
+      else
+        hexPath.lineTo(x, y);
+    }
+    hexPath.close();
+    canvas.drawPath(hexPath, polyPaint);
+
+    // 4. Soft glowing blob overlay
+    final glowPaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.04)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50);
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.2),
+      120,
+      glowPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 Widget _buildServicesGridSection(BuildContext context) {
   final screenWidth = MediaQuery.of(context).size.width;
 
@@ -238,6 +396,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           // Mobile
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_1'),
               delay: const Duration(milliseconds: 0),
               child: _buildServiceItem(
                 context,
@@ -250,6 +410,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           const SizedBox(height: 20),
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_2'),
               delay: const Duration(milliseconds: 50),
               child: _buildServiceItem(
                 context,
@@ -262,6 +424,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           const SizedBox(height: 20),
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_3'),
               delay: const Duration(milliseconds: 100),
               child: _buildServiceItem(
                 context,
@@ -291,6 +455,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           // Desktop (same ids)
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_4'),
               delay: const Duration(milliseconds: 0),
               child: _buildServiceItem(
                 context,
@@ -303,6 +469,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           ),
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_5'),
               delay: const Duration(milliseconds: 50),
               child: _buildServiceItem(
                 context,
@@ -315,6 +483,8 @@ Widget _buildServicesGridSection(BuildContext context) {
           ),
           RepaintBoundary(
             child: FadeInOnScroll(
+              playOnce: true,
+              key: const ValueKey('services_6'),
               delay: const Duration(milliseconds: 100),
               child: _buildServiceItem(
                 context,
@@ -542,7 +712,7 @@ Widget _buildOurServicesSection(BuildContext context) {
 
       return Container(
         width: double.infinity,
-        color: Colors.grey.shade100,
+        color: Colors.transparent,
         padding: EdgeInsets.symmetric(
           vertical: 30,
           horizontal: desktop ? 130 : 30,
@@ -604,6 +774,8 @@ Widget _buildOurServicesSection(BuildContext context) {
                   children: [
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_7'),
                         delay: const Duration(
                           milliseconds: 0,
                         ), // shows immediately
@@ -621,6 +793,8 @@ Widget _buildOurServicesSection(BuildContext context) {
                     ),
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_8'),
                         delay: const Duration(
                           milliseconds: 50,
                         ), // second comes later
@@ -639,6 +813,8 @@ Widget _buildOurServicesSection(BuildContext context) {
                     ),
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_9'),
                         delay: const Duration(
                           milliseconds: 100,
                         ), // third comes last
@@ -728,6 +904,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                 children: [
                   RepaintBoundary(
                     child: FadeInOnScroll(
+                      playOnce: true,
+                      key: const ValueKey('services_10'),
                       delay: const Duration(milliseconds: 0),
                       child: _buildReasonItem(
                         '100%\nCustom Solutions',
@@ -743,6 +921,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                   ),
                   RepaintBoundary(
                     child: FadeInOnScroll(
+                      playOnce: true,
+                      key: const ValueKey('services_11'),
                       delay: const Duration(milliseconds: 50),
 
                       child: _buildReasonItem(
@@ -759,6 +939,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                   ),
                   RepaintBoundary(
                     child: FadeInOnScroll(
+                      playOnce: true,
+                      key: const ValueKey('services_12'),
                       delay: const Duration(milliseconds: 100),
                       child: _buildReasonItem(
                         'Fast\nTurnaround',
@@ -778,6 +960,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                   children: [
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_13'),
                         delay: const Duration(milliseconds: 0),
                         child: _buildReasonItem(
                           '100%\nCustom Solutions',
@@ -796,6 +980,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                     ),
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_14'),
                         delay: const Duration(milliseconds: 50),
                         child: _buildReasonItem(
                           'Local Support,\nGlobal Standards',
@@ -814,6 +1000,8 @@ Widget _buildWhyVedaSection(BuildContext context) {
                     ),
                     RepaintBoundary(
                       child: FadeInOnScroll(
+                        playOnce: true,
+                        key: const ValueKey('services_15'),
                         delay: const Duration(milliseconds: 100),
                         child: _buildReasonItem(
                           'Fast\nTurnaround',

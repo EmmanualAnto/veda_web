@@ -77,7 +77,7 @@ class AboutUsPage extends StatelessWidget {
                 "INNOVATE",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.instrumentSans(
-                  fontSize: isDesktop ? 250 : 90,
+                  fontSize: isDesktop ? 250 : 100,
                   fontWeight: FontWeight.w900,
                   color: Colors.black.withOpacity(0.03),
                 ),
@@ -96,7 +96,7 @@ class AboutUsPage extends StatelessWidget {
                 "WE BUILD\nDIGITAL LUXURY.",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.brunoAce(
-                  fontSize: isDesktop ? 100 : 42,
+                  fontSize: isDesktop ? 100 : 50,
                   fontWeight: FontWeight.bold,
                   height: 0.95,
                   letterSpacing: isDesktop ? -4 : -2,
@@ -550,18 +550,19 @@ Widget _buildGlobalReach(bool isDesktop) {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildGlassBadge("OUR BASE"),
-            Text(
-              "ESTABLISHED IN MANAMA",
-              style: GoogleFonts.poppins(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: Colors.black26,
-                letterSpacing: 1.5,
+            if (isDesktop)
+              Text(
+                "ESTABLISHED IN MANAMA",
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black26,
+                  letterSpacing: 1.5,
+                ),
               ),
-            ),
           ],
         ),
-        const SizedBox(height: 60),
+        const SizedBox(height: 40),
 
         // Content Split (SAFE FIX)
         Flex(
@@ -623,7 +624,7 @@ Widget _buildGlobalReach(bool isDesktop) {
           ],
         ),
 
-        const SizedBox(height: 80),
+        const SizedBox(height: 40),
         Divider(color: Colors.black.withOpacity(0.05)),
         const SizedBox(height: 40),
 

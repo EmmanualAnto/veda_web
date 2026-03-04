@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:veda_main/pagenotfound.dart';
+import 'package:veda_main/screens/pagenotfound.dart';
 import 'package:veda_main/screens/about.dart';
 import 'package:veda_main/screens/contactus.dart';
 import 'package:veda_main/screens/hardwareandnetworkingpg.dart';

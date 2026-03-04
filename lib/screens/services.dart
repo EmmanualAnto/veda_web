@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:google_fonts/google_fonts.dart';
-import 'package:veda_main/constants.dart';
+
 import 'package:go_router/go_router.dart';
+
+import 'package:veda_main/constants.dart';
+
 import 'package:veda_main/popupanime.dart';
-import 'package:veda_main/stylecard.dart';
+
 import 'package:veda_main/veda_page_layout.dart';
 
 class ServicesPage extends StatelessWidget {
@@ -11,129 +15,355 @@ class ServicesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 800;
+    final isDesktop = MediaQuery.of(context).size.width > 1000;
 
     return VedaPageLayout(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 30,
-            horizontal: isDesktop ? 80 : 24,
+      child: Stack(
+        children: [
+          // STATIC GEOMETRIC BACKGROUND
+          Positioned.fill(
+            child: RepaintBoundary(child: _StaticGridBackground()),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+
+          Column(
             children: [
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '// ',
-                      style: GoogleFonts.instrumentSans(
-                        color: AppColors.primary,
-                        fontSize: isDesktop ? 25 : 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'Our Services',
-                      style: GoogleFonts.instrumentSans(
-                        fontSize: isDesktop ? 22 : 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+              _buildModernHeader(isDesktop),
+
+              _buildServiceSection(
+                context: context,
+
+                index: "01",
+
+                title: "Web Application",
+
+                subtitle: "Scalable Ecosystems",
+
+                description:
+                    "We build high-performance web platforms designed for heavy traffic and seamless user experiences. Using modern stacks, we ensure your business is ready for the future cloud.",
+
+                image: "assets/3.webp",
+
+                route: "/webapp",
+
+                isDesktop: isDesktop,
+
+                imageLeft: true,
               ),
-              const SizedBox(height: 10),
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Smart Tech Services\n',
-                      style: GoogleFonts.instrumentSans(
-                        fontSize: isDesktop ? 46 : 26,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'That Drive Results',
-                      style: GoogleFonts.instrumentSans(
-                        color: AppColors.primary,
-                        fontSize: isDesktop ? 46 : 26,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+
+              _buildServiceSection(
+                context: context,
+
+                index: "02",
+
+                title: "Software Engineering",
+
+                subtitle: "Custom Architecture",
+
+                description:
+                    "From ERP systems to bespoke desktop tools, our engineering team focuses on automation and reliability. We solve complex logic problems with clean, maintainable code.",
+
+                image: "assets/4.webp",
+
+                route: "/software",
+
+                isDesktop: isDesktop,
+
+                imageLeft: false, // Flipped layout
               ),
-              const SizedBox(height: 30),
 
-              Center(
-                child: Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: [
-                    RepaintBoundary(
-                      child: FadeInOnScroll(
-                        delay: const Duration(
-                          milliseconds: 0,
-                        ), // second comes later
+              _buildServiceSection(
+                context: context,
 
-                        child: StyledCardSection(
-                          pageKey: 'web_page',
-                          cardIndex: 0,
-                          imagePath: 'assets/3.webp',
-                          title: 'Web Application',
-                          description:
-                              'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
-                          onTap: () => context.go('/webapp'),
-                          showLearnMore: true,
-                        ),
-                      ),
-                    ),
-                    RepaintBoundary(
-                      child: FadeInOnScroll(
-                        delay: const Duration(
-                          milliseconds: 50,
-                        ), // second comes later
+                index: "03",
 
-                        child: StyledCardSection(
-                          pageKey: 'sftwr_page',
-                          cardIndex: 1,
-                          imagePath: 'assets/4.webp',
-                          title: 'Software Applications',
-                          description:
-                              'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
-                          onTap: () => context.go('/software'),
-                          showLearnMore: true,
-                        ),
-                      ),
-                    ),
-                    RepaintBoundary(
-                      child: FadeInOnScroll(
-                        delay: const Duration(
-                          milliseconds: 100,
-                        ), // second comes later
+                title: "Infrastructure",
 
-                        child: StyledCardSection(
-                          pageKey: 'hrdwr_page',
-                          cardIndex: 2,
-                          imagePath: 'assets/5.webp',
-                          title: 'Hardware & Networking',
-                          description:
-                              'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
-                          onTap: () => context.go('/hardware'),
-                          showLearnMore: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                subtitle: "Network & Security",
+
+                description:
+                    "Protecting your digital assets with robust networking and hardware solutions. We provide the backbone for your company's entire digital operation in Bahrain.",
+
+                image: "assets/5.webp",
+
+                route: "/hardware",
+
+                isDesktop: isDesktop,
+
+                imageLeft: true,
               ),
+
+              const SizedBox(height: 120),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernHeader(bool isDesktop) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        isDesktop ? 120 : 24,
+
+        100,
+
+        isDesktop ? 120 : 24,
+
+        80,
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+
+              borderRadius: BorderRadius.circular(100),
+            ),
+
+            child: Text(
+              "OUR CAPABILITIES",
+
+              style: GoogleFonts.inter(
+                color: AppColors.primary,
+
+                fontWeight: FontWeight.bold,
+
+                fontSize: 12,
+
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Text(
+            "Comprehensive technology\nsolutions for modern enterprise.",
+
+            textAlign: TextAlign.center,
+
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: isDesktop ? 64 : 36,
+
+              fontWeight: FontWeight.w800,
+
+              height: 1.1,
+
+              letterSpacing: -2,
+
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceSection({
+    required BuildContext context,
+    required String index,
+    required String title,
+    required String subtitle,
+    required String description,
+    required String image,
+    required String route,
+    required bool isDesktop,
+    required bool imageLeft,
+  }) {
+    final imageWidget = Container(
+      height: 450,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        image: DecorationImage(
+          image: ResizeImage(AssetImage(image), width: isDesktop ? 1200 : 800),
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.low,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 12,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+    );
+
+    final textWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          index,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 40,
+            fontWeight: FontWeight.w900,
+            color: AppColors.primary.withOpacity(0.2),
+          ),
+        ),
+        Text(
+          subtitle.toUpperCase(),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          title,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          description,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            color: AppColors.primary,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 32),
+        ElevatedButton(
+          onPressed: () => context.go(route),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
+          ),
+          child: const Text(
+            "View Case Study",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+
+    return RepaintBoundary(
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 120 : 24,
+          vertical: 60,
+        ),
+        child: isDesktop
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: imageLeft
+                    ? [
+                        Expanded(child: FadeInOnScroll(child: imageWidget)),
+                        const SizedBox(width: 80),
+                        Expanded(child: FadeInOnScroll(child: textWidget)),
+                      ]
+                    : [
+                        Expanded(child: FadeInOnScroll(child: textWidget)),
+                        const SizedBox(width: 80),
+                        Expanded(child: FadeInOnScroll(child: imageWidget)),
+                      ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FadeInOnScroll(child: imageWidget),
+                  const SizedBox(height: 40),
+                  FadeInOnScroll(child: textWidget),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+// ---------------------- STATIC BG DESIGN ----------------------
+class _StaticGridBackground extends StatelessWidget {
+  const _StaticGridBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFFDFDFD),
+      child: Stack(
+        children: const [
+          _OptimizedGrid(),
+          Positioned(
+            top: -200,
+            left: -200,
+            child: _GlowSpot(
+              color: Color(0x0D017697), // very light primary
+            ),
+          ),
+          Positioned(
+            bottom: 200,
+            right: -100,
+            child: _GlowSpot(
+              color: Color(0x080000FF), // subtle blue glow
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OptimizedGrid extends StatelessWidget {
+  const _OptimizedGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _GridPainter(), size: Size.infinite);
+  }
+}
+
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.primary.withOpacity(0.05)
+      ..strokeWidth = 1;
+
+    const spacing = 100.0;
+
+    for (double x = 0; x < size.width; x += spacing) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+
+    for (double y = 0; y < size.height; y += spacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+class _GlowSpot extends StatelessWidget {
+  final Color color;
+
+  const _GlowSpot({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 600,
+
+      height: 600,
+
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+
+        gradient: RadialGradient(colors: [color, Colors.transparent]),
       ),
     );
   }

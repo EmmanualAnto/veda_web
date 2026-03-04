@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +10,6 @@ import 'package:veda_main/constants.dart';
 class LetsTalkSection extends StatelessWidget {
   final double? height;
   const LetsTalkSection({super.key, this.height});
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -17,124 +17,163 @@ class LetsTalkSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 500),
-      child: Stack(
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              gaplessPlayback: true,
-              'assets/last.webp',
-              fit: BoxFit.cover,
-            ),
+      padding: EdgeInsets.symmetric(
+        horizontal: desktop ? 100 : 20,
+        vertical: 60,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: AppColors.primary.withOpacity(0.3),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.15),
+              blurRadius: 50,
+              spreadRadius: -10,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: Stack(
+            children: [
+              // 1. BASE COLOR LAYER (Soft Lavender/Blue)
+              Positioned.fill(child: Container(color: const Color(0xFFFBFBFF))),
 
-          // Gradient overlay
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(3, 9, 35, 0.94),
-                    Color.fromRGBO(3, 9, 35, 0.90),
-                    Color.fromRGBO(3, 9, 35, 0.85),
-                    Color.fromRGBO(3, 9, 35, 0.80),
-                    Color.fromRGBO(3, 9, 35, 0.75),
+              // 2. VIBRANT MESH COLOR BLOBS
+              // Top Right Glow (Brand Color)
+              Positioned(
+                top: -150,
+                right: -50,
+                child: Container(
+                  width: 400,
+                  height: 400,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withOpacity(0.25),
+                  ),
+                ),
+              ),
+
+              // Bottom Left Glow (Warm Accent)
+              Positioned(
+                bottom: -100,
+                left: -50,
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue.withOpacity(0.15),
+                  ),
+                ),
+              ),
+
+              // 3. BLUR LAYER (Creates the "Clean Mesh" look)
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
+              // 5. THE CONTENT
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: desktop ? 60 : 25,
+                  vertical: desktop ? 60 : 40,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title Span
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '// ',
+                            style: GoogleFonts.instrumentSans(
+                              color: AppColors.primary,
+                              fontSize: desktop ? 25 : 18,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "Let's Talk",
+                            style: GoogleFonts.instrumentSans(
+                              color: Colors.black87,
+                              fontSize: desktop ? 22 : 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Main Heading
+                    Text(
+                      "Tell us what you're working on",
+                      style: GoogleFonts.instrumentSans(
+                        color: Colors.black,
+                        fontSize: desktop ? 46 : 28,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Layout (Row/Column)
+                    desktop
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Flexible(child: _ContactInfo()),
+                              const SizedBox(width: 50),
+                              Flexible(child: _FormFields(isMobile: false)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const _ContactInfo(),
+                              const SizedBox(height: 40),
+                              _FormFields(isMobile: true),
+                            ],
+                          ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-
-          // Content
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: desktop ? 130 : 30,
-              vertical: desktop ? 100 : 40,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Section title
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '// ',
-                        style: GoogleFonts.instrumentSans(
-                          color: AppColors.primary,
-                          fontSize: desktop ? 25 : 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "Let's Talk",
-                        style: GoogleFonts.instrumentSans(
-                          color: Colors.white,
-                          fontSize: desktop ? 22 : 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Tell us what you're\n",
-                        style: GoogleFonts.instrumentSans(
-                          color: Colors.white,
-                          fontSize: desktop ? 46 : 26,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      TextSpan(
-                        text: "Working on",
-                        style: GoogleFonts.instrumentSans(
-                          color: AppColors.primary,
-                          fontSize: desktop ? 46 : 26,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                // Row for desktop / Column for mobile
-                desktop
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Flexible(fit: FlexFit.loose, child: _ContactInfo()),
-                          SizedBox(width: 30),
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: _FormFields(isMobile: false),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _ContactInfo(),
-                          SizedBox(height: 30),
-                          _FormFields(isMobile: true),
-                        ],
-                      ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
+}
+
+class DotMatrixPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.primary
+          .withOpacity(0.12) // Subtle dots
+      ..style = PaintingStyle.fill;
+
+    const double spacing = 25.0; // Space between dots
+    const double dotSize = 1.2; // Size of each dot
+
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), dotSize, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ---------------------- Contact Info ----------------------
@@ -153,7 +192,7 @@ class _ContactInfo extends StatelessWidget {
           "We'll help you\nbuild the right solution",
           style: GoogleFonts.instrumentSans(
             fontSize: desktop ? 22 : 16,
-            color: Colors.white,
+            color: Colors.black87, // Changed to Dark
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -162,7 +201,7 @@ class _ContactInfo extends StatelessWidget {
         ContactInfoItem(
           icon: Icons.email_outlined,
           text: 'info@vedabahrain.com',
-          textColor: Colors.white,
+          textColor: Colors.black87, // Changed to Dark
           onTap: () => _launchEmail('info@vedabahrain.com'),
         ),
 
@@ -171,7 +210,7 @@ class _ContactInfo extends StatelessWidget {
         ContactInfoItem(
           icon: Icons.location_on_outlined,
           text: 'Manama, Kingdom of Bahrain',
-          textColor: Colors.white,
+          textColor: Colors.black87, // Changed to Dark
           onTap: _launchMap,
         ),
 
@@ -180,7 +219,7 @@ class _ContactInfo extends StatelessWidget {
         ContactInfoItem(
           icon: Icons.local_phone_outlined,
           text: '+973 17 374742',
-          textColor: Colors.white,
+          textColor: Colors.black87, // Changed to Dark
           onTap: () => _launchPhone('+97317374742'),
         ),
       ],
@@ -188,22 +227,7 @@ class _ContactInfo extends StatelessWidget {
   }
 }
 
-Future<void> _launchEmail(String email) async {
-  final uri = Uri(scheme: 'mailto', path: email);
-  await launchUrl(uri);
-}
-
-Future<void> _launchPhone(String number) async {
-  final uri = Uri(scheme: 'tel', path: number);
-  await launchUrl(uri);
-}
-
-Future<void> _launchMap() async {
-  final uri = Uri.parse("https://maps.app.goo.gl/c8Cvqdb1xNkZwYQHA");
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
-}
-
-// ---------------------- Contact Info Item ----------------------
+// ---------------------- Contact Info Item (Updated Icon Colors) ----------------------
 class ContactInfoItem extends StatefulWidget {
   final IconData icon;
   final String text;
@@ -214,7 +238,7 @@ class ContactInfoItem extends StatefulWidget {
     super.key,
     required this.icon,
     required this.text,
-    this.textColor = Colors.white,
+    this.textColor = Colors.black87, // Default to dark
     this.onTap,
   });
 
@@ -245,18 +269,90 @@ class _ContactInfoItemState extends State<ContactInfoItem> {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 5),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 child: Icon(
                   widget.icon,
-                  color: hovering ? AppColors.primary : Colors.white,
+                  color: hovering
+                      ? AppColors.primary
+                      : Colors.black54, // Icon visibility
                 ),
               ),
               const SizedBox(width: 10),
               Text(widget.text),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------- Custom Text Field (Light Mode Look) ----------------------
+class _CustomTextField extends StatefulWidget {
+  final String label;
+  final IconData? icon;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputAction textInputAction;
+  final int? minLines;
+  final int? maxLines;
+  final AutovalidateMode? autovalidateMode;
+
+  const _CustomTextField({
+    required this.label,
+    this.icon,
+    this.controller,
+    this.validator,
+    this.textInputAction = TextInputAction.next,
+    this.minLines,
+    this.maxLines,
+    this.autovalidateMode,
+  });
+
+  @override
+  State<_CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<_CustomTextField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      validator: widget.validator,
+      autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
+      keyboardType: widget.label == "Phone"
+          ? TextInputType.phone
+          : (widget.label == "Email"
+                ? TextInputType.emailAddress
+                : TextInputType.multiline),
+      textInputAction: widget.textInputAction,
+      style: const TextStyle(color: Colors.black), // Text color black
+      maxLines: widget.maxLines ?? 1,
+      minLines: widget.minLines ?? 1,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        labelStyle: GoogleFonts.poppins(color: Colors.black54),
+        filled: true,
+        fillColor: Colors.grey.withOpacity(0.08), // Subtle grey background
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        prefixIcon: widget.icon != null
+            ? Icon(widget.icon, color: Colors.black45)
+            : null,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.redAccent),
         ),
       ),
     );
@@ -565,75 +661,17 @@ class _FormFieldsState extends State<_FormFields> {
   }
 }
 
-class _CustomTextField extends StatefulWidget {
-  final String label;
-  final IconData? icon;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final TextInputAction textInputAction;
-  final int? minLines;
-  final int? maxLines;
-  final AutovalidateMode? autovalidateMode;
-
-  const _CustomTextField({
-    required this.label,
-    this.icon,
-    this.controller,
-    this.validator,
-    this.textInputAction = TextInputAction.next,
-    this.minLines,
-    this.maxLines,
-    this.autovalidateMode,
-  });
-
-  @override
-  State<_CustomTextField> createState() => _CustomTextFieldState();
+Future<void> _launchEmail(String email) async {
+  final uri = Uri(scheme: 'mailto', path: email);
+  await launchUrl(uri);
 }
 
-class _CustomTextFieldState extends State<_CustomTextField> {
-  @override
-  void initState() {
-    super.initState();
-  }
+Future<void> _launchPhone(String number) async {
+  final uri = Uri(scheme: 'tel', path: number);
+  await launchUrl(uri);
+}
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: widget.controller,
-      validator: widget.validator,
-      autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
-
-      keyboardType: widget.label == "Phone"
-          ? TextInputType.phone
-          : (widget.label == "Email"
-                ? TextInputType.emailAddress
-                : TextInputType.multiline), // 👈 multiline for text
-      textInputAction: widget.textInputAction,
-      style: const TextStyle(color: Colors.white),
-      maxLines: widget.maxLines ?? 1, // 👈 default 1 for normal fields
-      minLines: widget.minLines ?? 1,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        labelStyle: GoogleFonts.poppins(color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.16),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16, // 👈 increase vertical padding
-        ),
-        prefixIcon: widget.icon != null
-            ? Icon(widget.icon, color: Colors.white70)
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
+Future<void> _launchMap() async {
+  final uri = Uri.parse("https://maps.app.goo.gl/c8Cvqdb1xNkZwYQHA");
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
