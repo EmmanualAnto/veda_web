@@ -1,15 +1,16 @@
 import 'dart:convert';
-import 'dart:ui';
-
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:veda_main/constants.dart';
+import 'package:veda_main/whatsapp.dart';
 
 class LetsTalkSection extends StatelessWidget {
   final double? height;
   const LetsTalkSection({super.key, this.height});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -40,111 +41,59 @@ class LetsTalkSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           child: Stack(
             children: [
-              // 1. BASE COLOR LAYER (Soft Lavender/Blue)
+              // Background
               Positioned.fill(child: Container(color: const Color(0xFFFBFBFF))),
 
-              // 2. VIBRANT MESH COLOR BLOBS
-              // Top Right Glow (Brand Color)
+              // Top Right Glow
               Positioned(
                 top: -150,
                 right: -50,
-                child: Container(
-                  width: 400,
-                  height: 400,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary.withOpacity(0.25),
-                  ),
+                child: _GlowCircle(
+                  size: 350,
+                  color: AppColors.primary.withOpacity(0.10),
+                  blur: 400,
                 ),
               ),
 
-              // Bottom Left Glow (Warm Accent)
+              // Bottom Left Glow
               Positioned(
                 bottom: -100,
                 left: -50,
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue.withOpacity(0.15),
-                  ),
+                child: _GlowCircle(
+                  size: 300,
+                  color: Colors.blue.withOpacity(0.15),
+                  blur: 300,
                 ),
               ),
 
-              // 3. BLUR LAYER (Creates the "Clean Mesh" look)
+              // Painter
               Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-                  child: Container(color: Colors.transparent),
-                ),
+                child: CustomPaint(painter: _LetsTalkBackgroundPainter()),
               ),
-              // 5. THE CONTENT
+
+              // CONTENT
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: desktop ? 60 : 25,
+                  horizontal: desktop ? 80 : 25,
                   vertical: desktop ? 60 : 40,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Title Span
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '// ',
-                            style: GoogleFonts.instrumentSans(
-                              color: AppColors.primary,
-                              fontSize: desktop ? 25 : 18,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          TextSpan(
-                            text: "Let's Talk",
-                            style: GoogleFonts.instrumentSans(
-                              color: Colors.black87,
-                              fontSize: desktop ? 22 : 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                child: desktop
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Expanded(flex: 5, child: _LetsTalkLeft()),
+                          SizedBox(width: 20),
+                          Expanded(flex: 5, child: _LetsTalkRight()),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          _LetsTalkLeft(),
+                          SizedBox(height: 40),
+                          _LetsTalkRight(),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Main Heading
-                    Text(
-                      "Tell us what you're working on",
-                      style: GoogleFonts.instrumentSans(
-                        color: Colors.black,
-                        fontSize: desktop ? 46 : 28,
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // Layout (Row/Column)
-                    desktop
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Flexible(child: _ContactInfo()),
-                              const SizedBox(width: 50),
-                              Flexible(child: _FormFields(isMobile: false)),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              const _ContactInfo(),
-                              const SizedBox(height: 40),
-                              _FormFields(isMobile: true),
-                            ],
-                          ),
-                  ],
-                ),
               ),
             ],
           ),
@@ -154,22 +103,231 @@ class LetsTalkSection extends StatelessWidget {
   }
 }
 
-class DotMatrixPainter extends CustomPainter {
+class _LetsTalkLeft extends StatelessWidget {
+  const _LetsTalkLeft();
+
+  @override
+  Widget build(BuildContext context) {
+    final desktop = MediaQuery.of(context).size.width > 800;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '// ',
+                style: GoogleFonts.instrumentSans(
+                  color: AppColors.primary,
+                  fontSize: desktop ? 25 : 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              TextSpan(
+                text: "Let's Talk",
+                style: GoogleFonts.instrumentSans(
+                  color: Colors.black87,
+                  fontSize: desktop ? 22 : 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Heading
+        Text(
+          "Tell us what you're working on",
+          style: GoogleFonts.instrumentSans(
+            color: Colors.black,
+            fontSize: desktop ? 46 : 28,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        const _ContactInfo(),
+      ],
+    );
+  }
+}
+
+class _LetsTalkRight extends StatelessWidget {
+  const _LetsTalkRight();
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width <= 800;
+
+    return _FormFields(isMobile: isMobile);
+  }
+}
+
+class _GlowCircle extends StatelessWidget {
+  final double size;
+  final Color color;
+  final double blur;
+
+  const _GlowCircle({
+    required this.size,
+    required this.color,
+    required this.blur,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: color, blurRadius: blur, spreadRadius: 10),
+        ],
+      ),
+    );
+  }
+}
+
+class _LetsTalkBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primary
-          .withOpacity(0.12) // Subtle dots
-      ..style = PaintingStyle.fill;
+    final borderPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..color = AppColors.primary.withOpacity(0.04);
 
-    const double spacing = 25.0; // Space between dots
-    const double dotSize = 1.2; // Size of each dot
+    final double scale = math.min(size.width / 180, size.height / 180) * 0.9;
 
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), dotSize, paint);
+    canvas.save();
+    canvas.translate(
+      (size.width - (180 * scale)) / 2,
+      (size.height - (180 * scale)) / 2,
+    );
+    canvas.scale(scale);
+
+    // 1. HANDSET
+    final handsetPath = Path()
+      ..moveTo(15, 50)
+      ..cubicTo(15, 5, 165, 5, 165, 50)
+      ..moveTo(165, 50)
+      ..cubicTo(175, 60, 140, 85, 135, 65)
+      ..moveTo(15, 50)
+      ..cubicTo(5, 60, 40, 85, 45, 65);
+    canvas.drawPath(handsetPath, borderPaint);
+
+    // 2. CRADLE HOOKS
+    final hooks = Path()
+      ..moveTo(58, 45)
+      ..quadraticBezierTo(58, 65, 75, 65)
+      ..moveTo(122, 45)
+      ..quadraticBezierTo(122, 65, 105, 65);
+    canvas.drawPath(hooks, borderPaint);
+
+    // 3. BODY
+    final bodyPath = Path()
+      ..moveTo(70, 65)
+      ..lineTo(110, 65)
+      ..cubicTo(140, 65, 170, 130, 165, 155)
+      ..quadraticBezierTo(162, 170, 135, 170)
+      ..lineTo(45, 170)
+      ..quadraticBezierTo(18, 170, 15, 155)
+      ..cubicTo(10, 130, 40, 65, 70, 65);
+    canvas.drawPath(bodyPath, borderPaint);
+
+    // 4. ROTARY DIAL
+    final Offset dialCenter = const Offset(90, 115);
+    final List<double> dialRadii = [42, 42 * 0.85, 42 * 0.35, 42 * 0.12];
+    for (double r in dialRadii) {
+      canvas.drawCircle(dialCenter, r, borderPaint);
+    }
+
+    // 5. FINGER HOLES
+    for (int i = 0; i < 10; i++) {
+      double angle = (i * 0.52) + 0.85;
+      canvas.drawCircle(
+        Offset(
+          dialCenter.dx + (dialRadii[1] * 0.78) * math.cos(angle),
+          dialCenter.dy + (dialRadii[1] * 0.78) * math.sin(angle),
+        ),
+        5.5,
+        borderPaint,
+      );
+    }
+
+    // 6. STOPPER
+    final stopper = Path()
+      ..moveTo(
+        dialCenter.dx + dialRadii[0] * math.cos(0.55),
+        dialCenter.dy + dialRadii[0] * math.sin(0.55),
+      )
+      ..quadraticBezierTo(
+        dialCenter.dx + (dialRadii[0] + 12) * math.cos(0.45),
+        dialCenter.dy + (dialRadii[0] + 12) * math.sin(0.45),
+        dialCenter.dx + (dialRadii[0] + 8) * math.cos(0.35),
+        dialCenter.dy + (dialRadii[0] + 8) * math.sin(0.35),
+      );
+    canvas.drawPath(stopper, borderPaint);
+
+    // 7. COILED WRISTED CABLE
+    final cablePath = Path();
+    final Offset p0 = const Offset(25, 72);
+    final Offset p1 = const Offset(-5, 95);
+    final Offset p2 = const Offset(5, 155);
+    final Offset p3 = const Offset(20, 155);
+
+    const int steps = 200;
+    const double rotations = 30.0;
+    const double radius = 3.5;
+
+    for (int i = 0; i <= steps; i++) {
+      double t = i / steps;
+      double x =
+          math.pow(1 - t, 3) * p0.dx +
+          3 * math.pow(1 - t, 2) * t * p1.dx +
+          3 * (1 - t) * math.pow(t, 2) * p2.dx +
+          math.pow(t, 3) * p3.dx;
+      double y =
+          math.pow(1 - t, 3) * p0.dy +
+          3 * math.pow(1 - t, 2) * t * p1.dy +
+          3 * (1 - t) * math.pow(t, 2) * p2.dy +
+          math.pow(t, 3) * p3.dy;
+
+      double tx =
+          3 * math.pow(1 - t, 2) * (p1.dx - p0.dx) +
+          6 * (1 - t) * t * (p2.dx - p1.dx) +
+          3 * math.pow(t, 2) * (p3.dx - p2.dx);
+      double ty =
+          3 * math.pow(1 - t, 2) * (p1.dy - p0.dy) +
+          6 * (1 - t) * t * (p2.dy - p1.dy) +
+          3 * math.pow(t, 2) * (p3.dy - p2.dy);
+
+      double len = math.sqrt(tx * tx + ty * ty);
+      double nx = -ty / len;
+      double ny = tx / len;
+
+      double angle = t * rotations * 2 * math.pi;
+
+      double cx = x + (math.cos(angle) * nx * radius);
+      double cy = y + (math.sin(angle) * ny * radius * 0.5);
+
+      if (i == 0) {
+        cablePath.moveTo(cx, cy);
+      } else {
+        cablePath.lineTo(cx, cy);
       }
     }
+    canvas.drawPath(cablePath, borderPaint);
+
+    canvas.restore();
   }
 
   @override
@@ -511,16 +669,46 @@ class _FormFieldsState extends State<_FormFields> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           content: Row(
-            children: const [
-              Icon(Icons.error_outline, color: Colors.white),
-              SizedBox(width: 12),
+            children: [
               Expanded(
-                child: Text(
-                  "Error connecting to server.",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.white),
+                    const SizedBox(width: 8),
+
+                    Text(
+                      "Error connecting to server. Reach us via ",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    // Clickable WhatsApp text
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      onPressed: () {
+                        WhatsAppHelper.openChat(
+                          phoneNumber: '+919961320030',
+                          message: 'Hello, I have a query!',
+                          context: context,
+                        );
+                      },
+                      child: const Text(
+                        "WhatsApp",
+                        style: TextStyle(
+                          color: Colors.greenAccent,
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -542,12 +730,15 @@ class _FormFieldsState extends State<_FormFields> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final desktop = screenWidth > 800;
     return Form(
       key: _formKey,
       child: Column(
         mainAxisSize: MainAxisSize.min, // shrink to content
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (desktop) SizedBox(height: 40),
           _CustomTextField(
             controller: _nameController,
             label: 'Name',
@@ -620,37 +811,44 @@ class _FormFieldsState extends State<_FormFields> {
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitForm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  backgroundColor: _isSubmitting
+                      ? Colors.transparent
+                      : AppColors.primary,
+                  foregroundColor: _isSubmitting
+                      ? AppColors.primary
+                      : Colors.white,
+                  elevation: 0,
+                  side: BorderSide(color: AppColors.primary, width: 1.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Submit',
-                          style: GoogleFonts.instrumentSans(fontSize: 16),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _isSubmitting
+                      // 🔄 LOADING STATE
+                      ? SizedBox(
+                          key: const ValueKey('loader'),
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      // ✅ NORMAL STATE
+                      : Row(
+                          key: const ValueKey('text'),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Submit',
+                              style: GoogleFonts.instrumentSans(fontSize: 16),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward_rounded, size: 20),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        if (!_isSubmitting)
-                          const Icon(Icons.arrow_forward_rounded, size: 20),
-                      ],
-                    ),
-                    if (_isSubmitting)
-                      const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      ),
-                  ],
                 ),
               ),
             ),
@@ -674,4 +872,24 @@ Future<void> _launchPhone(String number) async {
 Future<void> _launchMap() async {
   final uri = Uri.parse("https://maps.app.goo.gl/c8Cvqdb1xNkZwYQHA");
   await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+class WhatsAppHelper {
+  static Future<void> openChat({
+    required String phoneNumber,
+    required String message,
+    required BuildContext context,
+  }) async {
+    final Uri url = Uri.parse(
+      "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("WhatsApp not installed")));
+    }
+  }
 }

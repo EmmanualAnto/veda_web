@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
+import 'package:veda_main/bgpainter.dart';
 import 'package:veda_main/constants.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
@@ -66,10 +67,15 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: ProfessionalBackgroundPainter()),
+            ),
+          ),
+
           CustomScrollView(
             controller: _scrollController,
             slivers: [
-              // Header
               SliverToBoxAdapter(
                 child: RepaintBoundary(
                   child: FadeInOnScroll(
@@ -89,7 +95,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                     runSpacing: 20,
                     children: List.generate(8, (index) {
                       return FadeInOnScroll(
-                        delay: Duration(milliseconds: index * 120), // stagger
+                        delay: Duration(milliseconds: index * 100), // stagger
                         child: _buildCardByIndex(index),
                       );
                     }),
@@ -220,7 +226,13 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(image, fit: BoxFit.cover),
+          SizedBox(
+            width: double.infinity,
+            child: AspectRatio(
+              aspectRatio: 16 / 7, // match your design ratio
+              child: Image.asset(image, fit: BoxFit.cover),
+            ),
+          ),
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -239,7 +251,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: isMobile ? 5 : 120,
-              vertical: isMobile ? 0 : 170,
+              vertical: isMobile ? 0 : 225,
             ),
             child: Align(
               alignment: isMobile ? Alignment.center : Alignment.topLeft,
@@ -272,7 +284,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: isMobile ? 20 : 15),
                   Text(
                     'Smart Tech Solutions\nDesigned for Growth',
                     textAlign: isMobile ? TextAlign.center : TextAlign.start,
@@ -283,7 +295,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  SizedBox(height: isMobile ? 40 : 25),
                   SizedBox(
                     width: 1000,
                     child: Text(
@@ -297,7 +309,7 @@ class _HardwareandnetworkingpgState extends State<Hardwareandnetworkingpg>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 35),
+                  SizedBox(height: isMobile ? 45 : 35),
                   isMobile
                       ? Column(
                           mainAxisSize: MainAxisSize.min,

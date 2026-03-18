@@ -86,7 +86,6 @@ class Footer extends StatelessWidget {
           : CrossAxisAlignment.start,
       children: [
         Image.asset(
-          gaplessPlayback: true,
           'assets/logo.webp',
           height: 80,
           width: 220,

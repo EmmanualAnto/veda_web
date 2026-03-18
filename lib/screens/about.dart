@@ -95,7 +95,7 @@ class AboutUsPage extends StatelessWidget {
                 "WE BUILD\nDIGITAL LUXURY.",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.brunoAce(
-                  fontSize: isDesktop ? 100 : 50,
+                  fontSize: isDesktop ? 100 : 60,
                   fontWeight: FontWeight.bold,
                   height: 0.95,
                   letterSpacing: isDesktop ? -4 : -2,
@@ -221,13 +221,7 @@ class AboutUsPage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "01 / MISSION",
-          style: GoogleFonts.poppins(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        _buildGlassBadge("01 / MISSION"),
         const SizedBox(height: 12),
         Text(
           "Crafting high-performance digital artifacts that don't just work—they inspire.",
@@ -257,17 +251,32 @@ class AboutUsPage extends StatelessWidget {
   }
 
   Widget _buildFloatingContact(BuildContext context, bool isDesktop) {
+    double scale = 1.0;
+
     return Positioned(
       bottom: 40,
       right: isDesktop ? 40 : 20,
-      child: FloatingActionButton.extended(
-        backgroundColor: Colors.black,
-        onPressed: () => context.go('/contact-us'),
-        label: const Text(
-          "START A PROJECT",
-          style: TextStyle(color: Colors.white),
-        ),
-        icon: const Icon(Icons.add, color: Colors.white),
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return MouseRegion(
+            onEnter: (_) => setState(() => scale = 1.05), // scale up on hover
+            onExit: (_) => setState(() => scale = 1.0), // scale back on exit
+            child: AnimatedScale(
+              scale: scale,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: FloatingActionButton.extended(
+                backgroundColor: Colors.black,
+                onPressed: () => context.go('/contact-us'),
+                label: const Text(
+                  "START A PROJECT",
+                  style: TextStyle(color: Colors.white),
+                ),
+                icon: const Icon(Icons.add, color: Colors.white),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

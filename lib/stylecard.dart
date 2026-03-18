@@ -33,6 +33,13 @@ class _StyledCardSectionState extends State<StyledCardSection> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final desktop = screenWidth > 800;
+    final cardHeight = desktop
+        ? (widget.showLearnMore && widget.onTap != null
+              ? 450.0
+              : 330.0) // desktop heights
+        : (widget.showLearnMore && widget.onTap != null
+              ? 450.0
+              : 320.0); // mobile heights
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -71,7 +78,7 @@ class _StyledCardSectionState extends State<StyledCardSection> {
             ),
           ),
           child: SizedBox(
-            height: widget.showLearnMore && widget.onTap != null ? 450 : 355,
+            height: cardHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -87,11 +94,7 @@ class _StyledCardSectionState extends State<StyledCardSection> {
                       scale: _isHovered ? 1.05 : 1.0,
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeOut,
-                      child: Image.asset(
-                        gaplessPlayback: true,
-                        widget.imagePath,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset(widget.imagePath, fit: BoxFit.cover),
                     ),
                   ),
                 ),

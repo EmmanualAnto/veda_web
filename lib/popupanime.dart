@@ -10,22 +10,17 @@ class FadeInOnScroll extends StatefulWidget {
   const FadeInOnScroll({
     super.key,
     required this.child,
-    this.duration = const Duration(
-      milliseconds: 650,
-    ), // bit longer → feels premium, less abrupt
+    this.duration = const Duration(milliseconds: 650),
     this.delay = Duration.zero,
-    this.playOnce =
-        true, // changed default to true – usually better UX for scroll reveals
+    this.playOnce = true,
   });
 
   @override
   State<FadeInOnScroll> createState() => _FadeInOnScrollState();
 }
 
-// Simple global throttle – prevents too many simultaneous .forward() calls
 int _activeAnimations = 0;
-const int _maxConcurrentAnimations =
-    5; // tune: 3–6; lower = safer on mid-range devices
+const int _maxConcurrentAnimations = 5;
 
 class _FadeInOnScrollState extends State<FadeInOnScroll>
     with SingleTickerProviderStateMixin {
@@ -38,18 +33,18 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(vsync: this, duration: widget.duration);
 
     final curve = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic, // crisp end, good perf balance
-      // Alternatives: Curves.easeOutQuart (stronger slowdown), Curves.linearToEaseOut
+      curve: Curves.easeOutCubic,
     );
 
     _opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
 
     _slide = Tween<Offset>(
-      begin: const Offset(0.0, 0.10), // subtle ~40px lift – feels natural
+      begin: const Offset(0.0, 0.10), // ~40px slide up
       end: Offset.zero,
     ).animate(curve);
 
@@ -60,6 +55,7 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
     if (!mounted) return;
 
     _activeAnimations++;
+
     _controller.forward().then((_) {
       if (mounted) {
         _activeAnimations--;
@@ -70,15 +66,13 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
   void _onVisibilityChanged(VisibilityInfo info) {
     if (_hasAppeared && widget.playOnce) return;
 
-    if (info.visibleFraction > 0.06) {
-      // low threshold → starts earlier on approach
+    if (info.visibleFraction > 0.08) {
       _hasAppeared = true;
 
       void attemptStart() {
         if (_activeAnimations < _maxConcurrentAnimations) {
           _startAnimation();
         } else {
-          // Gentle queue: wait a tiny bit instead of dropping
           Future.delayed(const Duration(milliseconds: 60), () {
             if (mounted) attemptStart();
           });
@@ -102,16 +96,14 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      // Unique-ish key helps with hot reload & list recycling issues
-      key: ValueKey('fade_${widget.key?.toString() ?? UniqueKey().toString()}'),
+      key: widget.key ?? ValueKey(hashCode),
       onVisibilityChanged: _onVisibilityChanged,
       child: RepaintBoundary(
-        // isolates repaint → huge win during many anims
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
             return Transform.translate(
-              offset: _slide.value * 40.0, // ~40px – tweak 30–60 to taste
+              offset: _slide.value * 40,
               child: Opacity(opacity: _opacity.value, child: child),
             );
           },

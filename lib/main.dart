@@ -15,7 +15,6 @@ class VedaMobileApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
       routerConfig: AppRoutes.router,
       debugShowCheckedModeBanner: false,
-    ); 
+    );
   }
 }
- 

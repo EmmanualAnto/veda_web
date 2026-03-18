@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
+import 'package:veda_main/bgpainter.dart';
 import 'package:veda_main/constants.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
@@ -25,7 +26,6 @@ class _WebapppgState extends State<Webapppg>
   @override
   void initState() {
     super.initState();
-
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -65,6 +65,12 @@ class _WebapppgState extends State<Webapppg>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: ProfessionalBackgroundPainter()),
+            ),
+          ),
+
           CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -86,7 +92,7 @@ class _WebapppgState extends State<Webapppg>
                     runSpacing: 20,
                     children: List.generate(7, (index) {
                       return FadeInOnScroll(
-                        delay: Duration(milliseconds: index * 120), // stagger
+                        delay: Duration(milliseconds: index * 100), // stagger
                         child: _buildCardByIndex(index),
                       );
                     }),
@@ -94,15 +100,7 @@ class _WebapppgState extends State<Webapppg>
                 ),
               ),
 
-              SliverToBoxAdapter(
-                child: RepaintBoundary(
-                  child: FadeInOnScroll(
-                    delay: const Duration(milliseconds: 0),
-                    child: _buildClientsSection(context),
-                  ),
-                ),
-              ),
-
+              SliverToBoxAdapter(child: _buildClientsSection(context)),
               const SliverToBoxAdapter(child: LetsTalkSection()),
               const SliverToBoxAdapter(child: Footer()),
             ],

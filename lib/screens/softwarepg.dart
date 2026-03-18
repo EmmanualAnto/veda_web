@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:veda_main/autoscrolltext.dart';
+import 'package:veda_main/bgpainter.dart';
 import 'package:veda_main/constants.dart';
 import 'package:veda_main/footer.dart';
 import 'package:veda_main/letstalk.dart';
@@ -64,6 +65,12 @@ class _SoftwarepgState extends State<Softwarepg>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: ProfessionalBackgroundPainter()),
+            ),
+          ),
+
           CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -96,19 +103,11 @@ class _SoftwarepgState extends State<Softwarepg>
               ),
 
               // Clients section
-              SliverToBoxAdapter(
-                child: RepaintBoundary(
-                  child: FadeInOnScroll(
-                    delay: const Duration(milliseconds: 0),
-                    child: _buildClientsSection(context),
-                  ),
-                ),
-              ),
-
+              SliverToBoxAdapter(child: _buildClientsSection(context)),
               const SliverToBoxAdapter(child: Center(child: LetsTalkSection())),
 
               // Footer with navigation
-              SliverToBoxAdapter(child: Center(child: Footer())),
+              const SliverToBoxAdapter(child: Center(child: Footer())),
             ],
           ),
           Positioned(

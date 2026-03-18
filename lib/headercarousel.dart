@@ -121,6 +121,7 @@ class _HeaderCarouselState extends State<HeaderCarousel>
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     final height = isMobile ? 510.0 : 810.0;
+    final isDesktop = MediaQuery.of(context).size.width > 800;
 
     final currentImage = isMobile
         ? _banners[_currentIndex]['imageMobile']!
@@ -261,36 +262,45 @@ class _HeaderCarouselState extends State<HeaderCarousel>
                           end: 1.0,
                           child: isMobile
                               ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     _buildPrimaryButton(
                                       onPressed: () =>
                                           _banners[_currentIndex]['onPrimary'](
                                             context,
                                           ),
+                                      isDesktop: isDesktop,
                                     ),
-                                    SizedBox(height: 15),
+                                    const SizedBox(height: 15),
                                     _buildSecondaryButton(
                                       onPressed: () =>
                                           _banners[_currentIndex]['onSecondary'](
                                             context,
                                           ),
+                                      isDesktop: isDesktop,
                                     ),
                                   ],
                                 )
                               : Row(
                                   children: [
-                                    _buildPrimaryButton(
-                                      onPressed: () =>
-                                          _banners[_currentIndex]['onPrimary'](
-                                            context,
-                                          ),
+                                    Flexible(
+                                      child: _buildPrimaryButton(
+                                        onPressed: () =>
+                                            _banners[_currentIndex]['onPrimary'](
+                                              context,
+                                            ),
+                                        isDesktop: isDesktop,
+                                      ),
                                     ),
-                                    SizedBox(width: 15),
-                                    _buildSecondaryButton(
-                                      onPressed: () =>
-                                          _banners[_currentIndex]['onSecondary'](
-                                            context,
-                                          ),
+                                    const SizedBox(width: 15),
+                                    Flexible(
+                                      child: _buildSecondaryButton(
+                                        onPressed: () =>
+                                            _banners[_currentIndex]['onSecondary'](
+                                              context,
+                                            ),
+                                        isDesktop: isDesktop,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -325,90 +335,114 @@ Widget _buildAnimatedLine({
   );
 }
 
-Widget _buildPrimaryButton({required VoidCallback onPressed}) => ElevatedButton(
-  onPressed: onPressed,
-  style: ButtonStyle(
-    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-      return states.contains(WidgetState.hovered)
-          ? Colors.white
-          : AppColors.primary;
-    }),
-    foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-      return states.contains(WidgetState.hovered) ? Colors.black : Colors.white;
-    }),
-    side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-      return BorderSide(
-        color: states.contains(WidgetState.hovered)
-            ? Colors.black
-            : Colors.transparent,
-      );
-    }),
-    padding: WidgetStateProperty.all(
-      const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-    ),
-    shape: WidgetStateProperty.all(
-      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    ),
-    elevation: WidgetStateProperty.all(0),
-    minimumSize: WidgetStateProperty.all(const Size(205, 54)),
+Widget _buildPrimaryButton({
+  required VoidCallback onPressed,
+  required bool isDesktop,
+}) => ConstrainedBox(
+  constraints: BoxConstraints(
+    minWidth: isDesktop ? 160 : 140,
+    maxWidth: isDesktop ? 260 : 220,
+    minHeight: isDesktop ? 25 : 22,
   ),
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(
-        'Contact Now',
-        style: GoogleFonts.instrumentSans(
-          fontWeight: FontWeight.w400,
-          fontSize: 18,
+  child: ElevatedButton(
+    onPressed: onPressed,
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : AppColors.primary;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
+              ? Colors.black
+              : Colors.transparent,
+        );
+      }),
+      padding: WidgetStateProperty.all(
+        EdgeInsets.symmetric(
+          horizontal: isDesktop ? 25 : 20,
+          vertical: isDesktop ? 15 : 12,
         ),
       ),
-      const SizedBox(width: 8),
-      const Icon(Icons.arrow_forward, size: 24),
-    ],
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      elevation: WidgetStateProperty.all(0),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Contact Now',
+          style: GoogleFonts.instrumentSans(
+            fontWeight: FontWeight.w400,
+            fontSize: isDesktop ? 18 : 16,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(Icons.arrow_forward, size: isDesktop ? 24 : 20),
+      ],
+    ),
   ),
 );
-
-Widget _buildSecondaryButton({required VoidCallback onPressed}) =>
-    OutlinedButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
-          return states.contains(WidgetState.hovered)
-              ? Colors.white
-              : Colors.transparent;
-        }),
-        foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-          return states.contains(WidgetState.hovered)
+Widget _buildSecondaryButton({
+  required VoidCallback onPressed,
+  required bool isDesktop,
+}) => ConstrainedBox(
+  constraints: BoxConstraints(
+    minWidth: isDesktop ? 160 : 140,
+    maxWidth: isDesktop ? 260 : 220,
+    minHeight: isDesktop ? 25 : 22,
+  ),
+  child: OutlinedButton(
+    onPressed: onPressed,
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.white
+            : Colors.transparent;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        return states.contains(WidgetState.hovered)
+            ? Colors.black
+            : Colors.white;
+      }),
+      side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+        return BorderSide(
+          color: states.contains(WidgetState.hovered)
               ? Colors.black
-              : Colors.white;
-        }),
-        side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-          return BorderSide(
-            color: states.contains(WidgetState.hovered)
-                ? Colors.black
-                : Colors.white,
-          );
-        }),
-        padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              : Colors.white,
+        );
+      }),
+      padding: WidgetStateProperty.all(
+        EdgeInsets.symmetric(
+          horizontal: isDesktop ? 25 : 20,
+          vertical: isDesktop ? 15 : 12,
         ),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-        minimumSize: WidgetStateProperty.all(const Size(205, 54)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Explore More',
-            style: GoogleFonts.instrumentSans(
-              fontWeight: FontWeight.w400,
-              fontSize: 18,
-            ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Explore More',
+          style: GoogleFonts.instrumentSans(
+            fontWeight: FontWeight.w400,
+            fontSize: isDesktop ? 18 : 16,
           ),
-          const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward, size: 24),
-        ],
-      ),
-    );
+        ),
+        const SizedBox(width: 8),
+        Icon(Icons.arrow_forward, size: isDesktop ? 24 : 20),
+      ],
+    ),
+  ),
+);

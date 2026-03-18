@@ -87,7 +87,7 @@ class _ClientReelState extends State<ClientReel> with TickerProviderStateMixin {
               Colors.black,
               Colors.transparent,
             ],
-            stops: const [0.0, 0.08, 0.92, 1.0], // adjust width of fade
+            stops: const [0.0, 0.2, 0.8, 1.0], // adjust width of fade
           ).createShader(Rect.fromLTWH(0, 0, rect.width, rect.height));
         },
         blendMode: BlendMode.dstIn,
