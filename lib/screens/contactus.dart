@@ -92,12 +92,13 @@ class _ContactUsPageState extends State<ContactUsPage>
           const SizedBox(height: 16),
           Text(
             "Let’s build something\nexceptional together.",
-            style: GoogleFonts.wittgenstein(
+            style: TextStyle(
+              fontFamily: 'Wittgenstein', // your downloaded bold
               fontSize: isDesktop ? 56 : 32,
-              fontWeight: FontWeight.w800,
               height: 1.1,
               letterSpacing: -1.5,
               color: AppColors.textPrimary,
+              // No need for fontWeight, the file is already bold
             ),
           ),
         ],

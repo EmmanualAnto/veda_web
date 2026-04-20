@@ -119,9 +119,9 @@ class _SoftwarepgState extends State<Softwarepg>
               child: ReusableMenu(
                 menuRoutes: {
                   'Home': '/',
-                  'About': '/about',
-                  'Services': '/services',
-                  'Contact': '/contact-us',
+                  'About': '/About-Us',
+                  'Services': '/Our-Services',
+                  'Contact': '/Contact-Us',
                 },
               ),
             ),
@@ -315,7 +315,7 @@ class _SoftwarepgState extends State<Softwarepg>
   }
 
   Widget _buildPrimaryButton() => ElevatedButton(
-    onPressed: () => context.go('/contact-us'),
+    onPressed: () => context.go('/Contact-Us'),
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         return states.contains(WidgetState.hovered)

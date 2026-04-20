@@ -1,11 +1,12 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:veda_main/constants.dart';
 
 class ProfessionalBackgroundPainter extends CustomPainter {
   Picture? _cachedPicture;
 
-  static const Color baseColor = Color.fromARGB(30, 1, 118, 151);
+  static Color baseColor = AppColors.primary.withOpacity(0.07);
   double _s(Size size, double v) {
     return v; // fixed size for all screens
   }

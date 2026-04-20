@@ -36,7 +36,7 @@ class _StyledCardSectionState extends State<StyledCardSection> {
     final cardHeight = desktop
         ? (widget.showLearnMore && widget.onTap != null
               ? 450.0
-              : 330.0) // desktop heights
+              : 340.0) // desktop heights
         : (widget.showLearnMore && widget.onTap != null
               ? 450.0
               : 320.0); // mobile heights

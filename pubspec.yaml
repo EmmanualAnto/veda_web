@@ -100,8 +100,13 @@ flutter:
     - assets/networking/backup.webp
     - assets/networking/cloud.webp
     - assets/networking/it.webp
-    
-
+  fonts:
+    - family: Wittgenstein
+      fonts:
+        - asset: assets/fonts/Wittgenstein-ExtraBold.ttf
+    - family: BrunoAce
+      fonts:
+        - asset: assets/fonts/BrunoAce-Regular.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

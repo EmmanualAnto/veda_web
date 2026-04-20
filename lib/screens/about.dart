@@ -94,11 +94,12 @@ class AboutUsPage extends StatelessWidget {
               Text(
                 "WE BUILD\nDIGITAL LUXURY.",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.brunoAce(
+                style: TextStyle(
+                  fontFamily: 'BrunoAce', // your downloaded font
                   fontSize: isDesktop ? 100 : 60,
-                  fontWeight: FontWeight.bold,
                   height: 0.95,
                   letterSpacing: isDesktop ? -4 : -2,
+                  // No fontWeight – already baked in
                 ),
               ),
             ],
@@ -267,7 +268,7 @@ class AboutUsPage extends StatelessWidget {
               curve: Curves.easeInOut,
               child: FloatingActionButton.extended(
                 backgroundColor: Colors.black,
-                onPressed: () => context.go('/contact-us'),
+                onPressed: () => context.go('/Contact-Us'),
                 label: const Text(
                   "START A PROJECT",
                   style: TextStyle(color: Colors.white),

@@ -48,9 +48,9 @@ class VedaPageLayout extends StatelessWidget {
               child: ReusableMenu(
                 menuRoutes: {
                   'Home': '/',
-                  'About': '/about',
-                  'Services': '/services',
-                  'Contact': '/contact-us',
+                  'About': '/About-Us',
+                  'Services': '/Our-Services',
+                  'Contact': '/Contact-Us',
                 },
               ),
             ),

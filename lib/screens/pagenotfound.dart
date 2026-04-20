@@ -92,7 +92,7 @@ class _NotFoundPageState extends State<NotFoundPage>
                   // FIXED BUTTON: Using GoRouter navigation
                   TextButton(
                     onPressed: () =>
-                        context.go('/'), // GoRouter way to navigate home
+                        context.go('/Home'), // GoRouter way to navigate home
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 40,

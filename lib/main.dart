@@ -11,7 +11,7 @@ class VedaMobileApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Veda System Solutions',
+      title: 'Veda Systems Solutions',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
       routerConfig: AppRoutes.router,
       debugShowCheckedModeBanner: false,

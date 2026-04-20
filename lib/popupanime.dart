@@ -6,20 +6,21 @@ class FadeInOnScroll extends StatefulWidget {
   final Duration duration;
   final Duration delay;
   final bool playOnce;
+  final Offset beginOffset;
 
   const FadeInOnScroll({
     super.key,
     required this.child,
-    this.duration = const Duration(milliseconds: 650),
+    this.duration = const Duration(milliseconds: 800),
     this.delay = Duration.zero,
     this.playOnce = true,
+    this.beginOffset = const Offset(0, 40),
   });
 
   @override
   State<FadeInOnScroll> createState() => _FadeInOnScrollState();
 }
 
-int _activeAnimations = 0;
 const int _maxConcurrentAnimations = 5;
 
 class _FadeInOnScrollState extends State<FadeInOnScroll>
@@ -30,60 +31,52 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
 
   bool _hasAppeared = false;
 
+  late final Key _detectorKey;
+
   @override
   void initState() {
     super.initState();
 
+    _detectorKey = UniqueKey();
+
     _controller = AnimationController(vsync: this, duration: widget.duration);
 
-    final curve = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    );
-
-    _opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
+    _opacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _slide = Tween<Offset>(
-      begin: const Offset(0.0, 0.10), // ~40px slide up
+      begin: widget.beginOffset,
       end: Offset.zero,
-    ).animate(curve);
-
-    _controller.value = 0.0;
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
-  void _startAnimation() {
+  void _triggerAnimation() {
     if (!mounted) return;
 
-    _activeAnimations++;
+    if (_controller.status == AnimationStatus.completed ||
+        _controller.isAnimating) {
+      return;
+    }
 
-    _controller.forward().then((_) {
-      if (mounted) {
-        _activeAnimations--;
+    Future.delayed(widget.delay, () {
+      if (!mounted) return;
+
+      if (_controller.status == AnimationStatus.dismissed) {
+        _controller.forward();
       }
     });
   }
 
   void _onVisibilityChanged(VisibilityInfo info) {
-    if (_hasAppeared && widget.playOnce) return;
+    if (widget.playOnce && _controller.status == AnimationStatus.completed) {
+      return;
+    }
 
-    if (info.visibleFraction > 0.08) {
+    if (info.visibleFraction > 0.05) {
       _hasAppeared = true;
-
-      void attemptStart() {
-        if (_activeAnimations < _maxConcurrentAnimations) {
-          _startAnimation();
-        } else {
-          Future.delayed(const Duration(milliseconds: 60), () {
-            if (mounted) attemptStart();
-          });
-        }
-      }
-
-      if (widget.delay == Duration.zero) {
-        attemptStart();
-      } else {
-        Future.delayed(widget.delay, attemptStart);
-      }
+      _triggerAnimation();
     }
   }
 
@@ -96,15 +89,15 @@ class _FadeInOnScrollState extends State<FadeInOnScroll>
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      key: widget.key ?? ValueKey(hashCode),
+      key: _detectorKey,
       onVisibilityChanged: _onVisibilityChanged,
       child: RepaintBoundary(
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            return Transform.translate(
-              offset: _slide.value * 40,
-              child: Opacity(opacity: _opacity.value, child: child),
+            return Opacity(
+              opacity: _opacity.value,
+              child: Transform.translate(offset: _slide.value, child: child),
             );
           },
           child: widget.child,

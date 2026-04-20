@@ -43,7 +43,7 @@ class ServicesPage extends StatelessWidget {
 
                 image: "assets/3.webp",
 
-                route: "/webapp",
+                route: "/Web-Applications",
 
                 isDesktop: isDesktop,
 
@@ -64,7 +64,7 @@ class ServicesPage extends StatelessWidget {
 
                 image: "assets/4.webp",
 
-                route: "/software",
+                route: "/Software-Applications",
 
                 isDesktop: isDesktop,
 
@@ -85,7 +85,7 @@ class ServicesPage extends StatelessWidget {
 
                 image: "assets/5.webp",
 
-                route: "/hardware",
+                route: "/Hardware&Networking",
 
                 isDesktop: isDesktop,
 

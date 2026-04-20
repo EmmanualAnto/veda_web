@@ -60,7 +60,7 @@ class WhyUsPage extends StatelessWidget {
         Text(
           "Technology That\nDrives Businesses Forward",
           textAlign: TextAlign.center,
-          style: GoogleFonts.instrumentSans(
+          style: GoogleFonts.aBeeZee(
             fontSize: isDesktop ? 70 : 38,
             fontWeight: FontWeight.w700,
             height: 1.2,
@@ -496,7 +496,7 @@ class WhyUsPage extends StatelessWidget {
                 alignment: WrapAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: () => context.go('/contact-us'),
+                    onPressed: () => context.go('/Contact-Us'),
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.resolveWith<Color>((
                         states,

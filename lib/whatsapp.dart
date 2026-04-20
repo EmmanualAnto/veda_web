@@ -22,7 +22,7 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
 
   Future<void> openWhatsAppChat(BuildContext context) async {
     final String phoneNumber =
-        '+919961320030'; // Your WhatsApp number (with country code)
+        '+97333127850'; // Your WhatsApp number (with country code)
     final String message = Uri.encodeComponent("Hello,I have a query!");
     final Uri url = Uri.parse("https://wa.me/$phoneNumber?text=$message");
 

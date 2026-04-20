@@ -166,9 +166,9 @@ class _VedaHomePageState extends State<VedaHomePage>
             child: ReusableMenu(
               menuRoutes: {
                 'Home': '/',
-                'About': '/about',
-                'Services': '/services',
-                if (screenWidth > 800) 'Contact': '/contact-us',
+                'About': '/About-Us',
+                'Services': '/Our-Services',
+                if (screenWidth > 800) 'Contact': '/Contact-Us',
               },
             ),
           ),
@@ -615,7 +615,7 @@ Widget _buildOurServicesSection(BuildContext context) {
                           title: 'Web Application',
                           description:
                               'We design and develop powerful web applications with user-friendly interfaces and robust functionality. From business portals to custom platforms, our solutions are secure, scalable, and optimized to help your business grow online.',
-                          onTap: () => context.go('/webapp'),
+                          onTap: () => context.go('/Web-Applications'),
                           showLearnMore: true,
                         ),
                       ),
@@ -635,7 +635,7 @@ Widget _buildOurServicesSection(BuildContext context) {
                           title: 'Software Applications',
                           description:
                               'Our software solutions are tailored to meet the unique needs of your business. From desktop applications to enterprise-level systems, we deliver reliable, efficient, and scalable software that streamlines processes and drives productivity.',
-                          onTap: () => context.go('/software'),
+                          onTap: () => context.go('/Software-Applications'),
                           showLearnMore: true,
                         ),
                       ),
@@ -655,7 +655,7 @@ Widget _buildOurServicesSection(BuildContext context) {
                           title: 'Hardware & Networking',
                           description:
                               'We provide end-to-end hardware and networking services, from installation to maintenance. Our team ensures that your IT infrastructure is fast, secure, and dependable, helping your business stay connected without downtime.',
-                          onTap: () => context.go('/hardware'),
+                          onTap: () => context.go('/Hardware&Networking'),
                           showLearnMore: true,
                         ),
                       ),
@@ -811,7 +811,7 @@ Widget _buildWhyVedaSection(BuildContext context) {
                       child: FadeInOnScroll(
                         playOnce: true,
                         key: const ValueKey('services_14'),
-
+                        delay: const Duration(milliseconds: 50),
                         child: _buildReasonItem(
                           'Local Support,\nGlobal Standards',
                           'Serving Bahrain-based enterprises with ISO-grade quality.',

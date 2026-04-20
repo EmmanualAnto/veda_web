@@ -163,19 +163,19 @@ class Footer extends StatelessWidget {
         const SizedBox(height: 20),
         FooterLink(
           text: 'About Us',
-          onTap: () => context.go('/about'),
+          onTap: () => context.go('/About-Us'),
         ), // updated
         FooterLink(
           text: 'Our Services',
-          onTap: () => context.go('/services'),
+          onTap: () => context.go('/Our-Services'),
         ), // updated
         FooterLink(
           text: 'Why Us?',
-          onTap: () => context.go('/why-us'),
+          onTap: () => context.go('/Why-Us'),
         ), // updated
         FooterLink(
           text: 'Contact Us',
-          onTap: () => context.go('/contact-us'),
+          onTap: () => context.go('/Contact-Us'),
         ), // updated
       ],
     );

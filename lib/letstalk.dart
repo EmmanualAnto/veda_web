@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:veda_main/constants.dart';
-import 'package:veda_main/whatsapp.dart';
 
 class LetsTalkSection extends StatelessWidget {
   final double? height;
@@ -341,7 +340,7 @@ class _ContactInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final desktop = screenWidth > 800;
+    final desktop = screenWidth > 850;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -672,40 +671,47 @@ class _FormFieldsState extends State<_FormFields> {
             children: [
               Expanded(
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(Icons.error_outline, color: Colors.white),
                     const SizedBox(width: 8),
 
-                    Text(
-                      "Error connecting to server. Reach us via ",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    // Make text area flexible
+                    Expanded(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            "Error connecting to server. Reach us via ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
 
-                    // Clickable WhatsApp text
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(0, 0),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      onPressed: () {
-                        WhatsAppHelper.openChat(
-                          phoneNumber: '+919961320030',
-                          message: 'Hello, I have a query!',
-                          context: context,
-                        );
-                      },
-                      child: const Text(
-                        "WhatsApp",
-                        style: TextStyle(
-                          color: Colors.greenAccent,
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(0, 0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            onPressed: () {
+                              WhatsAppHelper.openChat(
+                                phoneNumber: '+919961320030',
+                                message: 'Hello, I have a query!',
+                                context: context,
+                              );
+                            },
+                            child: const Text(
+                              "WhatsApp",
+                              style: TextStyle(
+                                color: Colors.greenAccent,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -713,7 +719,7 @@ class _FormFieldsState extends State<_FormFields> {
               ),
             ],
           ),
-          duration: Duration(seconds: 4),
+          duration: Duration(seconds: 5),
         ),
       );
     } finally {

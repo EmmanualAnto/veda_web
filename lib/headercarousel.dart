@@ -29,8 +29,8 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       'title': 'Your Complete Digital Partner',
       'subtitle':
           'From web development to custom software and advanced networking, we provide end-to-end technology solutions tailored to scale your business with confidence.',
-      'onPrimary': (BuildContext context) => context.go('/contact-us'),
-      'onSecondary': (BuildContext context) => context.go('/webapp'),
+      'onPrimary': (BuildContext context) => context.go('/Contact-Us'),
+      'onSecondary': (BuildContext context) => context.go('/Web-Applications'),
     },
     {
       'imageMobile': 'assets/carousel/web1.webp',
@@ -39,8 +39,8 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       'title': 'Transform Clicks Into Customers',
       'subtitle':
           'We craft engaging and visually stunning web experiences that not only captivate your audience but also turn every click into measurable business growth.',
-      'onPrimary': (BuildContext context) => context.go('/contact-us'),
-      'onSecondary': (BuildContext context) => context.go('/webapp'),
+      'onPrimary': (BuildContext context) => context.go('/Contact-Us'),
+      'onSecondary': (BuildContext context) => context.go('/Web-Applications'),
     },
     {
       'imageMobile': 'assets/carousel/sftwr1.webp',
@@ -49,8 +49,9 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       'title': 'Automate. Optimize. Excel.',
       'subtitle':
           'Our custom software solutions are designed to simplify complex processes, automate repetitive tasks, and boost overall efficiency across your business operations.',
-      'onPrimary': (BuildContext context) => context.go('/contact-us'),
-      'onSecondary': (BuildContext context) => context.go('/software'),
+      'onPrimary': (BuildContext context) => context.go('/Contact-Us'),
+      'onSecondary': (BuildContext context) =>
+          context.go('/Software-Applications'),
     },
     {
       'imageMobile': 'assets/carousel/hrdwr1.webp',
@@ -59,8 +60,9 @@ class _HeaderCarouselState extends State<HeaderCarousel>
       'title': 'Fast. Secure. Reliable.',
       'subtitle':
           'We build top-notch IT infrastructure and networking systems that guarantee speed, security, and reliability—keeping your team and clients seamlessly connected 24/7.',
-      'onPrimary': (BuildContext context) => context.go('/contact-us'),
-      'onSecondary': (BuildContext context) => context.go('/hardware'),
+      'onPrimary': (BuildContext context) => context.go('/Contact-Us'),
+      'onSecondary': (BuildContext context) =>
+          context.go('/Hardware&Networking'),
     },
   ];
 
