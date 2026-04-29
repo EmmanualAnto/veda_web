@@ -53,10 +53,18 @@ class _ReusableMenuState extends State<ReusableMenu>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Logo
-                  Image.asset(
-                    'assets/logo.webp',
-                    height: 36,
-                    fit: BoxFit.contain,
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        context.go('/');
+                      },
+                      child: Image.asset(
+                        'assets/logo.webp',
+                        height: 36,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                   // Menu / burger button
                   if (isDesktop)

@@ -112,7 +112,9 @@ class Footer extends StatelessWidget {
               : MainAxisAlignment.start,
           children: [
             _buildSocialIcon(FontAwesomeIcons.instagram, () {
-              launchWeb("https://instagram.com/vedasystems");
+              launchWeb(
+                "https://www.instagram.com/vedabahrain?igsh=MTQxcXF6djBkMXZ6aQ==",
+              );
             }),
             const SizedBox(width: 15),
             _buildSocialIcon(FontAwesomeIcons.linkedin, () {
@@ -120,7 +122,9 @@ class Footer extends StatelessWidget {
             }),
             const SizedBox(width: 15),
             _buildSocialIcon(FontAwesomeIcons.facebook, () {
-              launchWeb("https://facebook.com/vedasystems");
+              launchWeb(
+                "https://www.facebook.com/vedabahrain?mibextid=rS40aB7S9Ucbxw6v",
+              );
             }),
           ],
         ),
