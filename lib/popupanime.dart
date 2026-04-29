@@ -21,8 +21,6 @@ class FadeInOnScroll extends StatefulWidget {
   State<FadeInOnScroll> createState() => _FadeInOnScrollState();
 }
 
-const int _maxConcurrentAnimations = 5;
-
 class _FadeInOnScrollState extends State<FadeInOnScroll>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
