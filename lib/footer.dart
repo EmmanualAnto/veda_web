@@ -61,7 +61,7 @@ class Footer extends StatelessWidget {
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
-                      '© 2025 Veda Systems Solutions – Bahrain.\nAll rights reserved.',
+                      '© 2026 Veda Systems Solutions – Bahrain.\nAll rights reserved.',
                       style: GoogleFonts.poppins(
                         color: const Color.fromRGBO(217, 217, 217, 1),
                         fontSize: 14,

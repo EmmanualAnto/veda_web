@@ -111,60 +111,19 @@ class AboutUsPage extends StatelessWidget {
 
   Widget _buildLiveImpactStats(bool isDesktop) {
     return RepaintBoundary(
-      // Isolates the animation from the background painter
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: isDesktop ? 100 : 24),
         child: Wrap(
           spacing: 80,
           runSpacing: 40,
           alignment: WrapAlignment.center,
-          children: [
-            _buildCounter("150", "PROJECTS", "+"),
-            _buildCounter("85", "CLIENTS", " %"),
-            _buildCounter("24", "EXPERTS", "/7"),
+          children: const [
+            _CounterItem(target: 150, label: "PROJECTS", suffix: "+"),
+            _CounterItem(target: 85, label: "CLIENTS", suffix: "%"),
+            _CounterItem(target: 24, label: "EXPERTS", suffix: "/7"),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildCounter(String target, String label, String suffix) {
-    final double endValue = double.tryParse(target) ?? 0;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: endValue),
-      duration: const Duration(
-        milliseconds: 1500,
-      ), // Slightly faster feels snappier
-      // We pass the label as a 'child' so Flutter doesn't rebuild it 60fps
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          color: AppColors.primary,
-          letterSpacing: 2,
-        ),
-      ),
-      builder: (context, value, staticChild) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "${value.toInt()}$suffix",
-              style: const TextStyle(
-                // Use standard TextStyle for the moving number
-                fontSize:
-                    72, // Apply font family globally in main.dart to save CPU
-                fontWeight: FontWeight.w900,
-                letterSpacing: -3,
-                color: Colors.black,
-              ),
-            ),
-            staticChild!, // This part never rebuilds during animation
-          ],
-        );
-      },
     );
   }
 
@@ -278,6 +237,85 @@ class AboutUsPage extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _CounterItem extends StatefulWidget {
+  final int target;
+  final String label;
+  final String suffix;
+
+  const _CounterItem({
+    required this.target,
+    required this.label,
+    required this.suffix,
+  });
+
+  @override
+  State<_CounterItem> createState() => _CounterItemState();
+}
+
+class _CounterItemState extends State<_CounterItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    );
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        final value = (_animation.value * widget.target).toInt();
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "$value${widget.suffix}",
+              style: const TextStyle(
+                fontSize: 72,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -3,
+                color: Colors.black,
+              ),
+            ),
+            child!,
+          ],
+        );
+      },
+      child: Text(
+        widget.label,
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          color: AppColors.primary,
+          letterSpacing: 2,
+        ),
       ),
     );
   }
